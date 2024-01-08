@@ -14,4 +14,4 @@ COPY . .
 EXPOSE 8501
 
 # Set the entrypoint for the container
-CMD ["streamlit", "run", "test_client.py", "--port", "8501"]
+CMD ["streamlit", "run", "test_client.py"]
