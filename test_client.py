@@ -19,7 +19,7 @@ user_input = st.text_input('Enter your message:')
 
 if st.button('Send'):
 	data = {'user_input': user_input}
-	response = requests.post(f'{SERVER_URL}/process', json=data)
+	response = requests.post(f'{SERVER_URL}/process', json=data, verify=False)
 	res=''
 	response_query=''
 	query_time=''

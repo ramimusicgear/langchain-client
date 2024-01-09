@@ -18,6 +18,6 @@ mydb = mysql.connector.connect(
 mycursor = mydb.cursor()
 # query_time, response_query, response
 # mycursor.execute("DROP TABLE llamaindex_data")
-mycursor.execute("CREATE TABLE llamaindex_data (query_time TEXT, response_query TEXT, response TEXT)")
+# mycursor.execute("CREATE TABLE llamaindex_data (query_time TEXT, response_query TEXT, response TEXT)")
 
 
