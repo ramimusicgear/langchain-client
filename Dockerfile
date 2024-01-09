@@ -5,7 +5,7 @@ FROM python:3.8-slim
 WORKDIR /app
 
 # Copy the Python requirements file
-RUN pip install --no-cache-dir streamlit requests
+RUN pip install --no-cache-dir streamlit requests mysql-connector-python python-dotenv
 
 # Copy all files from the current directory to the container
 COPY . .

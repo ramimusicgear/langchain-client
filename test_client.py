@@ -1,7 +1,17 @@
-import streamlit as st
+import os
+import time
 import requests
+import mysql.connector
+import streamlit as st
 
-SERVER_URL = 'https://82.80.25.207:5000'  # Replace with your server's URL
+from dotenv import load_dotenv
+load_dotenv()
+
+password = os.environ.get("PASSWORD")
+host = os.environ.get('HOST')
+user = os.environ.get('USER')
+database = os.environ.get('DB')
+SERVER_URL = os.environ.get('SERVER_URL')
 
 st.title('Chat Interface')
 
@@ -10,14 +20,35 @@ user_input = st.text_input('Enter your message:')
 if st.button('Send'):
 	data = {'user_input': user_input}
 	response = requests.post(f'{SERVER_URL}/process', json=data)
-
+	res=''
+	response_query=''
+	query_time=''
 	if response.status_code == 200:
 		result = response.json()
 		st.write("### response")
-		st.write(result.get('response', ''))
+		res = result.get('response', '')
+		st.write(res)
 		st.write("### Gpt Generated search")
 		st.write(result.get('response_query', ''))
+		response_query = result.get('response_query', '')
 		st.write("### time took to generate")
 		st.write(result.get('query_time ', '') + " seconds")
+		query_time = result.get('query_time', '')
 	else:
 		st.error('Failed to get a response from the server.')
+	while True:
+		try:
+			mydb = mysql.connector.connect(
+				host=host,
+				user=user,
+				password=password,
+				database=database
+			)
+			mycursor = mydb.cursor()
+			sql = "INSERT INTO llamaindex_data (query_time, response_query, response) VALUES (%s, %s, %s)"
+			val = (query_time, response_query, res)
+			mycursor.execute(sql, val)
+			mydb.commit()
+			break
+		except Exception as e:
+			time.sleep(1)
