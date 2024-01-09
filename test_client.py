@@ -29,11 +29,11 @@ if st.button('Send'):
 		res = result.get('response', '')
 		st.write(res)
 		st.write("### Gpt Generated search")
-		st.write(result.get('response_query', ''))
 		response_query = result.get('response_query', '')
+		st.write(response_query)
 		st.write("### time took to generate")
-		st.write(result.get('query_time ', '') + " seconds")
-		query_time = result.get('query_time', '')
+		query_time = str(result.get('query_time', ''))
+		st.write(query_time + " seconds")
 	else:
 		st.error('Failed to get a response from the server.')
 	while True:
