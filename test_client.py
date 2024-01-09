@@ -33,6 +33,10 @@ if st.button('Send'):
 		st.write(response_query)
 		st.write("### time took to generate")
 		query_time = str(result.get('query_time', ''))
+		print(result.get('query_time', ''))
+		print()
+		print(query_time)
+		st.write(result.get('query_time', ''))
 		st.write(query_time + " seconds")
 	else:
 		st.error('Failed to get a response from the server.')
