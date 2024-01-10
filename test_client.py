@@ -32,7 +32,7 @@ except requests.RequestException as e:
 	st.error("refresh please")
 
 
-# Initialize session state variables if they don't exist
+# Initialize session state for feedback
 if 'template' not in st.session_state:
 	st.session_state.template = "You are an assistant you help customers choose products using the given context (use only what is relevant) your output should be nicely phrased:"
 
@@ -51,6 +51,26 @@ if 'change_instruction' not in st.session_state:
 if 'document_id' not in st.session_state:
 	st.session_state.document_id = ''
 
+if 'feedback' not in st.session_state:
+	st.session_state.feedback = ''
+
+if 'message_submitted' not in st.session_state:
+	st.session_state.message_submitted = False
+
+if 'feedback_submitted' not in st.session_state:
+	st.session_state.feedback_submitted = False
+
+if 'context' not in st.session_state:
+	st.session_state.context = ''
+
+if 'response_query' not in st.session_state:
+	st.session_state.response_query = ''
+
+if 'response' not in st.session_state:
+	st.session_state.response = ''
+
+if 'query_time' not in st.session_state:
+	st.session_state.query_time = ''
 
 # Sidebar
 st.sidebar.write("### Template")
@@ -60,47 +80,26 @@ st.sidebar.write(st.session_state.search_prompt)
 if st.sidebar.button('Change Propmts', key='change_propmpts_button'):
     st.session_state.change_instruction = True
 
+
+# Model Instruction
 if st.session_state.change_instruction:
 	st.title('Model Instruction')
-
 	template = st.text_area('Enter Model Instruction For Template: ', 
 							key='template', 
 							value=st.session_state.template, 
 							height=50)
-
 	search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', 
 								key='search_prompt', 
 								value=st.session_state.search_prompt, 
 								height=125)
-							
+	
+# Chat Interface
 st.title('Chat Interface')
 user_input = st.text_area('Enter your message:', 
 						key='user_input', 
 						value=st.session_state.user_input, 
 						height=35)
 
-
-
-
-# Initialize session state variables if they don't exist
-if 'message_submitted' not in st.session_state:
-	st.session_state.message_submitted = False
-
-# Initialize session state variables if they don't exist
-if 'feedback_submitted' not in st.session_state:
-	st.session_state.feedback_submitted = False
-
-# Initialize session state variables if they don't exist
-if 'context' not in st.session_state:
-	st.session_state.context = ''
-
-# Initialize session state variables if they don't exist
-if 'response_query' not in st.session_state:
-	st.session_state.response_query = ''
-
-# Initialize session state variables if they don't exist
-if 'response' not in st.session_state:
-	st.session_state.response = ''
 
 if st.button('Send', key='send_button'):
 	start_time = datetime.now()
@@ -124,15 +123,19 @@ if st.button('Send', key='send_button'):
 	st.session_state.response_query = response_query
 
 	query_time = result.get('query_time', '')
+	st.session_state.query_time = query_time
+
+	st.session_state.message_submitted = True
+
+
+if st.session_state.message_submitted:
 	st.write("### response")
 	st.write(response)
 	st.write("### Gpt Generated search")
 	st.write(response_query)
 	st.write("### time took to generate")
 	st.write(f"{round(query_time)} seconds")
-	st.session_state.message_submitted = True
-
-if st.session_state.message_submitted:
+	
 	inserted_id = ''
 	references = []
 	category = ''
@@ -226,9 +229,7 @@ if st.session_state.message_submitted:
 			time.sleep(10)
 
 if st.session_state.message_submitted:
-	# Initialize session state for feedback
-	if 'feedback' not in st.session_state:
-		st.session_state.feedback = ''
+	
 
 	st.write("## Feedback")
 
