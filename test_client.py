@@ -121,7 +121,7 @@ if st.button('Send', key='send_button'):
 			references.append({
 				"name": p["name"],
 				"description": p["description"] ,
-				"price":int(p["price"]),
+				"price": float(p["price"]),
 				"categories": json.dumps(p["categories"])
 			})
 		except json.JSONDecodeError:
