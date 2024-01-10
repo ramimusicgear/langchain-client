@@ -86,6 +86,8 @@ if st.button('Send', key='send_button'):
 	
 	# Join the list into a single string (if it's not already)
 	context_string = ' '.join(context)
+	if not context_string.startswith("{"):
+		context_string = "{" + context_string
 	if not context_string.endswith("}"):
 		context_string += "}"
 
