@@ -25,40 +25,50 @@ db = client['llamaindex']  # Replace with your database name
 chats = db['chats']
 ip = ''
 try:
-    response = requests.get('https://api.ipify.org?format=json')
-    ip_data = response.json()
-    ip = ip_data['ip']
+	response = requests.get('https://api.ipify.org?format=json')
+	ip_data = response.json()
+	ip = ip_data['ip']
 except requests.RequestException as e:
-    st.error("refresh please")
+	st.error("refresh please")
 
 
-st.title('Model Instruction')
-template = st.text_input('Enter Model Instruction: ')
-search_prompt = st.text_input('Enter Model Instruction for prompt refinement: ')
+# Initialize session state variables if they don't exist
+if 'template' not in st.session_state:
+	st.session_state['template'] = "You are an assistant you help customers choose products using the given context (use only what is relevant) your output should be nicely phrased:"
 
-st.title('Chat Interface')
-user_input = st.text_input('Enter your message:')
-
-if not template:
-	template = "You are an assistant you help customers choose products using the given context (use only what is relevent) your output should be nicely phrased:"
-
-if not search_prompt:
-	search_prompt = """
+if 'search_prompt' not in st.session_state:
+	st.session_state['search_prompt'] = """
 	Using the Following question 
 	create a prompt which will be searched in the vector dataset
-    the prompt will help find the optimal search results for the given queston
-    you can alter the question to get more fitting products
+	the prompt will help find the optimal search results for the given question
+	you can alter the question to get more fitting products
 	"""
 
-st.sidebar.write("### template")
-st.sidebar.write(template)
-st.sidebar.write("### search prompt")
-st.sidebar.write(search_prompt)
+if 'user_input' not in st.session_state:
+	st.session_state['user_input'] = ''
+
+# User inputs
+st.title('Model Instruction')
+st.session_state['template'] = st.text_input('Enter Model Instruction For Template: ', st.session_state['template'])
+st.session_state['search_prompt'] = st.text_input('Enter Model Instruction for prompt refinement: ', st.session_state['search_prompt'])
+
+st.title('Chat Interface')
+st.session_state['user_input'] = st.text_input('Enter your message:', st.session_state['user_input'])
+
+# Sidebar
+st.sidebar.write("### Template")
+st.sidebar.write(st.session_state['template'])
+st.sidebar.write("### Search Prompt")
+st.sidebar.write(st.session_state['search_prompt'])
 
 
 if st.button('Send', key='send_button'):
 	start_time = datetime.now()
-	data = {'user_input': user_input,'template': template, 'search_prompt':search_prompt}
+	data = {
+		'user_input': st.session_state['user_input'],
+		'template': st.session_state['template'], 
+		'search_prompt': st.session_state['search_prompt']
+	}
 	res = requests.post(f'{SERVER_URL}/process', json=data, verify=False)
 
 	if res.status_code != 200:
@@ -167,8 +177,18 @@ if st.button('Send', key='send_button'):
 			st.error(str(e))
 			time.sleep(10)
 
+	# Initialize session state for feedback
+	if 'feedback' not in st.session_state:
+		st.session_state['feedback'] = ''
+
 	st.write("## Feedback")
-	new_feedback_text = st.text_input('Enter Your Feedback: ')
+
+	# Use session state variable for the text input
+	new_feedback_text = st.text_input('Enter Your Feedback:', key='feedback_text', value=st.session_state['feedback'])
+
+	# Update the session state when the text input changes
+	st.session_state['feedback'] = new_feedback_text
+
 	if st.button('Send Feedback', key='send_feedback_button'):
 		try:
 			# Create 'user_actions' with 'feedback_text'

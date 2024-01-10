@@ -104,6 +104,6 @@ else:
 	# Check if the "chats" collection exists
 	collection_names = db.list_collection_names()
 	if "chats" in collection_names:
-		first_document = db["chats"].find_one()
+		first_document = db["chats"].find()
 		# Print the document
 		print(first_document)
