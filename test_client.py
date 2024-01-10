@@ -63,6 +63,9 @@ if 'ready_for_feedback' not in st.session_state:
 if 'feedback_submitted' not in st.session_state:
 	st.session_state.feedback_submitted = False
 
+if 'new_chat' not in st.session_state:
+	st.session_state.new_chat = False
+
 if 'context' not in st.session_state:
 	st.session_state.context = ''
 
@@ -136,8 +139,8 @@ if st.session_state.message_submitted:
 	st.write(st.session_state.response)
 	st.write("### Gpt Generated search")
 	st.write(st.session_state.response_query)
-	# st.write("### time took to generate")
-	# st.write(f"{round(st.session_state.query_time)} seconds")
+	st.write("### time took to generate")
+	st.write(f"{round(st.session_state.query_time)} seconds")
 
 	inserted_id = ''
 	references = []
@@ -254,6 +257,35 @@ if st.session_state.ready_for_feedback:
 				st.write("thank you very much!")
 			else:
 				st.write("try feedback again, sorry")
+
 				
 		except Exception as e:
 			st.error(str(e))
+
+
+	if st.button('New Chat', key='new_chat_btn'):
+		st.session_state.new_chat = True
+	
+	if st.session_state.new_chat:
+
+		st.session_state.user_input = ''
+
+		st.session_state.document_id = ''
+
+		st.session_state.feedback = ''
+
+		st.session_state.message_submitted = False
+
+		st.session_state.ready_for_feedback = False
+
+		st.session_state.feedback_submitted = False
+
+		st.session_state.new_chat = False
+
+		st.session_state.context = ''
+
+		st.session_state.response_query = ''
+
+		st.session_state.response = ''
+
+		st.session_state.query_time = ''
