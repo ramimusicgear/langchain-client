@@ -1,5 +1,6 @@
 import os
 import time
+import json
 import requests
 import streamlit as st
 
@@ -68,6 +69,8 @@ if st.button('Send', key='send_button'):
 		response = result.get('response', '')
 		response_query = result.get('response_query', '')
 		query_time = result.get('query_time', '')
+		st.write("### context")
+		st.write(json.dumps(context))
 		st.write("### response")
 		st.write(response)
 		st.write("### Gpt Generated search")
@@ -79,7 +82,7 @@ if st.button('Send', key='send_button'):
 			try:
 				chat_document = {
 					"_id": ObjectId(),  # Generates a unique Object ID
-					"user_ip": "192.168.1.1",  # Example IP address
+					"user_ip": ip,  # Example IP address
 					"user_device": "Desktop",  # Example device type
 					"category": "General",
 					"subcategory": "Example",
@@ -88,29 +91,19 @@ if st.button('Send', key='send_button'):
 					"messages": [
 						{
 							"timestamp": datetime.now(),
-							"sender": "user",
-							"text": "Hello, this is an example message."
+							"sender": f"user - {str(ip)}",
+							"text": user_input
 						},
 						{
 							"timestamp": datetime.now(),
 							"sender": "bot",
-							"text": "Hi! I'm responding to your message."
+							"text": response
 						}
 					],
 					"prompts": {
 						"template_prompt": template,
 						"search_prompt": search_prompt,
 						"response_query": response_query
-					},
-					"user_actions": {
-						"feedback": "Positive",
-						"feedback_text": "Great experience!",
-						"actions": [
-							{
-								"product_id": "12345",
-								"action": "viewed"
-							}
-						]
 					},
 					"product_references": [
 						{
@@ -135,10 +128,11 @@ if st.button('Send', key='send_button'):
 		new_feedback_text = st.text_input('Enter Your Feedback: ')
 		if st.button('Send Feedback', key='send_feedback_button'):
 			try:
-				update_result = chats.update_one(
-					{"_id": inserted_id},
-					{"$set": {"user_actions.feedback_text": new_feedback_text}}
-				)
+				# Create 'user_actions' with 'feedback_text'
+				new_values = {"user_actions": {"feedback_text": new_feedback_text}}
+				# Perform the update
+				update_result = chats.update_one({"_id": inserted_id}, {"$set": new_values})
+
 				# Check if the update was successful
 				if update_result.modified_count > 0:
 					st.write("Document updated successfully.")
