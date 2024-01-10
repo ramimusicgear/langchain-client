@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import json
 import requests
@@ -60,96 +61,109 @@ if st.button('Send', key='send_button'):
 	data = {'user_input': user_input,'template': template, 'search_prompt':search_prompt}
 	res = requests.post(f'{SERVER_URL}/process', json=data, verify=False)
 
-	if res.status_code == 200:
-		result = res.json()
-		context = result.get("context","")
-	
-		response = result.get('response', '')
-		response_query = result.get('response_query', '')
-		query_time = result.get('query_time', '')
-		st.write("### response")
-		st.write(response)
-		st.write("### Gpt Generated search")
-		st.write(response_query)
-		st.write("### time took to generate")
-		st.write(f"{round(query_time)} seconds")
-		st.write("### products")
-		st.write(json.dumps(context))
-		inserted_id = ''
-		references = []
-		category = ''
-		subcategory = ''
-		for string in context:
-			try:
-				p = json.loads(string)
-				if len(p["categories"]) > 2:
-					category = p["categories"][2]
-					subcategory = p["categories"][3]
-					references.append({
-						"name": p["name"],
-						"description": p["description"],
-						"price": p["price"],
-						"categories": json.dumps(p["categories"])
-					})
-			except json.JSONDecodeError:
-				print(f"Error decoding JSON for string: {string}")
-		
-		while True:
-			try:
-				chat_document = {
-					"_id": ObjectId(),  # Generates a unique Object ID
-					"user_ip": ip,  # Example IP address
-					"user_device": "Desktop",  # Example device type
-					"category": category,
-					"subcategory": subcategory,
-					"start_time": datetime.now(),
-					"end_time": datetime.now(),
-					"messages": [
-						{
-							"timestamp": datetime.now(),
-							"sender": f"user - {str(ip)}",
-							"text": user_input
-						},
-						{
-							"timestamp": datetime.now(),
-							"sender": "bot",
-							"text": response
-						}
-					],
-					"prompts": {
-						"template_prompt": template,
-						"search_prompt": search_prompt,
-						"response_query": response_query
-					},
-					"product_references": references
-				}
-
-				# Insert the document into the 'chats' collection
-				insert_result = chats.insert_one(chat_document)
-				# Get the _id of the inserted document
-				inserted_id = insert_result.inserted_id
-
-				break
-			except Exception as e:
-				time.sleep(1)
-
-		st.write("## Feedback")
-		new_feedback_text = st.text_input('Enter Your Feedback: ')
-		if st.button('Send Feedback', key='send_feedback_button'):
-			try:
-				# Create 'user_actions' with 'feedback_text'
-				new_values = {"user_actions": {"feedback_text": new_feedback_text}}
-				# Perform the update
-				update_result = chats.update_one({"_id": inserted_id}, {"$set": new_values})
-
-				# Check if the update was successful
-				if update_result.modified_count > 0:
-					st.write("Document updated successfully.")
-				else:
-					st.error("No document was updated.")
-			except Exception as e:
-				st.error("No document was updated.")
-				st.error(str(e))
-
-	else:
+	if res.status_code != 200:
 		st.error('Failed to get a response from the server.')
+
+	result = res.json()
+	context = result.get("context","")
+
+	response = result.get('response', '')
+	response_query = result.get('response_query', '')
+	query_time = result.get('query_time', '')
+	st.write("### response")
+	st.write(response)
+	st.write("### Gpt Generated search")
+	st.write(response_query)
+	st.write("### time took to generate")
+	st.write(f"{round(query_time)} seconds")
+	st.write("### products")
+	st.write(json.dumps(context))
+	inserted_id = ''
+	references = []
+	category = ''
+	subcategory = ''
+	
+	
+	# Join the list into a single string (if it's not already)
+	context_string = ' '.join(context)
+	if not context_string.endswith("}"):
+		context_string += "}"
+
+	# Regex pattern to match JSON-like objects
+	pattern = r'\{(?:[^{}]|(?R))*\}'
+
+	# Find all matches
+	matches = re.findall(pattern, context_string)
+
+	# Parse each match as JSON and collect the results
+	valid_json_objects = []
+	for match in matches:
+		try:
+			p = json.loads(match)
+			category = p["categories"][2]
+			subcategory = p["categories"][3]
+			references.append({
+				"name": p["name"],
+				"description": p["description"] ,
+				"price": p["price"],
+				"categories": json.dumps(p["categories"])
+			})
+		except json.JSONDecodeError:
+			print(f"Invalid JSON object: {match}")
+
+	while True:
+		try:
+			chat_document = {
+				"_id": ObjectId(),  # Generates a unique Object ID
+				"user_ip": ip,  # Example IP address
+				"user_device": "Desktop",  # Example device type
+				"category": category,
+				"subcategory": subcategory,
+				"start_time": datetime.now(),
+				"end_time": datetime.now(),
+				"messages": [
+					{
+						"timestamp": datetime.now(),
+						"sender": f"user - {str(ip)}",
+						"text": user_input
+					},
+					{
+						"timestamp": datetime.now(),
+						"sender": "bot",
+						"text": response
+					}
+				],
+				"prompts": {
+					"template_prompt": template,
+					"search_prompt": search_prompt,
+					"response_query": response_query
+				},
+				"product_references": references
+			}
+
+			# Insert the document into the 'chats' collection
+			insert_result = chats.insert_one(chat_document)
+			# Get the _id of the inserted document
+			inserted_id = insert_result.inserted_id
+
+			break
+		except Exception as e:
+			time.sleep(1)
+
+	st.write("## Feedback")
+	new_feedback_text = st.text_input('Enter Your Feedback: ')
+	if st.button('Send Feedback', key='send_feedback_button'):
+		try:
+			# Create 'user_actions' with 'feedback_text'
+			new_values = {"user_actions": {"feedback_text": new_feedback_text}}
+			# Perform the update
+			update_result = chats.update_one({"_id": inserted_id}, {"$set": new_values})
+
+			# Check if the update was successful
+			if update_result.modified_count > 0:
+				st.write("Document updated successfully.")
+			else:
+				st.error("No document was updated.")
+		except Exception as e:
+			st.error("No document was updated.")
+			st.error(str(e))
