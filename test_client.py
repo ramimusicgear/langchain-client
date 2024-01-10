@@ -231,9 +231,6 @@ if st.session_state['message_submitted']:
 
 			# Check if the update was successful
 			if update_result.modified_count > 0:
-				st.write("Document updated successfully.")
-			else:
-				st.error("No document was updated.")
+				st.write("thank you very much!")
 		except Exception as e:
-			st.error("No document was updated.")
 			st.error(str(e))
