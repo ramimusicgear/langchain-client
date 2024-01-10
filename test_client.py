@@ -79,19 +79,20 @@ if st.button('Send', key='send_button'):
 		references = []
 		category = ''
 		subcategory = ''
-		for p in context:
-			if p["categories"] > 2:
-				if category == '':
+		for string in context:
+			try:
+				p = json.loads(string)
+				if len(p["categories"]) > 2:
 					category = p["categories"][2]
 					subcategory = p["categories"][3]
-				references.append({
-					"name": p["name"],
-					"description": p["description"] ,
-					"price": p["price"],
-					"categories": json.dumps(p["categories"])
-				})
-
-
+					references.append({
+						"name": p["name"],
+						"description": p["description"],
+						"price": p["price"],
+						"categories": json.dumps(p["categories"])
+					})
+			except json.JSONDecodeError:
+				print(f"Error decoding JSON for string: {string}")
 		
 		while True:
 			try:
