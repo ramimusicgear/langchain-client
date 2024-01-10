@@ -22,7 +22,7 @@ MONGODB_URL = os.environ.get("MONGODB_URL")
 # Connect to MongoDB
 client = pymongo.MongoClient(MONGODB_URL)
 db = client['llamaindex']  # Replace with your database name
-chats = db['chats']
+chats = db['chat']
 ip = ''
 try:
     response = requests.get('https://api.ipify.org?format=json')
@@ -82,13 +82,13 @@ if st.button('Send', key='send_button'):
 	category = ''
 	subcategory = ''
 	
-	
 	# Join the list into a single string (if it's not already)
 	context_string = ' '.join(context)
 	if not context_string.startswith("{"):
 		context_string = "{" + context_string
 	if not context_string.endswith("}"):
 		context_string += "}"
+	
 	def extract_json_strings(s):
 		json_strings = []
 		brace_count = 0
@@ -121,7 +121,7 @@ if st.button('Send', key='send_button'):
 			references.append({
 				"name": p["name"],
 				"description": p["description"] ,
-				"price": p["price"],
+				"price":int(p["price"]),
 				"categories": json.dumps(p["categories"])
 			})
 		except json.JSONDecodeError:
