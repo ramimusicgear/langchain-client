@@ -60,25 +60,34 @@ st.title('Model Instruction')
 # st.session_state.user_input = user_input
 # Use st.text_area for multi-line text input
 template = st.text_area('Enter Model Instruction For Template: ', 
-                        key='template', 
-                        value=st.session_state['template'], 
-                        height=50)
+						key='template', 
+						value=st.session_state['template'], 
+						height=50)
 
 search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', 
-                             key='search_prompt', 
-                             value=st.session_state['search_prompt'], 
-                             height=100)
+							key='search_prompt', 
+							value=st.session_state['search_prompt'], 
+							height=125)
 
 user_input = st.text_area('Enter your message:', 
-                          key='user_input', 
-                          value=st.session_state['user_input'], 
-                          height=50)
+						key='user_input', 
+						value=st.session_state['user_input'], 
+						height=35)
 
 # Sidebar
 st.sidebar.write("### Template")
 st.sidebar.write(st.session_state.template)
 st.sidebar.write("### Search Prompt")
 st.sidebar.write(st.session_state.search_prompt)
+
+
+# Initialize session state variables if they don't exist
+if 'message_submitted' not in st.session_state:
+	st.session_state.message_submitted = False
+
+# Initialize session state variables if they don't exist
+if 'feedback_submitted' not in st.session_state:
+	st.session_state.feedback_submitted = False
 
 
 if st.button('Send', key='send_button'):
@@ -105,6 +114,7 @@ if st.button('Send', key='send_button'):
 	st.write(response_query)
 	st.write("### time took to generate")
 	st.write(f"{round(query_time)} seconds")
+	st.session_state.message_submitted = True
 
 	inserted_id = ''
 	references = []
@@ -196,6 +206,7 @@ if st.button('Send', key='send_button'):
 			st.error(str(e))
 			time.sleep(10)
 
+if st.session_state['message_submitted']:
 	# Initialize session state for feedback
 	if 'feedback' not in st.session_state:
 		st.session_state.feedback = ''

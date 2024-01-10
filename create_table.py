@@ -13,7 +13,7 @@ client = pymongo.MongoClient(MONGODB_URL)
 
 db = client['llamaindex']  
 
-init = True
+init = False
 
 # Updated schema definition
 chat_schema = {
@@ -104,6 +104,6 @@ else:
 	# Check if the "chats" collection exists
 	collection_names = db.list_collection_names()
 	if "chats" in collection_names:
-		first_document = db["chats"].find()
+		first_document = db["chats"].find_one()
 		# Print the document
 		print(first_document)
