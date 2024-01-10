@@ -136,8 +136,8 @@ if st.session_state.message_submitted:
 	st.write(st.session_state.response)
 	st.write("### Gpt Generated search")
 	st.write(st.session_state.response_query)
-	st.write("### time took to generate")
-	st.write(f"{round(st.session_state.query_time)} seconds")
+	# st.write("### time took to generate")
+	# st.write(f"{round(st.session_state.query_time)} seconds")
 
 	inserted_id = ''
 	references = []
