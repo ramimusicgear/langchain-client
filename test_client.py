@@ -65,18 +65,18 @@ if st.session_state.change_instruction:
 
 	template = st.text_area('Enter Model Instruction For Template: ', 
 							key='template', 
-							value=st.session_state['template'], 
+							value=st.session_state.template, 
 							height=50)
 
 	search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', 
 								key='search_prompt', 
-								value=st.session_state['search_prompt'], 
+								value=st.session_state.search_prompt, 
 								height=125)
 							
 st.title('Chat Interface')
 user_input = st.text_area('Enter your message:', 
 						key='user_input', 
-						value=st.session_state['user_input'], 
+						value=st.session_state.user_input, 
 						height=35)
 
 
@@ -90,6 +90,17 @@ if 'message_submitted' not in st.session_state:
 if 'feedback_submitted' not in st.session_state:
 	st.session_state.feedback_submitted = False
 
+# Initialize session state variables if they don't exist
+if 'context' not in st.session_state:
+	st.session_state.context = ''
+
+# Initialize session state variables if they don't exist
+if 'response_query' not in st.session_state:
+	st.session_state.response_query = ''
+
+# Initialize session state variables if they don't exist
+if 'response' not in st.session_state:
+	st.session_state.response = ''
 
 if st.button('Send', key='send_button'):
 	start_time = datetime.now()
@@ -105,9 +116,13 @@ if st.button('Send', key='send_button'):
 
 	result = res.json()
 	context = result.get("context","")
-
+	st.session_state.context = context
+	
 	response = result.get('response', '')
+	st.session_state.response = response
 	response_query = result.get('response_query', '')
+	st.session_state.response_query = response_query
+
 	query_time = result.get('query_time', '')
 	st.write("### response")
 	st.write(response)
@@ -117,13 +132,14 @@ if st.button('Send', key='send_button'):
 	st.write(f"{round(query_time)} seconds")
 	st.session_state.message_submitted = True
 
+if st.session_state.message_submitted:
 	inserted_id = ''
 	references = []
 	category = ''
 	subcategory = ''
 	
 	# Join the list into a single string (if it's not already)
-	context_string = ' '.join(context)
+	context_string = ' '.join(st.session_state.context)
 	if not context_string.startswith("{"):
 		context_string = "{" + context_string
 	if not context_string.endswith("}"):
@@ -181,18 +197,18 @@ if st.button('Send', key='send_button'):
 					{
 						"timestamp": datetime.now(),
 						"sender": f"user - {str(ip)}",
-						"text": user_input
+						"text": st.session_state.user_input
 					},
 					{
 						"timestamp": datetime.now(),
 						"sender": "bot",
-						"text": response
+						"text": st.session_state.response
 					}
 				],
 				"prompts": {
 					"template_prompt": st.session_state.template,
 					"search_prompt": st.session_state.search_prompt,
-					"response_query": response_query
+					"response_query": st.session_state.response_query
 				},
 				"product_references": references
 			}
@@ -209,7 +225,7 @@ if st.button('Send', key='send_button'):
 			st.error(str(e))
 			time.sleep(10)
 
-if st.session_state['message_submitted']:
+if st.session_state.message_submitted:
 	# Initialize session state for feedback
 	if 'feedback' not in st.session_state:
 		st.session_state.feedback = ''
@@ -232,5 +248,8 @@ if st.session_state['message_submitted']:
 			# Check if the update was successful
 			if update_result.modified_count > 0:
 				st.write("thank you very much!")
+			else:
+				st.write("try feedback again, sorry")
+				
 		except Exception as e:
 			st.error(str(e))
