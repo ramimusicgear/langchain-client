@@ -76,8 +76,7 @@ if st.button('Send', key='send_button'):
 	st.write(response_query)
 	st.write("### time took to generate")
 	st.write(f"{round(query_time)} seconds")
-	st.write("### products")
-	st.write(json.dumps(context))
+
 	inserted_id = ''
 	references = []
 	category = ''
