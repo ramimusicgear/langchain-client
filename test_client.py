@@ -48,16 +48,31 @@ if 'user_input' not in st.session_state:
 # User inputs
 st.title('Model Instruction')
 
-template = st.text_area('Enter Model Instruction For Template: ', key='template', value=st.session_state.template, height=150)
-st.session_state.template = template
+# template = st.text_area('Enter Model Instruction For Template: ', key='template', value=st.session_state.template, height=50)
+# st.session_state.template = template
 
 
-search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', key='search_prompt', value=st.session_state.search_prompt, height=250)
-st.session_state.search_prompt = search_prompt
+# search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', key='search_prompt', value=st.session_state.search_prompt, height=150)
+# st.session_state.search_prompt = search_prompt
 
-st.title('Chat Interface')
-user_input = st.text_input('Enter Your Message: ', key='user_input', value=st.session_state.user_input)
-st.session_state.user_input = user_input
+# st.title('Chat Interface')
+# user_input = st.text_input('Enter Your Message: ', key='user_input', value=st.session_state.user_input)
+# st.session_state.user_input = user_input
+# Use st.text_area for multi-line text input
+template = st.text_area('Enter Model Instruction For Template: ', 
+                        key='template', 
+                        value=st.session_state['template'], 
+                        height=50)
+
+search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', 
+                             key='search_prompt', 
+                             value=st.session_state['search_prompt'], 
+                             height=100)
+
+user_input = st.text_area('Enter your message:', 
+                          key='user_input', 
+                          value=st.session_state['user_input'], 
+                          height=50)
 
 # Sidebar
 st.sidebar.write("### Template")
