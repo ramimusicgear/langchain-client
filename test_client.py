@@ -190,8 +190,8 @@ if st.button('Send', key='send_button'):
 					}
 				],
 				"prompts": {
-					"template_prompt": template,
-					"search_prompt": search_prompt,
+					"template_prompt": st.session_state.template,
+					"search_prompt": st.session_state.search_prompt,
 					"response_query": response_query
 				},
 				"product_references": references
