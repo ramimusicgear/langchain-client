@@ -57,7 +57,7 @@ st.sidebar.write(search_prompt)
 if st.button('Send'):
 	start_time = datetime.now()
 	data = {'user_input': user_input,'template': template, 'search_prompt':search_prompt}
-	res = requests.post(f'{SERVER_URL}/process', json=data)
+	res = requests.post(f'{SERVER_URL}/process', json=data, verify=False)
 
 	if res.status_code == 200:
 		result = res.json()
