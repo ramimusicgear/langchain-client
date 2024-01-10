@@ -22,7 +22,7 @@ MONGODB_URL = os.environ.get("MONGODB_URL")
 # Connect to MongoDB
 client = pymongo.MongoClient(MONGODB_URL)
 db = client['llamaindex']  # Replace with your database name
-chats = db['chat']
+chats = db['chats']
 ip = ''
 try:
     response = requests.get('https://api.ipify.org?format=json')

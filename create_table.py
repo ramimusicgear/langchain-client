@@ -13,7 +13,7 @@ client = pymongo.MongoClient(MONGODB_URL)
 
 db = client['llamaindex']  
 
-init = False
+init = True
 
 # Updated schema definition
 chat_schema = {
@@ -73,7 +73,7 @@ chat_schema = {
                 "bsonType": "array",
                 "items": {
                     "bsonType": "object",
-                    "required": ["name", "description", "price", "category"],
+                    "required": ["name", "description", "price", "categories"],
                     "properties": {
                         "name": {"bsonType": "string"},
                         "description": {"bsonType": "string"},
@@ -90,12 +90,12 @@ chat_schema = {
 if init:
 	# Check if the "chats" collection exists
 	collection_names = db.list_collection_names()
-	if "chat" in collection_names:
-		print("Collection 'chat' already exists. Deleting it.")
-		db["chat"].drop()
+	if "chats" in collection_names:
+		print("Collection 'chats' already exists. Deleting it.")
+		db["chats"].drop()
 
 	# Create or update the collection with the new validator
-	chats = db.create_collection("chat", validator=chat_schema)
+	chats = db.create_collection("chats", validator=chat_schema)
 
 	# Add indexes on 'category' and 'subcategory'
 	chats.create_index([("category", pymongo.ASCENDING), ("subcategory", pymongo.ASCENDING)])
@@ -103,7 +103,7 @@ else:
 	# Retrieve the first document
 	# Check if the "chats" collection exists
 	collection_names = db.list_collection_names()
-	if "chat" in collection_names:
-		first_document = db["chat"].find_one()
+	if "chats" in collection_names:
+		first_document = db["chats"].find_one()
 		# Print the document
 		print(first_document)
