@@ -18,11 +18,16 @@ init = False
 chat_schema = {
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["_id", "start_time","end_time", "messages"],
+        "required": ["_id", "start_time","end_time", "messages","prompts"],
         "properties": {
             "_id": {"bsonType": "objectId"},
+
+			# user	
+            "user_ip": {"bsonType": "string"},
+            "user_device": {"bsonType": "string"},
+
             "category": {"bsonType": "string"},
-            "subcategory": {"bsonType": "string"},  # Added subcategory field
+            "subcategory": {"bsonType": "string"},
             "start_time": {"bsonType": "date"},
             "end_time": {"bsonType": "date"},
             "messages": {
@@ -37,15 +42,24 @@ chat_schema = {
                     }
                 }
             },
-            "user_actions": {
+            "prompts": {
+                "bsonType": "object",
+				"properties": {
+					"template_prompt": {"bsonType": "string"},
+					"search_prompt": {"bsonType": "string"},
+					"response_query": {"bsonType": "string"}
+				}
+            },
+			"user_actions": {
                 "bsonType": "object",
                 "properties": {
                     "feedback": {"bsonType": "string"},
-                    "product_interactions": {
+                    "feedback_text": {"bsonType": "string"},
+                    "actions": {
                         "bsonType": "array",
                         "items": {
                             "bsonType": "object",
-                            "required": ["product_id", "action"],
+                            "required": ["action"],
                             "properties": {
                                 "product_id": {"bsonType": "string"},
                                 "action": {"bsonType": "string"}
@@ -73,6 +87,12 @@ chat_schema = {
 
 
 if init:
+	# Check if the "chats" collection exists
+	collection_names = db.list_collection_names()
+	if "chats" in collection_names:
+		print("Collection 'chats' already exists. Deleting it.")
+		db["chats"].drop()
+
 	# Create or update the collection with the new validator
 	chats = db.create_collection("chats", validator=chat_schema)
 
