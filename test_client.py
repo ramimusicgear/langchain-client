@@ -90,18 +90,33 @@ if st.button('Send', key='send_button'):
 		context_string = "{" + context_string
 	if not context_string.endswith("}"):
 		context_string += "}"
+	def extract_json_strings(s):
+		json_strings = []
+		brace_count = 0
+		current_json = ''
 
-	# Regex pattern to match JSON-like objects
-	pattern = r'\{(?:[^{}]|(?R))*\}'
+		for char in s:
+			if char == '{':
+				brace_count += 1
+				current_json += char
+			elif char == '}':
+				brace_count -= 1
+				current_json += char
+				if brace_count == 0:
+					json_strings.append(current_json)
+					current_json = ''
+			elif brace_count > 0:
+				current_json += char
 
-	# Find all matches
-	matches = re.findall(pattern, context_string)
+		return json_strings
 
-	# Parse each match as JSON and collect the results
-	valid_json_objects = []
-	for match in matches:
+	json_strings = extract_json_strings(context_string)
+
+	# Parsing each JSON string
+	parsed_json_objects = []
+	for json_str in json_strings:
 		try:
-			p = json.loads(match)
+			p = json.loads(json_str)
 			category = p["categories"][2]
 			subcategory = p["categories"][3]
 			references.append({
@@ -111,7 +126,7 @@ if st.button('Send', key='send_button'):
 				"categories": json.dumps(p["categories"])
 			})
 		except json.JSONDecodeError:
-			print(f"Invalid JSON object: {match}")
+			print(f"Invalid JSON object: {json_str}")
 
 	while True:
 		try:

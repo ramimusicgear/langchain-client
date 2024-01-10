@@ -5,6 +5,7 @@ import pymongo
 from dotenv import load_dotenv
 load_dotenv()
 
+
 MONGODB_URL = os.environ.get("MONGODB_URL")
 
 # Connect to MongoDB
