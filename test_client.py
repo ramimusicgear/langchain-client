@@ -127,6 +127,9 @@ if st.button('Send', key='send_button'):
 		except json.JSONDecodeError:
 			print(f"Invalid JSON object: {json_str}")
 
+	st.write("### products")
+	st.write(json.dumps(references))
+	
 	while True:
 		try:
 			chat_document = {
