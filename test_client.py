@@ -80,15 +80,16 @@ if st.button('Send', key='send_button'):
 		category = ''
 		subcategory = ''
 		for p in context:
-			if category == '':
-				category = p["categories"][2]
-				subcategory = p["categories"][3]
-			references.append({
-				"name": p["name"],
-				"description": p["description"] ,
-				"price": p["price"],
-				"categories": json.dumps(p["categories"])
-			})
+			if p["categories"] > 2:
+				if category == '':
+					category = p["categories"][2]
+					subcategory = p["categories"][3]
+				references.append({
+					"name": p["name"],
+					"description": p["description"] ,
+					"price": p["price"],
+					"categories": json.dumps(p["categories"])
+				})
 
 
 		
