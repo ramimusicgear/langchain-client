@@ -57,6 +57,9 @@ if 'feedback' not in st.session_state:
 if 'message_submitted' not in st.session_state:
 	st.session_state.message_submitted = False
 
+if 'ready_for_feedback' not in st.session_state:
+	st.session_state.ready_for_feedback = False
+
 if 'feedback_submitted' not in st.session_state:
 	st.session_state.feedback_submitted = False
 
@@ -128,14 +131,14 @@ if st.button('Send', key='send_button'):
 	st.session_state.message_submitted = True
 
 
-if st.session_state.message_submitted:
+if st.session_state.message_submitted:	
 	st.write("### response")
-	st.write(response)
+	st.write(st.session_state.response)
 	st.write("### Gpt Generated search")
-	st.write(response_query)
+	st.write(st.session_state.response_query)
 	st.write("### time took to generate")
-	st.write(f"{round(query_time)} seconds")
-	
+	st.write(f"{round(st.session_state.query_time)} seconds")
+
 	inserted_id = ''
 	references = []
 	category = ''
@@ -228,8 +231,8 @@ if st.session_state.message_submitted:
 			st.error(str(e))
 			time.sleep(10)
 
-if st.session_state.message_submitted:
-	
+	st.session_state.ready_for_feedback = True
+if st.session_state.ready_for_feedback:
 
 	st.write("## Feedback")
 
