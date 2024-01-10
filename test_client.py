@@ -54,7 +54,7 @@ st.sidebar.write("### search prompt")
 st.sidebar.write(search_prompt)
 
 
-if st.button('Send'):
+if st.button('Send', key='send_button'):
 	start_time = datetime.now()
 	data = {'user_input': user_input,'template': template, 'search_prompt':search_prompt}
 	res = requests.post(f'{SERVER_URL}/process', json=data, verify=False)
@@ -62,6 +62,9 @@ if st.button('Send'):
 	if res.status_code == 200:
 		result = res.json()
 		context = result.get("context","")
+		print()
+		print(context)
+		print()
 		response = result.get('response', '')
 		response_query = result.get('response_query', '')
 		query_time = result.get('query_time', '')
@@ -128,8 +131,9 @@ if st.button('Send'):
 			except Exception as e:
 				time.sleep(1)
 
+		st.write("## Feedback")
 		new_feedback_text = st.text_input('Enter Your Feedback: ')
-		if st.button('Send'):
+		if st.button('Send Feedback', key='send_feedback_button'):
 			try:
 				update_result = chats.update_one(
 					{"_id": inserted_id},
