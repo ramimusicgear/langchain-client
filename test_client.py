@@ -78,6 +78,22 @@ if 'response' not in st.session_state:
 if 'query_time' not in st.session_state:
 	st.session_state.query_time = ''
 
+
+
+if st.session_state.new_chat:
+	st.session_state.new_chat = False
+	st.session_state.user_input = ''
+	st.session_state.message_submitted = False
+	st.session_state.ready_for_feedback = False
+	st.session_state.feedback = ''
+	st.session_state.document_id = ''
+	st.session_state.feedback_submitted = False
+	st.session_state.context = ''
+	st.session_state.response_query = ''
+	st.session_state.response = ''
+	st.session_state.query_time = ''
+
+
 # Sidebar
 st.sidebar.write("### Template")
 st.sidebar.write(st.session_state.template)
@@ -262,30 +278,5 @@ if st.session_state.ready_for_feedback:
 		except Exception as e:
 			st.error(str(e))
 
-
 	if st.button('New Chat', key='new_chat_btn'):
 		st.session_state.new_chat = True
-	
-	if st.session_state.new_chat:
-
-		st.session_state.user_input = ''
-
-		st.session_state.document_id = ''
-
-		st.session_state.feedback = ''
-
-		st.session_state.message_submitted = False
-
-		st.session_state.ready_for_feedback = False
-
-		st.session_state.feedback_submitted = False
-
-		st.session_state.new_chat = False
-
-		st.session_state.context = ''
-
-		st.session_state.response_query = ''
-
-		st.session_state.response = ''
-
-		st.session_state.query_time = ''
