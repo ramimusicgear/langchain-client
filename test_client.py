@@ -62,7 +62,7 @@ if st.button('Send', key='send_button'):
 
 	if res.status_code == 200:
 		result = res.json()
-		context = json.loads(result.get("context",""))
+		context = result.get("context","")
 	
 		response = result.get('response', '')
 		response_query = result.get('response_query', '')
@@ -81,8 +81,8 @@ if st.button('Send', key='send_button'):
 		subcategory = ''
 		for p in context:
 			if category == '':
-				category = json.loads(p["categories"])[2]
-				subcategory = json.loads(p["categories"])[3]
+				category = p["categories"][2]
+				subcategory = p["categories"][3]
 			references.append({
 				"name": p["name"],
 				"description": p["description"] ,
