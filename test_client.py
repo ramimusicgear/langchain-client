@@ -62,30 +62,44 @@ if st.button('Send', key='send_button'):
 
 	if res.status_code == 200:
 		result = res.json()
-		context = result.get("context","")
-		print()
-		print(context)
-		print()
+		context = json.loads(result.get("context",""))
+	
 		response = result.get('response', '')
 		response_query = result.get('response_query', '')
 		query_time = result.get('query_time', '')
-		st.write("### context")
-		st.write(json.dumps(context))
 		st.write("### response")
 		st.write(response)
 		st.write("### Gpt Generated search")
 		st.write(response_query)
 		st.write("### time took to generate")
-		st.write(f"{query_time} seconds")
+		st.write(f"{round(query_time)} seconds")
+		st.write("### products")
+		st.write(json.dumps(context))
 		inserted_id = ''
+		references = []
+		category = ''
+		subcategory = ''
+		for p in context:
+			if category == '':
+				category = json.loads(p["categories"])[2]
+				subcategory = json.loads(p["categories"])[3]
+			references.append({
+				"name": p["name"],
+				"description": p["description"] ,
+				"price": p["price"],
+				"categories": json.dumps(p["categories"])
+			})
+
+
+		
 		while True:
 			try:
 				chat_document = {
 					"_id": ObjectId(),  # Generates a unique Object ID
 					"user_ip": ip,  # Example IP address
 					"user_device": "Desktop",  # Example device type
-					"category": "General",
-					"subcategory": "Example",
+					"category": category,
+					"subcategory": subcategory,
 					"start_time": datetime.now(),
 					"end_time": datetime.now(),
 					"messages": [
@@ -105,14 +119,7 @@ if st.button('Send', key='send_button'):
 						"search_prompt": search_prompt,
 						"response_query": response_query
 					},
-					"product_references": [
-						{
-							"name": "Example Product",
-							"description": "This is an example product description.",
-							"price": 19.99,
-							"category": "Electronics"
-						}
-					]
+					"product_references": references
 				}
 
 				# Insert the document into the 'chats' collection

@@ -77,7 +77,7 @@ chat_schema = {
                         "name": {"bsonType": "string"},
                         "description": {"bsonType": "string"},
                         "price": {"bsonType": "double"},
-                        "category": {"bsonType": "string"}
+                        "categories": {"bsonType": "string"}
                     }
                 }
             }
