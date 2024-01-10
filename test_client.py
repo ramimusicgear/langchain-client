@@ -45,40 +45,41 @@ if 'search_prompt' not in st.session_state:
 if 'user_input' not in st.session_state:
 	st.session_state.user_input = ''
 
-# User inputs
-st.title('Model Instruction')
+if 'change_instruction' not in st.session_state:
+	st.session_state.change_instruction = False
 
-# template = st.text_area('Enter Model Instruction For Template: ', key='template', value=st.session_state.template, height=50)
-# st.session_state.template = template
+if 'document_id' not in st.session_state:
+	st.session_state.document_id = ''
 
-
-# search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', key='search_prompt', value=st.session_state.search_prompt, height=150)
-# st.session_state.search_prompt = search_prompt
-
-# st.title('Chat Interface')
-# user_input = st.text_input('Enter Your Message: ', key='user_input', value=st.session_state.user_input)
-# st.session_state.user_input = user_input
-# Use st.text_area for multi-line text input
-template = st.text_area('Enter Model Instruction For Template: ', 
-						key='template', 
-						value=st.session_state['template'], 
-						height=50)
-
-search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', 
-							key='search_prompt', 
-							value=st.session_state['search_prompt'], 
-							height=125)
-
-user_input = st.text_area('Enter your message:', 
-						key='user_input', 
-						value=st.session_state['user_input'], 
-						height=35)
 
 # Sidebar
 st.sidebar.write("### Template")
 st.sidebar.write(st.session_state.template)
 st.sidebar.write("### Search Prompt")
 st.sidebar.write(st.session_state.search_prompt)
+if st.sidebar.button('Change Propmts', key='change_propmpts_button'):
+    st.session_state.change_instruction = True
+
+if st.session_state.change_instruction:
+	st.title('Model Instruction')
+
+	template = st.text_area('Enter Model Instruction For Template: ', 
+							key='template', 
+							value=st.session_state['template'], 
+							height=50)
+
+	search_prompt = st.text_area('Enter Model Instruction For Prompt Refinement: ', 
+								key='search_prompt', 
+								value=st.session_state['search_prompt'], 
+								height=125)
+							
+st.title('Chat Interface')
+user_input = st.text_area('Enter your message:', 
+						key='user_input', 
+						value=st.session_state['user_input'], 
+						height=35)
+
+
 
 
 # Initialize session state variables if they don't exist
@@ -200,6 +201,8 @@ if st.button('Send', key='send_button'):
 			insert_result = chats.insert_one(chat_document)
 			# Get the _id of the inserted document
 			inserted_id = insert_result.inserted_id
+			st.session_state.document_id = inserted_id
+
 
 			break
 		except Exception as e:
@@ -224,7 +227,7 @@ if st.session_state['message_submitted']:
 			# Create 'user_actions' with 'feedback_text'
 			new_values = {"user_actions": {"feedback_text": new_feedback_text}}
 			# Perform the update
-			update_result = chats.update_one({"_id": inserted_id}, {"$set": new_values})
+			update_result = chats.update_one({"_id": st.session_state.document_id}, {"$set": new_values})
 
 			# Check if the update was successful
 			if update_result.modified_count > 0:
