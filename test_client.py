@@ -29,12 +29,13 @@ try:
 except requests.RequestException as e:
     st.error("refresh please")
 
-st.title('Chat Interface')
 
-user_input = st.text_input('Enter your message:')
-
+st.title('Model Instruction')
 template = st.text_input('Enter Model Instruction: ')
 search_prompt = st.text_input('Enter Model Instruction for prompt refinement: ')
+
+st.title('Chat Interface')
+user_input = st.text_input('Enter your message:')
 
 if not template:
 	template = "You are an assistant you help customers choose products using the given context (use only what is relevent) your output should be nicely phrased:"

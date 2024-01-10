@@ -98,3 +98,11 @@ if init:
 
 	# Add indexes on 'category' and 'subcategory'
 	chats.create_index([("category", pymongo.ASCENDING), ("subcategory", pymongo.ASCENDING)])
+else:
+	# Retrieve the first document
+	# Check if the "chats" collection exists
+	collection_names = db.list_collection_names()
+	if "chats" in collection_names:
+		first_document = db["chats"].find_one()
+		# Print the document
+		print(first_document)
