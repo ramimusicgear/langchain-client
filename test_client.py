@@ -1,8 +1,9 @@
 import os
 import time
-import bson
 import requests
 import streamlit as st
+
+import urllib3
 
 import pymongo
 from bson import ObjectId
@@ -10,6 +11,8 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 load_dotenv()
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 SERVER_URL = os.environ.get('SERVER_URL')
 MONGODB_URL = os.environ.get("MONGODB_URL")
