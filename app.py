@@ -21,13 +21,12 @@ from admin import admin_page
 
 # Initialize session state for feedback
 if 'template' not in st.session_state:
-	st.session_state.template = "You are an assistant you help customers choose products using the given context (use only what is relevant) your output should be nicely phrased:"
+	st.session_state.template = """You are an assistant you help customers choose products using the given context (use only what is relevant) your output should be nicely phrased:"""
 
 if 'search_prompt' not in st.session_state:
-	st.session_state.search_prompt = """
-	what technical specs is the product the customer is asking for should have, do not explain why.
-	You can change the question to get more suitable products.
-	for example in case the customer is looking for a product that is suitable for playing a rock style, you will show the specifications suitable for playing rock on the instrument he is requesting."""
+	st.session_state.search_prompt = """What technical specs is the product the customer is asking for should have, please infer the price and the type of the product he wants based on your knowledge, do not explain why.
+You can change the question to get more suitable products.
+for example in case the customer is looking for a product that is suitable for playing a rock style, you will show the specifications suitable for playing rock on the product he is requesting."""
 
 if 'user_input' not in st.session_state:
 	st.session_state.user_input = ''
