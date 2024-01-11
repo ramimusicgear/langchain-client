@@ -5,7 +5,7 @@ FROM python:3.8-slim
 WORKDIR /app
 
 # Copy the Python requirements file
-RUN pip install --no-cache-dir streamlit requests pymongo python-dotenv
+RUN pip install --no-cache-dir streamlit requests pymongo python-dotenv pyjwt
 
 # Copy all files from the current directory to the container
 COPY . .
@@ -14,4 +14,4 @@ COPY . .
 EXPOSE 8501
 
 # Set the entrypoint for the container
-CMD ["streamlit", "run", "test_client.py"]
+CMD ["streamlit", "run", "app.py"]
