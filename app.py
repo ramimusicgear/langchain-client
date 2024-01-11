@@ -70,6 +70,8 @@ if 'ip' not in st.session_state:
 
 if 'lastclicked' not in st.session_state:
 	st.session_state.lastclicked = ''
+if 'sender' not in st.session_state:
+	st.session_state.sender = ''
 
 # Initialize page navigation
 if 'page' not in st.session_state:
