@@ -16,7 +16,7 @@ def admin_page(select, navigate_to):
         first_message_text = conv['messages'][0]['text']
         id = st.session_state.selected_conversation if st.session_state.selected_conversation else last_id
         if conversation_id == id:
-            st.sidebar.write(f"### {first_message_text}")
+            st.sidebar.markdown(f"<p>{first_message_text}</p>", unsafe_allow_html=True)
         else:
             button_clicked = st.sidebar.button(first_message_text, key=f"{conversation_id}", on_click=lambda cid=conversation_id: select(cid))
             
@@ -31,25 +31,29 @@ def admin_page(select, navigate_to):
         # Model Instruction
         st.write("### Model Instruction")
         st.write("#### Template:")
-        st.write(conv['prompts']['template_prompt'])
+        st.markdown(f"<p>{conv['prompts']['template_prompt']}</p>", unsafe_allow_html=True)
 
         st.write("#### Prompt Refinement:")
-        st.write(conv['prompts']['search_prompt'])
+        st.markdown(f"<p>{conv['prompts']['search_prompt']}</p>", unsafe_allow_html=True)
 
     # Chat Interface
     st.title('Chat Interface')
     
     st.write("### Enter your message:")
-    st.write(conv['messages'][0]['text'])
+    st.markdown(f"<p>{conv['messages'][0]['text']}</p>", unsafe_allow_html=True)
+
 
     st.write("### Response")
-    st.write(conv['messages'][1]['text'])
+    st.markdown(f"<p>{conv['messages'][1]['text']}</p>", unsafe_allow_html=True)
+
     st.write("### Gpt Generated Search")
     st.write(conv['prompts']['search_prompt'])
+    st.markdown(f"<p>{conv['prompts']['search_prompt']}</p>", unsafe_allow_html=True)
     
     try:
         conv['user_actions']
         st.write("## Feedback")
+        st.markdown(f"<p>{conv['user_actions']['feedback_text']}</p>", unsafe_allow_html=True)
         st.write(conv['user_actions']['feedback_text'])
         st.write(f"# The Feedback Is From - {conv['user_actions']['sender']}")
     except Exception as e:

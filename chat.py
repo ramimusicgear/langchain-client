@@ -15,28 +15,15 @@ client = pymongo.MongoClient(MONGODB_URL)
 db = client['llamaindex']  # Replace with your database name
 chats = db['chats']
 
-def chat_page(navigate_to):
+def chat_page(navigate_to, reset):
     if st.session_state['user']:
         st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
     else:
-        st.sidebar.write("## Login/Register")
+        st.sidebar.write("# Login/Register")
         st.sidebar.button("Login",key='to_login_btn', on_click=lambda: navigate_to('login'))
         st.sidebar.button("Register",key='to_register_btn', on_click=lambda: navigate_to('register'))
-        
-    if st.session_state.new_chat:
-        st.session_state.new_chat = False
-        st.session_state.user_input = ''
-        st.session_state.message_submitted = False
-        st.session_state.ready_for_feedback = False
-        st.session_state.feedback = ''
-        st.session_state.document_id = ''
-        st.session_state.feedback_submitted = False
-        st.session_state.context = ''
-        st.session_state.response_query = ''
-        st.session_state.response = ''
-        st.session_state.query_time = ''
 
-    st.sidebar.write("### Chat Instruction")
+    st.sidebar.write("# Chat Instruction")
     st.sidebar.write("## Template")
     st.sidebar.write(st.session_state.template)
     st.sidebar.write("## Search Prompt")
@@ -65,7 +52,7 @@ def chat_page(navigate_to):
 
 
     if st.button('Send', key='send_button'):
-        start_time = datetime.now()
+        st.session_state.start_time = datetime.now()
         data = {
             'template': st.session_state.template, 
             'user_input': st.session_state.user_input,
@@ -93,9 +80,9 @@ def chat_page(navigate_to):
 
     if st.session_state.message_submitted:	
         st.write("### response")
-        st.write(st.session_state.response)
+        st.markdown(f"<p>{st.session_state.response}</p>", unsafe_allow_html=True)
         st.write("### Gpt Generated search")
-        st.write(st.session_state.response_query)
+        st.markdown(f"<p>{st.session_state.response_query}</p>", unsafe_allow_html=True)
         st.write("### time took to generate")
         st.write(f"{round(st.session_state.query_time)} seconds")
 
@@ -146,7 +133,8 @@ def chat_page(navigate_to):
                     "categories": json.dumps(p["categories"])
                 })
             except json.JSONDecodeError:
-                print(f"Invalid JSON object: {json_str}")
+                pass
+                # print(f"Invalid JSON object: {json_str}")
 
         while True:
             try:
@@ -156,7 +144,7 @@ def chat_page(navigate_to):
                     "user_device": "Desktop",  # Example device type
                     "category": category,
                     "subcategory": subcategory,
-                    "start_time": start_time,
+                    "start_time": st.session_state.start_time,
                     "end_time": datetime.now(),
                     "messages": [
                         {
@@ -224,5 +212,4 @@ def chat_page(navigate_to):
             except Exception as e:
                 st.error(str(e))
 
-        if st.button('New Chat', key='new_chat_btn'):
-            st.session_state.new_chat = True
+        st.button('New Chat', key='new_chat_btn', on_click=lambda: reset())
