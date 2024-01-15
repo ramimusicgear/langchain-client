@@ -172,7 +172,6 @@ def chat_page(navigate_to, reset):
                 inserted_id = insert_result.inserted_id
                 st.session_state.document_id = inserted_id
 
-
                 break
             except Exception as e:
                 st.error(str(e))
