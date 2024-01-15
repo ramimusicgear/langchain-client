@@ -154,7 +154,7 @@ always follow the instructions""",
                     "text": prompt
                 }
                 if not TESTING:
-                    chats.update_one(
+                    update_result = chats.update_one(
                         {"_id": st.session_state.document_id},
                         {"$push": {"messages": new_message}}
                     )
@@ -207,10 +207,16 @@ if st.session_state.messages[-1]["role"] != "assistant":
                 "text": full_response
             }
             if not TESTING:
-                chats.update_one(
+                update_result = chats.update_one(
                     {"_id": st.session_state.document_id},
                     {"$push": {"messages": new_message}}
                 )
+                # Check if the update was successful
+                if update_result.modified_count > 0:
+                    break
+                else:
+                    st.error("try again, sorry")
+                    time.sleep(5)
 
             break
         except Exception as e:
