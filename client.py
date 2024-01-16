@@ -127,8 +127,8 @@ def log_out():
     st.session_state['user'] = None
     st.session_state['selected_conversation']= None
     st.session_state['page'] = "chat"
-    cookie_manager.delete("token")
-    cookie_manager.delete("selected_conversation")
+    cookie_manager.delete("token", key=f"del_page_cookie_chat")
+    cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
     cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     
 def log_in(username, password):
@@ -174,12 +174,12 @@ def clear_all_cookies():
     st.session_state.start_time = datetime.now()
     st.session_state.document_id = ''
     cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
-    cookie_manager.delete("token")
-    cookie_manager.delete("selected_conversation")
+    cookie_manager.delete("token", key=f"del_selected_token")
+    cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
     cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     st.session_state.document_id = ''
     
-st.sidebar.button("Reset",key='reset_btn', on_click=clear_all_cookies)
+st.sidebar.button("Reset Cookies",key='reset_btn', on_click=clear_all_cookies)
 
 # App Routing
 if st.session_state['page'] == 'login':
