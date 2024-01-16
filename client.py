@@ -4,6 +4,7 @@ import time
 import json
 import requests
 import streamlit as st
+import extra_streamlit_components as stx
 
 import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -31,88 +32,142 @@ if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
 
 if 'start_time' not in st.session_state:
-	st.session_state.start_time = datetime.now()
+    st.session_state.start_time = datetime.now()
 
 if 'document_id' not in st.session_state:
-	st.session_state.document_id = ''
-      
+    st.session_state.document_id = ''
+    
 # Initialize log in and admin dashboard
 if 'jwt' not in st.session_state:
-	st.session_state['jwt'] = None
+    st.session_state['jwt'] = None
 if 'user' not in st.session_state:
-	st.session_state['user'] = None
+    st.session_state['user'] = None
 
 if 'selected_conversation' not in st.session_state:
-	st.session_state.selected_conversation = None
+    st.session_state.selected_conversation = None
 
 # Initialize page navigation
 if 'page' not in st.session_state:
-	st.session_state['page'] = 'chat'
-      
+    st.session_state['page'] = 'chat'
+    
 if 'ip' not in st.session_state:
-	st.session_state.ip = ''
+    st.session_state.ip = ''
 try:
-	response = requests.get('https://api.ipify.org?format=json')
-	ip_data = response.json()
-	st.session_state.ip = ip_data['ip']
+    response = requests.get('https://api.ipify.org?format=json')
+    ip_data = response.json()
+    st.session_state.ip = ip_data['ip']
 
 except requests.RequestException as e:
-	st.error("refresh please")
-     
+    st.error("refresh please")
+    
 # App title
 st.set_page_config(page_title="Rami Chatbot")
 
+st.session_state.token_loaded = False
+st.session_state.page_loaded = False
+st.session_state.selected_conversation_loaded = False
+
+st.session_state.loaded_messages = False
+
+def get_manager():
+    return stx.CookieManager()
+
+cookie_manager = get_manager()
+
+messages_cookie = cookie_manager.get(cookie="messages")
+if messages_cookie and not st.session_state.loaded_messages:
+    if isinstance(messages_cookie, str):
+        # If messages_cookie is a string, parse it as JSON
+        st.session_state.messages = json.loads(messages_cookie)
+    elif isinstance(messages_cookie, list):
+        # If messages_cookie is already a list, use it directly
+        st.session_state.messages = messages_cookie
+
+    st.session_state.loaded_messages = True
+
+
+page_cookie = cookie_manager.get(cookie="page")
+if page_cookie and not st.session_state.page_loaded:
+    st.session_state['page'] = page_cookie  # Store the JWT in session state
+    st.session_state.page_loaded = True
+
+selected_conversation_cookie = cookie_manager.get(cookie="selected_conversation")
+if selected_conversation_cookie and not st.session_state.selected_conversation_loaded:
+    st.session_state['selected_conversation'] = selected_conversation_cookie  # Store the JWT in session state
+    st.session_state.selected_conversation_loaded = True
+
+jwt_cookie = cookie_manager.get(cookie="token")
+if jwt_cookie and not st.session_state.token_loaded:
+    st.session_state.token_loaded = True
+    payload = verify_jwt_token(jwt_cookie)
+    if payload:
+        st.session_state['jwt'] = jwt_cookie  # Store the JWT in session state
+        st.session_state['user'] = payload['user']
+
+
+if jwt_cookie and not st.session_state.token_loaded:
+    st.session_state.jwt = jwt_cookie
+    st.session_state.token_loaded = True
+    payload = verify_jwt_token(jwt_cookie)
+    if payload:
+        st.session_state['jwt'] = jwt_cookie  # Store the JWT in session state
+        st.session_state['user'] = payload['user']
+
 # Function to navigate between pages
 def navigate_to(page):
-	st.session_state['page'] = page
+    st.session_state['page'] = page
+    cookie_manager.set("page", page)
 
 def select(conv_id):
-	st.session_state.selected_conversation = conv_id
+    st.session_state.selected_conversation = conv_id
+    cookie_manager.set("selected_conversation", conv_id)
 
 def log_in(username, password):
-	token = create_jwt_token(username, password)
-	payload = verify_jwt_token(token)
-	if payload:
-		st.success(f"You are logged in successfully as {username}")
-		st.session_state['jwt'] = token  # Store the JWT in session state
-		st.session_state['user'] = username  # Store the JWT in session state
-		if payload['is_admin']:
-			navigate_to('admin')
-		else:
-			navigate_to('chat')
-	else:
-		st.error("Log In failed. Please try again.")
+    token = create_jwt_token(username, password)
+    cookie_manager.set("token", token)
+    payload = verify_jwt_token(token)
+    if payload:
+        st.success(f"You are logged in successfully as {username}")
+        st.session_state['jwt'] = token  # Store the JWT in session state
+        st.session_state['user'] = username  # Store the JWT in session state
+        if payload['is_admin']:
+            navigate_to('admin')
+        else:
+            navigate_to('chat')
+    else:
+        st.error("Log In failed. Please try again.")
 
 def register(username, password):
-	token = create_jwt_token(username, password)  # Reuse the JWT creation function from login
-	payload = verify_jwt_token(token)
-	if payload:
-		st.success(f"You are registered successfully as {username}")
-		st.session_state['jwt'] = token  # Store the JWT in session state
-		st.session_state['user'] = username  # Store the JWT in session state
-		if payload['is_admin']:
-			navigate_to('admin')
-		else:
-			navigate_to('chat')
-	else:
-		st.error("Registration failed. Please try again.")
+    token = create_jwt_token(username, password)  # Reuse the JWT creation function from login
+    cookie_manager.set("token", token)
+    payload = verify_jwt_token(token)
+    if payload:
+        st.success(f"You are registered successfully as {username}")
+        st.session_state['jwt'] = token  # Store the JWT in session state
+        st.session_state['user'] = username  # Store the JWT in session state
+        if payload['is_admin']:
+            navigate_to('admin')
+        else:
+            navigate_to('chat')
+    else:
+        st.error("Registration failed. Please try again.")
 
 # App Routing
 if st.session_state['page'] == 'login':
-	st.sidebar.button("Back to Chat", key='login_back_btn', on_click=lambda: navigate_to('chat'))
-	st.sidebar.button("Back to Register", key='login_back_register_btn', on_click=lambda: navigate_to('login'))
-	login_page(log_in)
+    st.sidebar.button("Back to Chat", key='login_back_btn', on_click=lambda: navigate_to('chat'))
+    st.sidebar.button("Back to Register", key='login_back_register_btn', on_click=lambda: navigate_to('login'))
+    login_page(log_in)
 
 elif st.session_state['page'] == 'register':
-	st.sidebar.button("Back to Chat", key='register_back_btn', on_click=lambda: navigate_to('chat'))
-	st.sidebar.button("Back to Login", key='register_back_login_btn', on_click=lambda: navigate_to('login'))
-	registration_page(register)
+    st.sidebar.button("Back to Chat", key='register_back_btn', on_click=lambda: navigate_to('chat'))
+    st.sidebar.button("Back to Login", key='register_back_login_btn', on_click=lambda: navigate_to('login'))
+    registration_page(register)
 
 elif st.session_state['page'] == 'admin':
-	admin_page(select, navigate_to)
-     
+    admin_page(select, navigate_to)
+    
 elif st.session_state['page'] == 'chat':
-	# Navigation buttons
+    # Navigation buttons
     # Display or clear chat messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
@@ -126,6 +181,8 @@ elif st.session_state['page'] == 'chat':
         st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
         st.session_state.start_time = datetime.now()
         st.session_state.document_id = ''
+        cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]))
+
         
     placeholder_sidebar = st.sidebar.empty()
     
@@ -179,7 +236,6 @@ elif st.session_state['page'] == 'chat':
         #     "demands":{"rating":demands,"reason":demands_reasoning},
         #     "phraise":{"rating":phraise,"reason":phraise_reasoning},
         #     "other":feedback}
-        # print(feedback_d)
         if not TESTING:
             if st.session_state.document_id != '':
                 while True:
@@ -211,7 +267,7 @@ elif st.session_state['page'] == 'chat':
     def generate_response(prompt_input):
         messages = st.session_state.messages
         data = {"history":messages,"user_input":prompt_input}
-        response = requests.post(f'{SERVER_URL}/process', json=data, verify=False)
+        response = requests.post(f"{SERVER_URL}/process", json=data, verify=False)
         result = response.json()
         return result.get('response', '')
 
@@ -289,6 +345,7 @@ elif st.session_state['page'] == 'chat':
                     time.sleep(10)
             
         st.session_state.messages.append({"role": "user", "content": prompt})
+        cookie_manager.set("messages",json.dumps(st.session_state.messages))
         with st.chat_message("user"):
             st.markdown(f"""
                 <p>{prompt}</p>
@@ -318,6 +375,8 @@ elif st.session_state['page'] == 'chat':
 
         message = {"role": "assistant", "content": full_response}
         st.session_state.messages.append(message)
+        cookie_manager.set("messages",json.dumps(st.session_state.messages))
+
         while True:
             try:
                 new_message = {
