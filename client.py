@@ -41,10 +41,7 @@ if 'jwt' not in st.session_state:
 	st.session_state['jwt'] = None
 if 'user' not in st.session_state:
 	st.session_state['user'] = None
-if 'username' not in st.session_state:
-	st.session_state.username = ''
-if 'password' not in st.session_state:
-	st.session_state.password = ''
+
 if 'selected_conversation' not in st.session_state:
 	st.session_state.selected_conversation = None
 
@@ -127,7 +124,9 @@ elif st.session_state['page'] == 'chat':
 
     def clear_chat_history():
         st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
-
+        st.session_state.start_time = datetime.now()
+        st.session_state.document_id = ''
+        
     placeholder_sidebar = st.sidebar.empty()
     
     st.sidebar.button('New chat', on_click=clear_chat_history)
@@ -147,6 +146,8 @@ elif st.session_state['page'] == 'chat':
     product_reasoning = ""
     demands_reasoning = ""
     phraise_reasoning = ""
+    feedback = ""
+
     st.sidebar.write("# Feedback")
     with st.sidebar:
         f = st.form("Feedback",clear_on_submit=True,border=True)
@@ -172,13 +173,13 @@ elif st.session_state['page'] == 'chat':
 
     submit = f.form_submit_button("Submit")
     if submit:
-        feedback_d = {"name":feedback_sender,
-            "price":{"rating":price,"reason":price_reasoning},
-            "product":{"rating":product,"reason":product_reasoning},
-            "demands":{"rating":demands,"reason":demands_reasoning},
-            "phraise":{"rating":phraise,"reason":phraise_reasoning},
-            "other":feedback}
-        print(feedback_d)
+        # feedback_d = {"name":feedback_sender,
+        #     "price":{"rating":price,"reason":price_reasoning},
+        #     "product":{"rating":product,"reason":product_reasoning},
+        #     "demands":{"rating":demands,"reason":demands_reasoning},
+        #     "phraise":{"rating":phraise,"reason":phraise_reasoning},
+        #     "other":feedback}
+        # print(feedback_d)
         if not TESTING:
             if st.session_state.document_id != '':
                 while True:

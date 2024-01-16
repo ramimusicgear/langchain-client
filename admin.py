@@ -49,35 +49,44 @@ def admin_page(select, navigate_to):
     for idx, msg in enumerate(conv['messages']):
         st.markdown(f'<p><strong>{"client: " if idx % 2 == 0 else "bot: "}</strong>{msg['text']}</p>', unsafe_allow_html=True)
 
+    with_feedback = False
     try:
         conv['user_actions']
         st.write("## Feedback")
+        with_feedback = True
     except Exception as e:
         st.write("## No Feedback")
-    try:
-        conv['user_actions']['price']
-        st.write("##### Rate pricing match")
-        st.markdown(f"<p>Rate: {conv['user_actions']['price']['rating']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p>{conv['user_actions']['price']['reason']}</p>", unsafe_allow_html=True)
-        
-        st.write("##### Rate product match")
-        st.markdown(f"<p>Rate: {conv['user_actions']['product']['rating']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p>{conv['user_actions']['product']['reason']}</p>", unsafe_allow_html=True)
-        
-        st.write("##### Rate demands match")
-        st.markdown(f"<p>Rate: {conv['user_actions']['demands']['rating']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p>{conv['user_actions']['demands']['reason']}</p>", unsafe_allow_html=True)
-        
-        st.write("##### Rate phrasing")
-        st.markdown(f"<p>Rate: {conv['user_actions']['phraise']['rating']}</p>", unsafe_allow_html=True)
-        st.markdown(f"<p>{conv['user_actions']['phraise']['reason']}</p>", unsafe_allow_html=True)
-
-        st.write(f"### The Feedback Is From - {conv['user_actions']['name']}")
-    except Exception as e:
+        with_feedback = False
+    if with_feedback:
         try:
-            conv['user_actions']['feedback_text']
-            st.markdown(f"<p>{conv['user_actions']['feedback_text']}</p>", unsafe_allow_html=True)
-            st.write(f"### The Feedback Is From - {conv['user_actions']['sender']}")
+            conv['user_actions']['price']
+            st.write("##### Rate pricing match")
+            st.markdown(f"<p>Rate: {conv['user_actions']['price']['rating']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p>{conv['user_actions']['price']['reason']}</p>", unsafe_allow_html=True)
+            
+            st.write("##### Rate product match")
+            st.markdown(f"<p>Rate: {conv['user_actions']['product']['rating']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p>{conv['user_actions']['product']['reason']}</p>", unsafe_allow_html=True)
+            
+            st.write("##### Rate demands match")
+            st.markdown(f"<p>Rate: {conv['user_actions']['demands']['rating']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p>{conv['user_actions']['demands']['reason']}</p>", unsafe_allow_html=True)
+            
+            st.write("##### Rate phrasing")
+            st.markdown(f"<p>Rate: {conv['user_actions']['phraise']['rating']}</p>", unsafe_allow_html=True)
+            st.markdown(f"<p>{conv['user_actions']['phraise']['reason']}</p>", unsafe_allow_html=True)
+            
+            st.write("##### Do you have anything else you would like to add?")
+            st.markdown(f"<p>{conv['user_actions']['other']}</p>", unsafe_allow_html=True)
+            
+            st.write(f"### The Feedback Is From - {conv['user_actions']['name']}")
         except Exception as e:
-            pass
-        
+            try:
+                conv['user_actions']['feedback_text']
+                st.write("##### Feedback Text")
+                st.markdown(f"<p>{conv['user_actions']['feedback_text']}</p>", unsafe_allow_html=True)
+                
+                st.write(f"### The Feedback Is From - {conv['user_actions']['sender']}")
+            except Exception as e:
+                pass
+            
