@@ -47,7 +47,8 @@ def admin_page(select, navigate_to):
     # Chat Interface
     st.title('Chat Interface')
     for idx, msg in enumerate(conv['messages']):
-        st.markdown(f'<p><strong>{"client: " if idx % 2 == 0 else "bot: "}</strong>{msg['text']}</p>', unsafe_allow_html=True)
+        # st.markdown(f'<p><strong>{"client: " if idx % 2 == 0 else "bot: "}</strong>{msg['text']}</p>', unsafe_allow_html=True)
+        st.markdown(f"<p><strong>{'client: ' if idx % 2 == 0 else 'bot: '}</strong>{msg['text']}</p>", unsafe_allow_html=True)
 
     with_feedback = False
     try:
