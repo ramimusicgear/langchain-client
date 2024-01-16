@@ -212,12 +212,10 @@ elif st.session_state['page'] == 'chat':
     st.sidebar.button('New chat', on_click=clear_chat_history)
 
     if st.session_state['user']:
-        if st.sidebar.button("Logout",key='to_logout_btn'):
-            log_out()
-        
+        st.sidebar.button("Logout",key='to_logout_btn', on_click=log_out)
         st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
         payload = verify_jwt_token(st.session_state['jwt'])
-        if payload['is_admin']:
+        if payload and payload['is_admin']:
             st.sidebar.button('Go To Admin Dashboard',key="admin_dashboard", on_click=lambda: navigate_to('admin'))
     else:
         st.sidebar.write("# Login/Register")
