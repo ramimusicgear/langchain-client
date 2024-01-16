@@ -44,7 +44,7 @@ if 'user' not in st.session_state:
     st.session_state['user'] = None
 
 if 'selected_conversation' not in st.session_state:
-    st.session_state.selected_conversation = None
+    st.session_state['selected_conversation']= None
 
 # Initialize page navigation
 if 'page' not in st.session_state:
@@ -122,6 +122,15 @@ def select(conv_id):
     st.session_state.selected_conversation = conv_id
     cookie_manager.set("selected_conversation", conv_id, key=f"set_selected_conversation_cookie_{conv_id}")
 
+def log_out():
+    st.session_state['jwt'] = None
+    st.session_state['user'] = None
+    st.session_state['selected_conversation']= None
+    st.session_state['page'] = "chat"
+    cookie_manager.delete("token")
+    cookie_manager.delete("selected_conversation")
+    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
+    
 def log_in(username, password):
     token = create_jwt_token(username, password)
     cookie_manager.set("token", token, key=f"set_jwt_cookie_{token}")
@@ -154,6 +163,24 @@ def register(username, password):
     else:
         st.error("Registration failed. Please try again.")
 
+def clear_chat_history():
+    st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
+    st.session_state.start_time = datetime.now()
+    st.session_state.document_id = ''
+    cookie_manager.set("messages", json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
+    
+def clear_all_cookies():
+    st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
+    st.session_state.start_time = datetime.now()
+    st.session_state.document_id = ''
+    cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
+    cookie_manager.delete("token")
+    cookie_manager.delete("selected_conversation")
+    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
+    st.session_state.document_id = ''
+    
+st.sidebar.button("Reset",key='reset_btn', on_click=clear_all_cookies)
+
 # App Routing
 if st.session_state['page'] == 'login':
     st.sidebar.button("Back to Chat", key='login_back_btn', on_click=lambda: navigate_to('chat'))
@@ -168,6 +195,7 @@ elif st.session_state['page'] == 'register':
 elif st.session_state['page'] == 'admin':
     admin_page(select, navigate_to)
     
+
 elif st.session_state['page'] == 'chat':
     # Navigation buttons
     # Display or clear chat messages
@@ -179,17 +207,12 @@ elif st.session_state['page'] == 'chat':
                 <p>{message["content"]}</p>
                 """, unsafe_allow_html=True)
 
-    def clear_chat_history():
-        st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
-        st.session_state.start_time = datetime.now()
-        st.session_state.document_id = ''
-        cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
-        
     placeholder_sidebar = st.sidebar.empty()
     
     st.sidebar.button('New chat', on_click=clear_chat_history)
 
     if st.session_state['user']:
+        st.sidebar.button("Logout",key='to_logout_btn', on_click=log_out)
         st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
         payload = verify_jwt_token(st.session_state['jwt'])
         if payload['is_admin']:
@@ -239,6 +262,7 @@ elif st.session_state['page'] == 'chat':
         #     "other":feedback}
         if not TESTING:
             if st.session_state.document_id != '':
+                retry = 0
                 while True:
                     try:
                         # Create 'user_actions' with 'feedback_text'
@@ -253,15 +277,21 @@ elif st.session_state['page'] == 'chat':
 
                         # Check if the update was successful
                         if update_result.modified_count > 0:
-                            st.write(f"thank you very much {feedback_sender}!")
                             break
                         else:
-                            st.error("try feedback again, sorry")
-                            time.sleep(5)
-                        
+                            if retry > 3:
+                                st.error("error, refresh to fix")
+                                time.sleep(10)
+                            retry += 1
+                            time.sleep(1)
+
                     except Exception as e:
-                        st.error(str(e))
-                        time.sleep(5)
+                        print(str(e))
+                        if retry > 3:
+                            st.error("error, refresh to fix")
+                            time.sleep(10)
+                        retry += 1
+                        time.sleep(1)
         st.rerun()
                 
             
@@ -275,6 +305,7 @@ elif st.session_state['page'] == 'chat':
     # User-provided prompt
     if prompt := st.chat_input(disabled=False):
         if len(st.session_state.messages) == 1:
+            retry = 0
             while True:
                 try:
                     chat_document = {
@@ -314,14 +345,20 @@ elif st.session_state['page'] == 'chat':
                         # Get the _id of the inserted document
                         inserted_id = insert_result.inserted_id
                         st.session_state.document_id = inserted_id
+                        break
                     else:
                         st.session_state.document_id = "inserted_id"
-                        
-                    break
+                        break
                 except Exception as e:
-                    st.error(str(e))
-                    time.sleep(10)
+                    if retry > 3:
+                        st.error("error, to fix click on reset button")
+                        st.error(str(e))
+                        print(str(e))
+                        time.sleep(10)
+                    retry += 1
+                    time.sleep(1)
         else:
+            retry = 0
             while True:
                 try:
                     new_message = {
@@ -338,12 +375,20 @@ elif st.session_state['page'] == 'chat':
                         if update_result.modified_count > 0:
                             break
                         else:
-                            st.error("try again, sorry")
-                            time.sleep(5)
+                            if retry > 3:
+                                st.error("error, to fix click on reset button")
+                                time.sleep(10)
+                            retry += 1
+                            time.sleep(1)
                     break
                 except Exception as e:
-                    st.error(str(e))
-                    time.sleep(10)
+                    if retry > 3:
+                        st.error("error, to fix click on reset button")
+                        st.error(str(e))
+                        print(str(e))
+                        time.sleep(10)
+                    retry += 1
+                    time.sleep(1)
             
         st.session_state.messages.append({"role": "user", "content": prompt})
         cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{prompt}")
@@ -378,7 +423,7 @@ elif st.session_state['page'] == 'chat':
         message = {"role": "assistant", "content": full_response}
         st.session_state.messages.append(message)
         cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
-
+        retry = 0
         while True:
             try:
                 new_message = {
@@ -395,10 +440,17 @@ elif st.session_state['page'] == 'chat':
                     if update_result.modified_count > 0:
                         break
                     else:
-                        st.error("try again, sorry")
-                        time.sleep(5)
-
+                        if retry > 3:
+                            st.error("error, to fix click on reset button")
+                            time.sleep(10)
+                        retry += 1
+                        time.sleep(1)
                 break
             except Exception as e:
-                st.error(str(e))
-                time.sleep(10)
+                if retry > 3:
+                    st.error("error, to fix click on reset button")
+                    st.error(str(e))
+                    print(str(e))
+                    time.sleep(10)
+                retry += 1
+                time.sleep(1)
