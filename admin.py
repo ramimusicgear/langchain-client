@@ -10,7 +10,7 @@ def admin_page(select, navigate_to):
     last_id = ''
     dates = []
     for conv in conversations:
-        conversation_id = conv['_id']
+        conversation_id = str(conv['_id'])
         if last_id == '':
             last_id = conversation_id
         first_message_text = conv['messages'][0]['text']
@@ -27,7 +27,7 @@ def admin_page(select, navigate_to):
                     first_message_text = f"with feedback: " + first_message_text
             except Exception as e:
                 pass
-            button_clicked = st.sidebar.button(first_message_text, key=f"{conversation_id}", on_click=lambda cid=conversation_id: select(cid))
+            button_clicked = st.sidebar.button(first_message_text, key=f"{conversation_id}_btn", on_click=lambda cid=conversation_id: select(cid))
             if button_clicked:
                 st.session_state.selected_conversation = conversation_id
 
