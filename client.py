@@ -67,24 +67,11 @@ st.session_state.token_loaded = False
 st.session_state.page_loaded = False
 st.session_state.selected_conversation_loaded = False
 
-st.session_state.loaded_messages = False
 
 def get_manager():
     return stx.CookieManager()
 
 cookie_manager = get_manager()
-
-messages_cookie = cookie_manager.get(cookie="messages")
-if messages_cookie and not st.session_state.loaded_messages:
-    if isinstance(messages_cookie, str):
-        # If messages_cookie is a string, parse it as JSON
-        st.session_state.messages = json.loads(messages_cookie)
-    elif isinstance(messages_cookie, list):
-        # If messages_cookie is already a list, use it directly
-        st.session_state.messages = messages_cookie
-
-    st.session_state.loaded_messages = True
-
 
 page_cookie = cookie_manager.get(cookie="page")
 if page_cookie and not st.session_state.page_loaded:
@@ -99,7 +86,10 @@ if selected_conversation_cookie and not st.session_state.selected_conversation_l
 jwt_cookie = cookie_manager.get(cookie="token")
 if jwt_cookie and not st.session_state.token_loaded:
     st.session_state.token_loaded = True
-    payload = verify_jwt_token(jwt_cookie)
+    payload = None
+    token = st.session_state['jwt']
+    if token:
+        payload = verify_jwt_token(jwt_cookie)
     if payload:
         st.session_state['jwt'] = jwt_cookie  # Store the JWT in session state
         st.session_state['user'] = payload['user']
@@ -108,14 +98,33 @@ if jwt_cookie and not st.session_state.token_loaded:
 if jwt_cookie and not st.session_state.token_loaded:
     st.session_state.jwt = jwt_cookie
     st.session_state.token_loaded = True
-    payload = verify_jwt_token(jwt_cookie)
+    payload = None
+    token = st.session_state['jwt']
+    if token:
+        payload = verify_jwt_token(jwt_cookie)
     if payload:
         st.session_state['jwt'] = jwt_cookie  # Store the JWT in session state
         st.session_state['user'] = payload['user']
 
+def clear_all_cookies():
+    st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
+    st.session_state.start_time = datetime.now()
+    st.session_state.document_id = ''
+    st.session_state.jwt = None
+    st.session_state.user = None
+    st.session_state.selected_conversation = None
+    st.session_state.page = "chat"
+    # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
+    cookie_manager.delete("token", key=f"del_selected_token")
+    cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
+    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
+    
+if st.sidebar.button("Reset Cookies", key='reset_btn'):
+    clear_all_cookies()
+
 # Function to navigate between pages
 def navigate_to(page):
-    st.session_state['page'] = page
+    st.session_state.page = page
     cookie_manager.set("page", page, key=f"set_page_cookie_{page}")
 
 def select(conv_id):
@@ -123,39 +132,47 @@ def select(conv_id):
     cookie_manager.set("selected_conversation", conv_id, key=f"set_selected_conversation_cookie_{conv_id}")
 
 def log_out():
-    st.session_state['jwt'] = None
-    st.session_state['user'] = None
-    st.session_state['selected_conversation'] = None
-    st.session_state['page'] = "chat"
+    st.session_state.page = "chat"
+    st.session_state.jwt = None
+    st.session_state.user = None
+    st.session_state.selected_conversation = None
+
+    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     cookie_manager.delete("token", key=f"del_page_cookie_chat")
     cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
-    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     
 def log_in(username, password):
     token = create_jwt_token(username, password)
-    cookie_manager.set("token", token, key=f"set_jwt_cookie_{token}")
-
-    payload = verify_jwt_token(token)
+    cookie_manager.set("token", token, key=f"set_register_jwt_cookie_{token}")
+    payload = None
+    if token:
+        payload = verify_jwt_token(token)
     if payload:
         st.success(f"You are logged in successfully as {username}")
-        st.session_state['jwt'] = token  # Store the JWT in session state
-        st.session_state['user'] = username  # Store the JWT in session state
+        st.session_state.jwt = token  # Store the JWT in session state
+        st.session_state.user = username  # Store the JWT in session state
         if payload['is_admin']:
             navigate_to('admin')
         else:
             navigate_to('chat')
     else:
         st.error("Log In failed. Please try again.")
+    print(payload)
+    print(st.session_state['user'])
+    print()
+    # st.rerun()
 
 def register(username, password):
     token = create_jwt_token(username, password)  # Reuse the JWT creation function from login
     cookie_manager.set("token", token, key=f"set_register_jwt_cookie_{token}")
 
-    payload = verify_jwt_token(token)
+    payload = None
+    if token:
+        payload = verify_jwt_token(token)    
     if payload:
         st.success(f"You are registered successfully as {username}")
-        st.session_state['jwt'] = token  # Store the JWT in session state
-        st.session_state['user'] = username  # Store the JWT in session state
+        st.session_state.jwt = token  # Store the JWT in session state
+        st.session_state.user = username  # Store the JWT in session state
         if payload['is_admin']:
             navigate_to('admin')
         else:
@@ -167,19 +184,8 @@ def clear_chat_history():
     st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
     st.session_state.start_time = datetime.now()
     st.session_state.document_id = ''
-    cookie_manager.set("messages", json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
     
-def clear_all_cookies():
-    st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
-    st.session_state.start_time = datetime.now()
-    st.session_state.document_id = ''
-    cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
-    cookie_manager.delete("token", key=f"del_selected_token")
-    cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
-    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
-    st.session_state.document_id = ''
-    
-st.sidebar.button("Reset Cookies",key='reset_btn', on_click=clear_all_cookies)
+
 
 # App Routing
 if st.session_state['page'] == 'login':
@@ -212,9 +218,16 @@ elif st.session_state['page'] == 'chat':
     st.sidebar.button('New chat', on_click=clear_chat_history)
 
     if st.session_state['user']:
-        st.sidebar.button("Logout",key='to_logout_btn', on_click=log_out)
-        st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
-        payload = verify_jwt_token(st.session_state['jwt'])
+        if st.sidebar.button("Logout",key='to_logout_btn'):
+            log_out()
+
+        if st.session_state['user']:
+            st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
+            
+        payload = None
+        token = st.session_state['jwt']
+        if token:
+            payload = verify_jwt_token(token)
         if payload and payload['is_admin']:
             st.sidebar.button('Go To Admin Dashboard',key="admin_dashboard", on_click=lambda: navigate_to('admin'))
     else:
@@ -231,7 +244,7 @@ elif st.session_state['page'] == 'chat':
 
     st.sidebar.write("# Feedback")
     with st.sidebar:
-        f = st.form("Feedback",clear_on_submit=True,border=True)
+        f = st.form("Feedback", clear_on_submit=True,border=True)
     feedback_sender = f.text_input("Name (Not Required)",key="feedback_sender")
 
     price = f.radio("Rate pricing match",["Good","Okay","Bad"],index=None,horizontal=True)
@@ -254,24 +267,22 @@ elif st.session_state['page'] == 'chat':
 
     submit = f.form_submit_button("Submit")
     if submit:
-        # feedback_d = {"name":feedback_sender,
-        #     "price":{"rating":price,"reason":price_reasoning},
-        #     "product":{"rating":product,"reason":product_reasoning},
-        #     "demands":{"rating":demands,"reason":demands_reasoning},
-        #     "phraise":{"rating":phraise,"reason":phraise_reasoning},
-        #     "other":feedback}
         if not TESTING:
             if st.session_state.document_id != '':
                 retry = 0
                 while True:
                     try:
                         # Create 'user_actions' with 'feedback_text'
-                        new_values = {"user_actions": {"name":feedback_sender,
-                            "price":{"rating":price,"reason":price_reasoning},
-                            "product":{"rating":product,"reason":product_reasoning},
-                            "demands":{"rating":demands,"reason":demands_reasoning},
-                            "phraise":{"rating":phraise,"reason":phraise_reasoning},
-                            "other":feedback}}
+                        new_values = {
+                            "user_actions": {
+                                "name":feedback_sender,
+                                "price":{"rating":price,"reason":price_reasoning},
+                                "product":{"rating":product,"reason":product_reasoning},
+                                "demands":{"rating":demands,"reason":demands_reasoning},
+                                "phraise":{"rating":phraise,"reason":phraise_reasoning},
+                                "other":feedback
+                            }
+                        }
                         # Perform the update
                         update_result = chats.update_one({"_id": st.session_state.document_id}, {"$set": new_values})
 
@@ -391,7 +402,7 @@ elif st.session_state['page'] == 'chat':
                     time.sleep(1)
             
         st.session_state.messages.append({"role": "user", "content": prompt})
-        cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{prompt}")
+        # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{prompt}")
 
         with st.chat_message("user"):
             st.markdown(f"""
@@ -422,7 +433,7 @@ elif st.session_state['page'] == 'chat':
 
         message = {"role": "assistant", "content": full_response}
         st.session_state.messages.append(message)
-        cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
+        # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
         retry = 0
         while True:
             try:

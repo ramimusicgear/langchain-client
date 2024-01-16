@@ -67,7 +67,6 @@ def login_page(log_in):
     submit = f.form_submit_button("Login")
     if submit:
         log_in(username, password)
-        st.rerun()
    
 def register_user(username, password):
     """
@@ -89,4 +88,3 @@ def registration_page(register):
     submit = f.form_submit_button("Register")
     if submit:
         register(new_username, new_password)
-        st.rerun()
