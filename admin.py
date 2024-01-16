@@ -8,18 +8,26 @@ def admin_page(select, navigate_to):
     
     conversations = get_all()
     last_id = ''
-    
+    dates = []
     for conv in conversations:
         conversation_id = conv['_id']
         if last_id == '':
             last_id = conversation_id
         first_message_text = conv['messages'][0]['text']
         id = st.session_state.selected_conversation if st.session_state.selected_conversation else last_id
+        d = str(conv['start_time']).split()[0]
+        if d not in dates: 
+            st.sidebar.markdown(f"<p>Date: {d}</p>", unsafe_allow_html=True)
+            dates.append(d)
         if conversation_id == id:
-            st.sidebar.markdown(f"<p>{first_message_text}</p>", unsafe_allow_html=True)
+            st.sidebar.markdown(f"<p><strong>Selected Chat: </strong>{first_message_text}</p>", unsafe_allow_html=True)
         else:
+            try:
+                if conv['user_actions']:
+                    first_message_text = f"with feedback: " + first_message_text
+            except Exception as e:
+                pass
             button_clicked = st.sidebar.button(first_message_text, key=f"{conversation_id}", on_click=lambda cid=conversation_id: select(cid))
-            
             if button_clicked:
                 st.session_state.selected_conversation = conversation_id
 
@@ -38,23 +46,38 @@ def admin_page(select, navigate_to):
 
     # Chat Interface
     st.title('Chat Interface')
-    
-    st.write("### Enter your message:")
-    st.markdown(f"<p>{conv['messages'][0]['text']}</p>", unsafe_allow_html=True)
+    for idx, msg in enumerate(conv['messages']):
+        st.markdown(f'<p><strong>{"client: " if idx % 2 == 0 else "bot: "}</strong>{msg['text']}</p>', unsafe_allow_html=True)
 
-
-    st.write("### Response")
-    st.markdown(f"<p>{conv['messages'][1]['text']}</p>", unsafe_allow_html=True)
-
-    st.write("### Gpt Generated Search")
-    st.write(conv['prompts']['search_prompt'])
-    st.markdown(f"<p>{conv['prompts']['search_prompt']}</p>", unsafe_allow_html=True)
-    
     try:
         conv['user_actions']
         st.write("## Feedback")
-        st.markdown(f"<p>{conv['user_actions']['feedback_text']}</p>", unsafe_allow_html=True)
-        st.write(conv['user_actions']['feedback_text'])
-        st.write(f"# The Feedback Is From - {conv['user_actions']['sender']}")
     except Exception as e:
         st.write("## No Feedback")
+    try:
+        conv['user_actions']['price']
+        st.write("##### Rate pricing match")
+        st.markdown(f"<p>Rate: {conv['user_actions']['price']['rating']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p>{conv['user_actions']['price']['reason']}</p>", unsafe_allow_html=True)
+        
+        st.write("##### Rate product match")
+        st.markdown(f"<p>Rate: {conv['user_actions']['product']['rating']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p>{conv['user_actions']['product']['reason']}</p>", unsafe_allow_html=True)
+        
+        st.write("##### Rate demands match")
+        st.markdown(f"<p>Rate: {conv['user_actions']['demands']['rating']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p>{conv['user_actions']['demands']['reason']}</p>", unsafe_allow_html=True)
+        
+        st.write("##### Rate phrasing")
+        st.markdown(f"<p>Rate: {conv['user_actions']['phraise']['rating']}</p>", unsafe_allow_html=True)
+        st.markdown(f"<p>{conv['user_actions']['phraise']['reason']}</p>", unsafe_allow_html=True)
+
+        st.write(f"### The Feedback Is From - {conv['user_actions']['name']}")
+    except Exception as e:
+        try:
+            conv['user_actions']['feedback_text']
+            st.markdown(f"<p>{conv['user_actions']['feedback_text']}</p>", unsafe_allow_html=True)
+            st.write(f"### The Feedback Is From - {conv['user_actions']['sender']}")
+        except Exception as e:
+            pass
+        

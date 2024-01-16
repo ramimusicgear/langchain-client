@@ -4,16 +4,13 @@ import time
 import hashlib
 import datetime
 import streamlit as st
+
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
 ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
 
 # Function to validate login (implement proper validation here)
 def validate_login(username, password):
-    # print(username)
-    # print(ADMIN_USERNAME)
-    # print(password)
-    # print(ADMIN_PASSWORD)
     return username == ADMIN_USERNAME and password == ADMIN_PASSWORD
 
 
@@ -62,23 +59,16 @@ def verify_jwt_token(token, triggered=True):
 
 def login_page(log_in):
     st.title("Login")
+    f = st.form("LoginForm",clear_on_submit=False,border=True)
+    username = f.text_input('Enter Your Username:', key='username_inp')
 
-    # Use session state variable for the text input
-    username = st.text_input('Enter Your Username:', key='username_inp', value=st.session_state.username)
-    # Update the session state when the text input changes
-    st.session_state.username = username
+    password = f.text_input('Enter Your Password:', type="password", key='password_inp')
 
-    # Use session state variable for the text input
-    password = st.text_input('Enter Your Password:', type="password", key='password_inp', value=st.session_state.password)
-    # Update the session state when the text input changes
-    st.session_state.password = password
-
-    # Check if the password is not empty to enable the "Login" button
-    if st.session_state.password:
-        st.button("Login", key='login_btn', on_click=lambda: log_in(st.session_state.username, st.session_state.password))
-    else:
-        st.button("Login", key='dis_login_btn', on_click=None, disabled=True)
-
+    submit = f.form_submit_button("Login")
+    if submit:
+        log_in(username, password)
+        st.rerun()
+   
 def register_user(username, password):
     """
     Register a new user and return a JWT token upon successful registration.
@@ -90,21 +80,13 @@ def register_user(username, password):
 
 
 def registration_page(register):
-    if st.session_state['page'] == 'register':
-        st.title("Registration")
-         # Use session state variable for the text input
-        new_username = st.text_input('Choose Your Username:', key='new_username', value=st.session_state.username)
+    st.title("Registration")
+    f = st.form("RegistrationForm",clear_on_submit=False,border=True)
+    new_username = f.text_input('Choose Your Username:', key='new_username')
 
-        # Update the session state when the text input changes
-        st.session_state.username = new_username
+    new_password = f.text_input('Choose Your Password:', type="password", key='new_password')
 
-         # Use session state variable for the text input
-        new_password = st.text_input('Choose Your Password:', type="password", key='new_password', value=st.session_state.password)
-
-        # Update the session state when the text input changes
-        st.session_state.password = new_password
-         # Check if the password is not empty to enable the "Login" button
-        if st.session_state.password:
-            st.button("Register", key='register_btn', on_click=lambda: register(st.session_state.username, st.session_state.password))
-        else:
-            st.button("Register", key='dis_register_btn', on_click=None, disabled=True)
+    submit = f.form_submit_button("Register")
+    if submit:
+        register(new_username, new_password)
+        st.rerun()

@@ -15,7 +15,7 @@ chats = db['chats']
 def get_all():
     payload = verify_jwt_token(st.session_state['jwt'])
     if payload and payload['is_admin']:
-        conversations = chats.find({}) 
+        conversations = chats.find({}).sort("start_time", -1)
         return conversations
     return []
 
