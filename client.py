@@ -116,15 +116,16 @@ if jwt_cookie and not st.session_state.token_loaded:
 # Function to navigate between pages
 def navigate_to(page):
     st.session_state['page'] = page
-    cookie_manager.set("page", page)
+    cookie_manager.set("page", page, key=f"set_page_cookie_{page}")
 
 def select(conv_id):
     st.session_state.selected_conversation = conv_id
-    cookie_manager.set("selected_conversation", conv_id)
+    cookie_manager.set("selected_conversation", conv_id, key=f"set_selected_conversation_cookie_{conv_id}")
 
 def log_in(username, password):
     token = create_jwt_token(username, password)
-    cookie_manager.set("token", token)
+    cookie_manager.set("token", token, key=f"set_jwt_cookie_{token}")
+
     payload = verify_jwt_token(token)
     if payload:
         st.success(f"You are logged in successfully as {username}")
@@ -139,7 +140,8 @@ def log_in(username, password):
 
 def register(username, password):
     token = create_jwt_token(username, password)  # Reuse the JWT creation function from login
-    cookie_manager.set("token", token)
+    cookie_manager.set("token", token, key=f"set_register_jwt_cookie_{token}")
+
     payload = verify_jwt_token(token)
     if payload:
         st.success(f"You are registered successfully as {username}")
@@ -181,8 +183,7 @@ elif st.session_state['page'] == 'chat':
         st.session_state.messages = [{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]
         st.session_state.start_time = datetime.now()
         st.session_state.document_id = ''
-        cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]))
-
+        cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
         
     placeholder_sidebar = st.sidebar.empty()
     
@@ -345,7 +346,8 @@ elif st.session_state['page'] == 'chat':
                     time.sleep(10)
             
         st.session_state.messages.append({"role": "user", "content": prompt})
-        cookie_manager.set("messages",json.dumps(st.session_state.messages))
+        cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{prompt}")
+
         with st.chat_message("user"):
             st.markdown(f"""
                 <p>{prompt}</p>
@@ -375,7 +377,7 @@ elif st.session_state['page'] == 'chat':
 
         message = {"role": "assistant", "content": full_response}
         st.session_state.messages.append(message)
-        cookie_manager.set("messages",json.dumps(st.session_state.messages))
+        cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
 
         while True:
             try:
