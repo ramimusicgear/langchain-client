@@ -1,7 +1,6 @@
 import os
 import pymongo
 from bson import ObjectId
-from pymongo.errors import InvalidId
 
 from datetime import datetime
 import streamlit as st
@@ -26,7 +25,7 @@ def get_selected(selected_conversation):
     try:
         # Convert string to ObjectId
         selected_conversation_id = ObjectId(selected_conversation)
-    except InvalidId:
+    except Exception as e:
         # Handle invalid ObjectId string
         return None
 
