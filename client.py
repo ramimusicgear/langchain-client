@@ -125,7 +125,7 @@ def select(conv_id):
 def log_out():
     st.session_state['jwt'] = None
     st.session_state['user'] = None
-    st.session_state['selected_conversation']= None
+    st.session_state['selected_conversation'] = None
     st.session_state['page'] = "chat"
     cookie_manager.delete("token", key=f"del_page_cookie_chat")
     cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
@@ -212,7 +212,9 @@ elif st.session_state['page'] == 'chat':
     st.sidebar.button('New chat', on_click=clear_chat_history)
 
     if st.session_state['user']:
-        st.sidebar.button("Logout",key='to_logout_btn', on_click=log_out)
+        if st.sidebar.button("Logout",key='to_logout_btn'):
+            log_out()
+        
         st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
         payload = verify_jwt_token(st.session_state['jwt'])
         if payload['is_admin']:
