@@ -83,7 +83,7 @@ if selected_conversation_cookie and not st.session_state.selected_conversation_l
     st.session_state['selected_conversation'] = selected_conversation_cookie  # Store the JWT in session state
     st.session_state.selected_conversation_loaded = True
 
-jwt_cookie = cookie_manager.get(cookie="token")
+jwt_cookie = cookie_manager.get(cookie="jwt-token")
 if jwt_cookie and not st.session_state.token_loaded:
     st.session_state.token_loaded = True
     payload = None
@@ -115,7 +115,7 @@ def clear_all_cookies():
     st.session_state.selected_conversation = None
     st.session_state.page = "chat"
     # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
-    cookie_manager.delete("token", key=f"del_selected_token")
+    cookie_manager.delete("jwt-token", key=f"del_selected_token")
     cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
     cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     
@@ -138,12 +138,12 @@ def log_out():
     st.session_state.selected_conversation = None
 
     cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
-    cookie_manager.delete("token", key=f"del_page_cookie_chat")
+    cookie_manager.delete("jwt-token", key=f"del_page_cookie_chat")
     cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
     
 def log_in(username, password):
     token = create_jwt_token(username, password)
-    cookie_manager.set("token", token, key=f"set_register_jwt_cookie_{token}")
+    cookie_manager.set("jwt-token", token, key=f"set_register_jwt_cookie_{token}")
     payload = None
     if token:
         payload = verify_jwt_token(token)
@@ -164,7 +164,7 @@ def log_in(username, password):
 
 def register(username, password):
     token = create_jwt_token(username, password)  # Reuse the JWT creation function from login
-    cookie_manager.set("token", token, key=f"set_register_jwt_cookie_{token}")
+    cookie_manager.set("jwt-token", token, key=f"set_register_jwt_cookie_{token}")
 
     payload = None
     if token:
