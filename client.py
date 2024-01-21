@@ -309,7 +309,7 @@ elif st.session_state['page'] == 'chat':
     def generate_response(prompt_input):
         messages = st.session_state.messages
         data = {"history":messages,"user_input":prompt_input}
-        response = requests.post(f"{SERVER_URL}/process", json=data, verify=False)
+        response = requests.post(f"{SERVER_URL}/process", json=data)
         result = response.json()
         return result.get('response', '')
 
