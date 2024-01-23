@@ -18,6 +18,8 @@ def admin_page(navigate_to, select):
         d = str(conv['start_time']).split()[0]
         if d not in dates: 
             st.sidebar.markdown(f"<p>Date: {d}</p>", unsafe_allow_html=True)
+            # TODO: show the total price of all chats on the date
+            
             dates.append(d)
         if conversation_id == id:
             st.sidebar.markdown(f"<p><strong>Selected Chat: </strong>{first_message_text}</p>", unsafe_allow_html=True)

@@ -109,14 +109,4 @@ else:
 		first_document = chats.find_one()
 		# Print the document
 		print(first_document)
-		print()
-		print()
-		print()
-		# Query to get only the user feedbacks
-		feedbacks = chats.find({}, {"user_actions.feedback_text": 1, "_id": 0})
 
-		# Process and print the feedbacks
-		for feedback in feedbacks:
-			user_feedback = feedback.get('user_actions', {}).get('feedback_text')
-			if user_feedback:
-				print(user_feedback)
