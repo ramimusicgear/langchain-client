@@ -80,13 +80,16 @@ def insert_first_message(chat_document):
             retry += 1
             time.sleep(1)
 
-def insert_message(document_id, new_message):
+def insert_message(document_id, new_message, price):
     retry = 0
     while True:
         try:
             update_result = chats.update_one(
                 {"_id": document_id},
-                {"$push": {"messages": new_message}}
+                {
+                    "$push": {"messages": new_message},
+                    "$inc": {"price": price}
+                }
             )
             # Check if the update was successful
             if update_result.modified_count > 0:

@@ -105,6 +105,7 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
                         "user_device": "Desktop",  # Example device type
                         # "category": category,
                         # "subcategory": subcategory,
+                        "price": 0,
                         "start_time": st.session_state.start_time,
                         "end_time": datetime.now(),
                         "messages": [
@@ -175,10 +176,11 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
         message = {"role": "assistant", "content": full_response}
         st.session_state.messages.append(message)
         # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
+        price = float(result.get('price', ''))
         new_message = {
             "timestamp": datetime.now(),
             "sender": "bot",
             "text": full_response
         }
         if not TESTING:
-            insert_message(st.session_state.document_id, new_message)
+            insert_message(st.session_state.document_id, new_message, price)

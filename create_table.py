@@ -31,6 +31,7 @@ chat_schema = {
             "subcategory": {"bsonType": "string"},
             "start_time": {"bsonType": "date"},
             "end_time": {"bsonType": "date"},
+            "price": {"bsonType": "double"},
             "messages": {
                 "bsonType": "array",
                 "items": {
