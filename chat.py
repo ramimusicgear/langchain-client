@@ -7,208 +7,178 @@ import streamlit as st
 from bson import ObjectId
 from datetime import datetime
 
+from user_pages_and_functions import verify_jwt_token
+
+from db import update_feedback, insert_first_message, insert_message
+
 SERVER_URL = os.environ.get('SERVER_URL')
-MONGODB_URL = os.environ.get("MONGODB_URL")
 
-# Connect to MongoDB
-client = pymongo.MongoClient(MONGODB_URL)
-db = client['llamaindex']  # Replace with your database name
-chats = db['chats']
+def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
+    # Navigation buttons
 
-def chat_page(navigate_to, reset):
+    # Display or clear chat messages
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(f"""
+                <p>{message["content"]}</p>
+                """, unsafe_allow_html=True)
+
+    
+    # sidebar
+    st.sidebar.button('New chat', on_click=clear_chat_history)
     if st.session_state['user']:
-        st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
+        if st.sidebar.button("Logout",key='to_logout_btn'):
+            log_out()
+        if st.session_state['user']:
+            st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
+            
+        payload = None
+        token = st.session_state['jwt']
+        if token:
+            payload = verify_jwt_token(token)
+        if payload and payload['is_admin']:
+            st.sidebar.button('Go To Admin Dashboard',key="admin_dashboard", on_click=lambda: navigate_to('admin'))
     else:
         st.sidebar.write("# Login/Register")
         st.sidebar.button("Login",key='to_login_btn', on_click=lambda: navigate_to('login'))
         st.sidebar.button("Register",key='to_register_btn', on_click=lambda: navigate_to('register'))
+    
+    # sidebar feedback
+    feedback_sender = ""
+    price_reasoning = ""
+    product_reasoning = ""
+    demands_reasoning = ""
+    phraise_reasoning = ""
+    feedback = ""
 
-    st.sidebar.write("# Chat Instruction")
-    st.sidebar.write("## Template")
-    st.sidebar.write(st.session_state.template)
-    st.sidebar.write("## Search Prompt")
-    st.sidebar.write(st.session_state.search_prompt)
-    if st.sidebar.button('Change Propmts', key='change_propmpts_button'):
-        st.session_state.change_instruction = True
-        
-    # Model Instruction
-    if st.session_state.change_instruction:
-        st.title('Model Instruction')
-        st.text_area('Enter Model Instruction For Template: ', 
-                                key='template', 
-                                value=st.session_state.template, 
-                                height=50)
-        st.text_area('Enter Model Instruction For Prompt Refinement: ', 
-                                    key='search_prompt', 
-                                    value=st.session_state.search_prompt, 
-                                    height=125)
-        
-    # Chat Interface
-    st.title('Chat Interface')
-    st.text_area('Enter your message:', 
-                            key='user_input', 
-                            value=st.session_state.user_input, 
-                            height=35)
+    st.sidebar.write("# Feedback")
+    with st.sidebar:
+        f = st.form("Feedback", clear_on_submit=True,border=True)
+    feedback_sender = f.text_input("Name (Not Required)",key="feedback_sender")
 
+    price = f.radio("Rate pricing match",["Good","Okay","Bad"],index=None,horizontal=True)
 
-    if st.button('Send', key='send_button'):
-        st.session_state.start_time = datetime.now()
-        data = {
-            'template': st.session_state.template, 
-            'user_input': st.session_state.user_input,
-            'search_prompt': st.session_state.search_prompt
-        }
-        res = requests.post(f'{SERVER_URL}/process', json=data, verify=False)
+    price_reasoning = f.text_input("Why? (Not Required)",key="price_reason")
 
-        if res.status_code != 200:
-            st.error('Failed to get a response from the server.')
+    product = f.radio("Rate product match",["Good","Okay","Bad"],index=None,horizontal=True)
 
-        result = res.json()
-        context = result.get("context","")
-        st.session_state.context = context
-        
-        response = result.get('response', '')
-        st.session_state.response = response
-        response_query = result.get('response_query', '')
-        st.session_state.response_query = response_query
+    product_reasoning = f.text_input("Why? (Not Required)",key="produt_reason")
 
-        query_time = result.get('query_time', '')
-        st.session_state.query_time = query_time
+    demands = f.radio("Rate demands match",["Good","Okay","Bad"],index=None,horizontal=True)
 
-        st.session_state.message_submitted = True
+    demands_reasoning = f.text_input("Why? (Not Required)",key="demands_reason")
 
+    phraise = f.radio("Rate phrasing",["Good","Okay","Bad"],index=None,horizontal=True)
 
-    if st.session_state.message_submitted:	
-        st.write("### response")
-        st.markdown(f"<p>{st.session_state.response}</p>", unsafe_allow_html=True)
-        st.write("### Gpt Generated search")
-        st.markdown(f"<p>{st.session_state.response_query}</p>", unsafe_allow_html=True)
-        st.write("### time took to generate")
-        st.write(f"{round(st.session_state.query_time)} seconds")
+    phraise_reasoning = f.text_input("Why? (Not Required)",key="phraise_reason")
 
-        inserted_id = ''
-        references = []
-        category = ''
-        subcategory = ''
-        
-        # Join the list into a single string (if it's not already)
-        context_string = ' '.join(st.session_state.context)
-        if not context_string.startswith("{"):
-            context_string = "{" + context_string
-        if not context_string.endswith("}"):
-            context_string += "}"
-        
-        def extract_json_strings(s):
-            json_strings = []
-            brace_count = 0
-            current_json = ''
+    feedback = f.text_area("Do you have anything else you would like to add?",key="extra feedback")
 
-            for char in s:
-                if char == '{':
-                    brace_count += 1
-                    current_json += char
-                elif char == '}':
-                    brace_count -= 1
-                    current_json += char
-                    if brace_count == 0:
-                        json_strings.append(current_json)
-                        current_json = ''
-                elif brace_count > 0:
-                    current_json += char
-
-            return json_strings
-
-        json_strings = extract_json_strings(context_string)
-
-        # Parsing each JSON string
-        for json_str in json_strings:
-            try:
-                p = json.loads(json_str)
-                category = p["categories"][2]
-                subcategory = p["categories"][3]
-                references.append({
-                    "name": p["name"],
-                    "description": p["description"] ,
-                    "price": float(p["price"].replace(",","")),
-                    "categories": json.dumps(p["categories"])
-                })
-            except json.JSONDecodeError:
-                pass
-                # print(f"Invalid JSON object: {json_str}")
-
-        while True:
-            try:
-                chat_document = {
-                    "_id": ObjectId(),  # Generates a unique Object ID
-                    "user_ip": st.session_state.ip,  # Example IP address
-                    "user_device": "Desktop",  # Example device type
-                    "category": category,
-                    "subcategory": subcategory,
-                    "start_time": st.session_state.start_time,
-                    "end_time": datetime.now(),
-                    "messages": [
-                        {
-                            "timestamp": datetime.now(),
-                            "sender": f"user - {str(st.session_state.ip)}",
-                            "text": st.session_state.user_input
-                        },
-                        {
-                            "timestamp": datetime.now(),
-                            "sender": "bot",
-                            "text": st.session_state.response
-                        }
-                    ],
-                    "prompts": {
-                        "template_prompt": st.session_state.template,
-                        "search_prompt": st.session_state.search_prompt,
-                        "response_query": st.session_state.response_query
-                    },
-                    "product_references": references
+    submit = f.form_submit_button("Submit")
+    # submit the feedback
+    if submit:
+        if not TESTING:
+            if st.session_state.document_id != '':
+                new_values = {
+                    "user_actions": {
+                        "name":feedback_sender,
+                        "price":{"rating":price,"reason":price_reasoning},
+                        "product":{"rating":product,"reason":product_reasoning},
+                        "demands":{"rating":demands,"reason":demands_reasoning},
+                        "phraise":{"rating":phraise,"reason":phraise_reasoning},
+                        "other":feedback
+                    }
                 }
+                update_feedback(st.session_state.document_id, new_values)
+        st.rerun()
 
-                # Insert the document into the 'chats' collection
-                insert_result = chats.insert_one(chat_document)
-                # Get the _id of the inserted document
-                inserted_id = insert_result.inserted_id
-                st.session_state.document_id = inserted_id
 
-                break
-            except Exception as e:
-                st.error(str(e))
-                time.sleep(10)
 
-        st.session_state.ready_for_feedback = True
-    if st.session_state.ready_for_feedback:
+    # Chat
 
-        st.write("## Feedback")
+    # User-provided prompt
+    if prompt := st.chat_input(disabled=False):
+        if len(st.session_state.messages) == 1:
+            chat_document = {
+                        "_id": ObjectId(),  # Generates a unique Object ID
+                        "user_ip": st.session_state.ip,  # Example IP address
+                        "user_device": "Desktop",  # Example device type
+                        # "category": category,
+                        # "subcategory": subcategory,
+                        "start_time": st.session_state.start_time,
+                        "end_time": datetime.now(),
+                        "messages": [
+                            {
+                                "timestamp": datetime.now(),
+                                "sender": f"user - {str(st.session_state.ip)}",
+                                "text": prompt
+                            }
+                        ],
+                        "prompts": {
+                            "template_prompt": """Given a conversation (between Human and Assistant) and a follow up question from the user
+    You are an assistant you help customers choose products using the given context (use only what is relevent) 
+    your output should be nicely phrased
+    ask the customer questions to figure out what he needs
+    in your questions behave a little bit like a salesman and try and figure out exactly what the customer is looking for
+    in your questions lead the customer to the right product for him""",
+                            "search_prompt": """you are a spec analiyzer you use the given chat history and question and give out the 
+    techincal specs that the product the customer is describing should have 
+    don't write anything other than the specs, do not explain why
+    the specs should be only technical
+    always follow the instructions""",
+                        },
+                        # "product_references": references
+                    }
 
-        # Use session state variable for the text input
-        new_feedback_text = st.text_input('Enter Your Feedback:', key='feedback_text', value=st.session_state.feedback)
+            if TESTING:
+                st.session_state.document_id = "inserted_id"
+            else:
+                insert_first_message(chat_document)
+        else:
+            new_message = {
+                "timestamp": datetime.now(),
+                "sender": f"user - {str(st.session_state.ip)}",
+                "text": prompt
+            }
+            if not TESTING:
+                insert_message(st.session_state.document_id, new_message)
+           
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{prompt}")
 
-        # Update the session state when the text input changes
-        st.session_state.feedback = new_feedback_text
+        # show user message added to the chat when he submited the message
+        with st.chat_message("user"):
+            st.markdown(f"""
+                <p>{prompt}</p>
+                """, unsafe_allow_html=True)
 
-        # Use session state variable for the text input
-        sender = st.text_input('Enter Your Name:', key='feedback_name_text', value=st.session_state.sender)
+    # Generate a new response if last message is not from assistant
+    if st.session_state.messages[-1]["role"] != "assistant":
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                messages = st.session_state.messages
+                data = {"history": messages, "user_input": prompt}
+                res = requests.post(f"{SERVER_URL}/process", json=data)
+                result = res.json()
+                response = result.get('response', '')                
+                placeholder = st.empty()
+                full_response = ''
+                for item in response:
+                    full_response += item
+                    placeholder.markdown(f"""
+                        <p>{full_response}</p>
+                        """, unsafe_allow_html=True)
+                placeholder.markdown(f"""
+                        <p>{full_response}</p>
+                        """, unsafe_allow_html=True)
 
-        # Update the session state when the text input changes
-        st.session_state.sender = sender
-
-        if st.button('Send Feedback', key='send_feedback_button'):
-            try:
-                # Create 'user_actions' with 'feedback_text'
-                new_values = {"user_actions": {"feedback_text": new_feedback_text, "sender": sender}}
-                # Perform the update
-                update_result = chats.update_one({"_id": st.session_state.document_id}, {"$set": new_values})
-
-                # Check if the update was successful
-                if update_result.modified_count > 0:
-                    st.write("thank you very much!")
-                else:
-                    st.write("try feedback again, sorry")
-
-                    
-            except Exception as e:
-                st.error(str(e))
-
-        st.button('New Chat', key='new_chat_btn', on_click=lambda: reset())
+        message = {"role": "assistant", "content": full_response}
+        st.session_state.messages.append(message)
+        # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
+        new_message = {
+            "timestamp": datetime.now(),
+            "sender": "bot",
+            "text": full_response
+        }
+        if not TESTING:
+            insert_message(st.session_state.document_id, new_message)

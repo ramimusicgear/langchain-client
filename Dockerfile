@@ -14,4 +14,4 @@ COPY . .
 EXPOSE 8501
 
 # Set the entrypoint for the container
-CMD ["streamlit", "run", "client.py"]
+CMD ["streamlit", "run", "main.py"]

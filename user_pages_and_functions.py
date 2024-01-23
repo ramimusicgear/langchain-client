@@ -13,7 +13,6 @@ ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
 def validate_login(username, password):
     return username == ADMIN_USERNAME and password == ADMIN_PASSWORD
 
-
 def create_jwt_token(username, password):
     """
     Create a JWT token for the given username and password.
@@ -57,7 +56,9 @@ def verify_jwt_token(token, triggered=True):
         except jwt.ExpiredSignatureError:
             return None
 
-def login_page(log_in):
+def login_page(navigate_to, log_in):
+    st.sidebar.button("Back to Chat", key='login_back_btn', on_click=lambda: navigate_to('chat'))
+    st.sidebar.button("Back to Register", key='login_back_register_btn', on_click=lambda: navigate_to('login'))
     st.title("Login")
     f = st.form("LoginForm",clear_on_submit=False,border=True)
     username = f.text_input('Enter Your Username:', key='username_inp')
@@ -67,18 +68,10 @@ def login_page(log_in):
     submit = f.form_submit_button("Login")
     if submit:
         log_in(username, password)
-   
-def register_user(username, password):
-    """
-    Register a new user and return a JWT token upon successful registration.
-    """
-    # Add logic to securely store the user's credentials (with hashed password)
-    # For demonstration, we assume registration is always successful
-    token = create_jwt_token(username, password)  # Reuse the JWT creation function from login
-    return True, token
 
-
-def registration_page(register):
+def registration_page(navigate_to, register):
+    st.sidebar.button("Back to Chat", key='register_back_btn', on_click=lambda: navigate_to('chat'))
+    st.sidebar.button("Back to Login", key='register_back_login_btn', on_click=lambda: navigate_to('login'))
     st.title("Registration")
     f = st.form("RegistrationForm",clear_on_submit=False,border=True)
     new_username = f.text_input('Choose Your Username:', key='new_username')
