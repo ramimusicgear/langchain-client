@@ -109,4 +109,3 @@ else:
 		first_document = chats.find_one()
 		# Print the document
 		print(first_document)
-
