@@ -1,7 +1,6 @@
 import streamlit as st
 from db import get_selected, get_all
 
-
 def admin_page(navigate_to, select):
     st.sidebar.button("Back to Chat", key='back_btn', on_click=lambda: navigate_to('chat'))
     st.sidebar.write("# Conversations")

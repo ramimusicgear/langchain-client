@@ -7,7 +7,7 @@ import streamlit as st
 from bson import ObjectId
 from datetime import datetime
 
-from user_pages_and_functions import verify_jwt_token
+from login import verify_jwt_token
 
 from db import update_feedback, insert_first_message, insert_message
 
@@ -35,7 +35,7 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
         payload = None
         token = st.session_state['jwt']
         if token:
-            payload = verify_jwt_token(token)
+            payload = verify_jwt_token(token, False)
         if payload and payload['is_admin']:
             st.sidebar.button('Go To Admin Dashboard',key="admin_dashboard", on_click=lambda: navigate_to('admin'))
     else:
@@ -155,7 +155,7 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
 
     # Generate a new response if last message is not from assistant
     if st.session_state.messages[-1]["role"] != "assistant":
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar_url="https://ramimusic.io/svg/IconLogo.svg"):
             with st.spinner("Thinking..."):
                 messages = st.session_state.messages
                 data = {"history": messages, "user_input": prompt}

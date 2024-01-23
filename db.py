@@ -5,7 +5,7 @@ import streamlit as st
 from bson import ObjectId
 from datetime import datetime
 
-from user_pages_and_functions import verify_jwt_token
+from login import verify_jwt_token
 
 MONGODB_URL = os.environ.get("MONGODB_URL")
 
@@ -16,7 +16,7 @@ chats = db['chats']
 
 # GET
 def get_all():
-    payload = verify_jwt_token(st.session_state['jwt'])
+    payload = verify_jwt_token(st.session_state['jwt'], False)
     if payload and payload['is_admin']:
         conversations = chats.find({}).sort("start_time", -1)
         return conversations
@@ -30,7 +30,7 @@ def get_selected(selected_conversation):
         # Handle invalid ObjectId string
         return None
 
-    payload = verify_jwt_token(st.session_state['jwt'])
+    payload = verify_jwt_token(st.session_state['jwt'], False)
     if payload and payload['is_admin']:
         # Query the database with ObjectId
         conversation = db.chats.find_one({'_id': selected_conversation_id})
