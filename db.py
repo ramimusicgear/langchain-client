@@ -101,7 +101,7 @@ def insert_first_message(chat_document):
             retry += 1
             time.sleep(1)
 
-def insert_message(document_id, new_message, price):
+def insert_message(document_id, new_message, price=0):
     retry = 0
     while True:
         try:
