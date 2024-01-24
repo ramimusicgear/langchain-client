@@ -15,7 +15,7 @@ client = pymongo.MongoClient(MONGODB_URL)
 
 db = client[MONGODB_DB]  
 
-init = False
+init = True
 
 # Updated schema definition
 chat_schema = {

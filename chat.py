@@ -176,7 +176,14 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
         message = {"role": "assistant", "content": full_response}
         st.session_state.messages.append(message)
         # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
-        price = float(result.get('price', ''))
+        
+        # Fetch the price; default to '0.0' if not found
+        price_str = result.get('price', '0.0')  
+        try:
+            price = float(price_str)  # Attempt to convert the price to a float
+        except ValueError:
+            price = 0.0  # Set to a default value
+
         new_message = {
             "timestamp": datetime.now(),
             "sender": "bot",
