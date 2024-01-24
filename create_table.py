@@ -7,11 +7,13 @@ load_dotenv()
 
 
 MONGODB_URL = os.environ.get("MONGODB_URL")
+MONGODB_DB = os.environ.get("MONGODB_DB")
+MONGODB_COLLECTION = os.environ.get("MONGODB_COLLECTION")
 
 # Connect to MongoDB
 client = pymongo.MongoClient(MONGODB_URL)
 
-db = client['llamaindex']  
+db = client[MONGODB_DB]  
 
 init = False
 
@@ -89,23 +91,23 @@ chat_schema = {
 
 
 if init:
-	# Check if the "chats" collection exists
+	# Check if the MONGODB_COLLECTION collection exists
 	collection_names = db.list_collection_names()
-	if "chats" in collection_names:
-		print("Collection 'chats' already exists. Deleting it.")
-		db["chats"].drop()
+	if MONGODB_COLLECTION in collection_names:
+		print(f"Collection {MONGODB_COLLECTION} already exists. Deleting it.")
+		db[MONGODB_COLLECTION].drop()
 
 	# Create or update the collection with the new validator
-	chats = db.create_collection("chats", validator=chat_schema)
+	chats = db.create_collection(MONGODB_COLLECTION, validator=chat_schema)
 
 	# Add indexes on 'category' and 'subcategory'
 	chats.create_index([("category", pymongo.ASCENDING), ("subcategory", pymongo.ASCENDING)])
 else:
 	# Retrieve the first document
-	# Check if the "chats" collection exists
+	# Check if the MONGODB_COLLECTION collection exists
 	collection_names = db.list_collection_names()
-	if "chats" in collection_names:
-		chats = db['chats']
+	if MONGODB_COLLECTION in collection_names:
+		chats = db[MONGODB_COLLECTION]
 		first_document = chats.find_one()
 		# Print the document
 		print(first_document)

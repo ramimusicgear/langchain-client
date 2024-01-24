@@ -1,0 +1,6 @@
+streamlit
+extra-streamlit-components
+requests
+pymongo
+python-dotenv
+pyjwt
