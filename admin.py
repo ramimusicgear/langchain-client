@@ -19,7 +19,11 @@ def admin_page(navigate_to, select):
             # st.sidebar.markdown(f"<p>Date: {d}</p>", unsafe_allow_html=True)
             # TODO: show the total price of all chats on the date
             total_price = total_prices.get(d, 0)  # Get total price for the date
-            st.sidebar.markdown(f"<p>Date: {d}, Total Price: {total_price}$</p>", unsafe_allow_html=True)
+            if total_price == 0:
+                st.sidebar.markdown(f"<p>Date: {d}</p>", unsafe_allow_html=True)
+            else:
+                formatted_number = "{:.2f}".format(total_price)
+                st.sidebar.markdown(f"<p>Date: {d}, Total Price: {formatted_number} $</p>", unsafe_allow_html=True)
             dates.append(d)
         if conversation_id == id:
             st.sidebar.markdown(f"<p><strong>Selected Chat: </strong>{first_message_text}</p>", unsafe_allow_html=True)
@@ -33,7 +37,7 @@ def admin_page(navigate_to, select):
             if button_clicked:
                 st.session_state.selected_conversation = conversation_id
 
-    
+    # print(f"selected: {st.session_state.selected_conversation}")
     conv = get_selected(st.session_state.selected_conversation if st.session_state.selected_conversation else last_id)
     if conv is None:
         st.write("### Please select a conversation")
@@ -53,6 +57,14 @@ def admin_page(navigate_to, select):
         for idx, msg in enumerate(conv['messages']):
             # st.markdown(f'<p><strong>{"client: " if idx % 2 == 0 else "bot: "}</strong>{msg['text']}</p>', unsafe_allow_html=True)
             st.markdown(f"<p><strong>{'client: ' if idx % 2 == 0 else 'bot: '}</strong>{msg['text']}</p>", unsafe_allow_html=True)
+
+        try:
+            conv['price']
+            formatted_number = "{:.2f}".format(conv['price'])
+            st.write("## Price")
+            st.markdown(f"<p><strong>{formatted_number} $</strong></p>", unsafe_allow_html=True)
+        except Exception as e:
+            pass
 
         with_feedback = False
         try:

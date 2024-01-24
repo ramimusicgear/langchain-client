@@ -9,12 +9,10 @@ from datetime import datetime
 from dotenv import load_dotenv
 load_dotenv()
 
-from admin import admin_page
-from chat import chat_page
-from login import login_page, registration_page, verify_jwt_token, create_jwt_token
-
 # App title
-st.set_page_config(page_title="Rami Chatbot")
+st.set_page_config(page_title="Rami Chatbot", page_icon="https://ramimusic.io/svg/IconLogo.svg")
+
+from login_utils import verify_jwt_token, create_jwt_token
 
 # states
 if "messages" not in st.session_state:
@@ -63,30 +61,28 @@ def get_manager():
 
 cookie_manager = get_manager()
 
+jwt_cookie = cookie_manager.get(cookie="rami-token")
 page_cookie = cookie_manager.get(cookie="page")
-if page_cookie and not st.session_state.page_loaded:
-    if page_cookie == "admin":
-        if st.session_state.jwt == None:
-            page_cookie = "chat"
-    st.session_state.page = page_cookie  # Store the JWT in session state
-    st.session_state.page_loaded = True
 
 selected_conversation_cookie = cookie_manager.get(cookie="selected_conversation")
+
 if selected_conversation_cookie and not st.session_state.selected_conversation_loaded:
     st.session_state.selected_conversation = selected_conversation_cookie  # Store the JWT in session state
     st.session_state.selected_conversation_loaded = True
 
-jwt_cookie = cookie_manager.get(cookie="rami-token")
 if jwt_cookie and not st.session_state.token_loaded:
-    st.session_state.jwt = jwt_cookie
-    st.session_state.token_loaded = True
     payload = None
-    token = st.session_state['jwt']
-    if token:
+    if jwt_cookie:
         payload = verify_jwt_token(jwt_cookie, False)
     if payload:
-        st.session_state['jwt'] = jwt_cookie  # Store the JWT in session state
-        st.session_state['user'] = payload['user']
+        if page_cookie and not st.session_state.page_loaded:
+            if not payload["is_admin"] and page_cookie == "admin":
+                page_cookie == "chat"
+            st.session_state.page = page_cookie  # Store the JWT in session state
+            st.session_state.page_loaded = True
+        st.session_state.user = payload['user']
+        st.session_state.jwt = jwt_cookie
+        st.session_state.token_loaded = True
 
 # functions
 def clear_all_cookies():
@@ -162,6 +158,10 @@ def clear_chat_history():
     st.session_state.document_id = ''
 
 TESTING = False
+
+from admin import admin_page
+from chat import chat_page
+from login_pages import login_page, registration_page
 
 # App Routing
 if st.session_state.page == 'login':

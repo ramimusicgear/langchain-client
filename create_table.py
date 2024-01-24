@@ -1,6 +1,7 @@
 import os
 import time
 import pymongo
+from datetime import timedelta
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -15,7 +16,7 @@ client = pymongo.MongoClient(MONGODB_URL)
 
 db = client[MONGODB_DB]  
 
-init = True
+init = False
 
 # Updated schema definition
 chat_schema = {
@@ -25,10 +26,10 @@ chat_schema = {
         "properties": {
             "_id": {"bsonType": "objectId"},
 
-			# user	
+            # user	
             "user_ip": {"bsonType": "string"},
             "user_device": {"bsonType": "string"},
-
+            "version": {"bsonType": "string"},
             "category": {"bsonType": "string"},
             "subcategory": {"bsonType": "string"},
             "start_time": {"bsonType": "date"},
@@ -42,19 +43,19 @@ chat_schema = {
                     "properties": {
                         "timestamp": {"bsonType": "date"},
                         "sender": {"bsonType": "string"},
-                        "text": {"bsonType": "string"}
+                        "text": {"bsonType": "string"},
                     }
                 }
             },
             "prompts": {
                 "bsonType": "object",
-				"properties": {
-					"template_prompt": {"bsonType": "string"},
-					"search_prompt": {"bsonType": "string"},
-					"response_query": {"bsonType": "string"}
-				}
+                "properties": {
+                    "template_prompt": {"bsonType": "string"},
+                    "search_prompt": {"bsonType": "string"},
+                    "response_query": {"bsonType": "string"}
+                }
             },
-			"user_actions": {
+            "user_actions": {
                 "bsonType": "object",
                 "properties": {
                     "feedback": {"bsonType": "string"},
@@ -91,23 +92,14 @@ chat_schema = {
 
 
 if init:
-	# Check if the MONGODB_COLLECTION collection exists
-	collection_names = db.list_collection_names()
-	if MONGODB_COLLECTION in collection_names:
-		print(f"Collection {MONGODB_COLLECTION} already exists. Deleting it.")
-		db[MONGODB_COLLECTION].drop()
+    # Check if the MONGODB_COLLECTION collection exists
+    collection_names = db.list_collection_names()
+    if MONGODB_COLLECTION in collection_names:
+        print(f"Collection {MONGODB_COLLECTION} already exists. Deleting it.")
+        db[MONGODB_COLLECTION].drop()
 
-	# Create or update the collection with the new validator
-	chats = db.create_collection(MONGODB_COLLECTION, validator=chat_schema)
+    # Create or update the collection with the new validator
+    chats = db.create_collection(MONGODB_COLLECTION, validator=chat_schema)
 
-	# Add indexes on 'category' and 'subcategory'
-	chats.create_index([("category", pymongo.ASCENDING), ("subcategory", pymongo.ASCENDING)])
-else:
-	# Retrieve the first document
-	# Check if the MONGODB_COLLECTION collection exists
-	collection_names = db.list_collection_names()
-	if MONGODB_COLLECTION in collection_names:
-		chats = db[MONGODB_COLLECTION]
-		first_document = chats.find_one()
-		# Print the document
-		print(first_document)
+    # Add indexes on 'category' and 'subcategory'
+    chats.create_index([("category", pymongo.ASCENDING), ("subcategory", pymongo.ASCENDING)])

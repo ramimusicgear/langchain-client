@@ -5,7 +5,7 @@ import streamlit as st
 from bson import ObjectId
 from datetime import datetime
 
-from login import verify_jwt_token
+from login_utils import verify_jwt_token
 
 MONGODB_URL = os.environ.get("MONGODB_URL")
 MONGODB_DB = os.environ.get("MONGODB_DB")
@@ -50,13 +50,65 @@ def get_selected(selected_conversation):
         # Handle invalid ObjectId string
         return None
 
-    payload = verify_jwt_token(st.session_state['jwt'], False)
+    payload = verify_jwt_token(st.session_state.jwt, False)
     if payload and payload['is_admin']:
         # Query the database with ObjectId
-        conversation = db.chats.find_one({'_id': selected_conversation_id})
+        conversation = chats.find_one({'_id': selected_conversation_id})
         return conversation
 
     return None
+
+def get_requests_overall_average_time():
+    # Check if the MONGODB_COLLECTION collection exists
+    collection_names = db.list_collection_names()
+    if MONGODB_COLLECTION in collection_names:
+        chats = db[MONGODB_COLLECTION]
+
+       # Initialize variables to calculate the total average time difference
+        total_time_difference = 0
+        total_message_count = 0
+        # Define the start_date as a datetime object
+        start_date = datetime(2024, 1, 21)
+
+        # Query for messages before the start_date
+        query = {"messages.timestamp": {"$lt": start_date}}
+
+        # Iterate through all chat documents that match the query
+        for chat_document in chats.find(query):
+            # Access the "messages" array within the chat document
+            messages = chat_document.get("messages", [])
+
+            # Initialize variables to calculate the average time difference for this chat
+            chat_time_difference = 0
+            chat_message_count = len(messages)
+
+            # Iterate through messages to calculate time differences
+            for i in range(1, chat_message_count):
+                current_message = messages[i]
+                previous_message = messages[i - 1]
+
+                # Extract timestamp from the messages
+                current_timestamp = current_message.get("timestamp")
+                previous_timestamp = previous_message.get("timestamp")
+
+                if current_timestamp and previous_timestamp:
+                    # Calculate the time difference between messages
+                    time_difference = (current_timestamp - previous_timestamp).total_seconds()
+
+                    # Add the time difference to the chat total
+                    chat_time_difference += time_difference
+
+            # Add the chat's time difference and message count to the total
+            total_time_difference += chat_time_difference
+            total_message_count += chat_message_count
+
+        # Calculate the overall average time difference
+        average_time_difference = total_time_difference / (total_message_count - len(chats.distinct("_id")))
+
+        # Print the overall average time difference
+        print(f"Overall Average Time Between Messages: {average_time_difference} seconds")
+
+
 
 # POST, UPDATE
 def update_feedback(id, new_values):

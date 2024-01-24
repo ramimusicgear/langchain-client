@@ -7,7 +7,7 @@ import streamlit as st
 from bson import ObjectId
 from datetime import datetime
 
-from login import verify_jwt_token
+from login_utils import verify_jwt_token
 
 from db import update_feedback, insert_first_message, insert_message
 
@@ -16,21 +16,23 @@ SERVER_URL = os.environ.get('SERVER_URL')
 def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
     # Navigation buttons
 
-    # Display or clear chat messages
     for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(f"""
-                <p>{message["content"]}</p>
-                """, unsafe_allow_html=True)
+        if message["role"] == "assistant":  # Assuming 'assistant' is the role for the bot
+            with st.chat_message(message["role"], avatar="https://ramimusic.io/svg/IconLogo.svg"):
+                st.markdown(f"<p>{message['content']}</p>", unsafe_allow_html=True)
+        else:
+            # Default styling for other roles
+            with st.chat_message(message["role"]):
+                st.markdown(f"<p>{message['content']}</p>", unsafe_allow_html=True)
 
     
     # sidebar
     st.sidebar.button('New chat', on_click=clear_chat_history)
-    if st.session_state['user']:
+    if st.session_state.user:
         if st.sidebar.button("Logout",key='to_logout_btn'):
             log_out()
-        if st.session_state['user']:
-            st.sidebar.write(f"# Welcome, {st.session_state['user']}!")
+        if st.session_state.user:
+            st.sidebar.write(f"# Welcome, {st.session_state.user}!")
             
         payload = None
         token = st.session_state['jwt']
@@ -155,7 +157,7 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
 
     # Generate a new response if last message is not from assistant
     if st.session_state.messages[-1]["role"] != "assistant":
-        with st.chat_message("assistant"):
+        with st.chat_message("assistant", avatar="🧊"):
             with st.spinner("Thinking..."):
                 messages = st.session_state.messages
                 data = {"history": messages, "user_input": prompt}
