@@ -105,7 +105,7 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
                         "user_device": "Desktop",  # Example device type
                         # "category": category,
                         # "subcategory": subcategory,
-                        "price": 0,
+                        "price": 0.0,
                         "start_time": st.session_state.start_time,
                         "end_time": datetime.now(),
                         "messages": [
