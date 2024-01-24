@@ -5,7 +5,7 @@ def admin_page(navigate_to, select):
     st.sidebar.button("Back to Chat", key='back_btn', on_click=lambda: navigate_to('chat'))
     st.sidebar.write("# Conversations")
     
-    conversations = get_all()
+    conversations, total_prices = get_all()
     last_id = ''
     dates = []
     for conv in conversations:
@@ -16,9 +16,10 @@ def admin_page(navigate_to, select):
         id = st.session_state.selected_conversation if st.session_state.selected_conversation else last_id
         d = str(conv['start_time']).split()[0]
         if d not in dates: 
-            st.sidebar.markdown(f"<p>Date: {d}</p>", unsafe_allow_html=True)
+            # st.sidebar.markdown(f"<p>Date: {d}</p>", unsafe_allow_html=True)
             # TODO: show the total price of all chats on the date
-            
+            total_price = total_prices.get(d, 0)  # Get total price for the date
+            st.sidebar.markdown(f"<p>Date: {d}, Total Price: {total_price}$</p>", unsafe_allow_html=True)
             dates.append(d)
         if conversation_id == id:
             st.sidebar.markdown(f"<p><strong>Selected Chat: </strong>{first_message_text}</p>", unsafe_allow_html=True)

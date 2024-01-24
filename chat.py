@@ -155,7 +155,7 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
 
     # Generate a new response if last message is not from assistant
     if st.session_state.messages[-1]["role"] != "assistant":
-        with st.chat_message("assistant", avatar_url="https://ramimusic.io/svg/IconLogo.svg"):
+        with st.chat_message("assistant"):
             with st.spinner("Thinking..."):
                 messages = st.session_state.messages
                 data = {"history": messages, "user_input": prompt}

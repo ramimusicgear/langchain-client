@@ -36,7 +36,6 @@ def create_jwt_token(username, password):
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     return token
 
-
 def verify_jwt_token(token, triggered=True):
     """ Verify the given JWT token """
     if triggered:

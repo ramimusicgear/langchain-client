@@ -8,19 +8,39 @@ from datetime import datetime
 from login import verify_jwt_token
 
 MONGODB_URL = os.environ.get("MONGODB_URL")
+MONGODB_DB = os.environ.get("MONGODB_DB")
+MONGODB_COLLECTION = os.environ.get("MONGODB_COLLECTION")
 
 # Connect to MongoDB
 client = pymongo.MongoClient(MONGODB_URL)
-db = client['llamaindex']  
-chats = db['chats']
+db = client[MONGODB_DB]  
+chats = db[MONGODB_COLLECTION]
 
 # GET
 def get_all():
     payload = verify_jwt_token(st.session_state['jwt'], False)
+
+
     if payload and payload['is_admin']:
+        # Fetch all conversations and sort by start_time with total price of the day
         conversations = chats.find({}).sort("start_time", -1)
-        return conversations
-    return []
+
+        total_prices = {}  # Dictionary to cache total prices by date
+
+        # Aggregate total prices by date
+        pipeline = [
+            {
+                "$group": {
+                    "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$start_time"}},
+                    "total_price": {"$sum": "$price"}
+                }
+            }
+        ]
+        for group in chats.aggregate(pipeline):
+            total_prices[group["_id"]] = group["total_price"]
+
+        return conversations, total_prices
+    return [], {}
 
 def get_selected(selected_conversation):
     try:
@@ -70,6 +90,7 @@ def insert_first_message(chat_document):
             # Get the _id of the inserted document
             inserted_id = insert_result.inserted_id
             st.session_state.document_id = inserted_id
+            print(inserted_id)
             break
         except Exception as e:
             if retry > 3:
