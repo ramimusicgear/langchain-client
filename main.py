@@ -175,3 +175,4 @@ elif st.session_state.page == 'admin':
     
 elif st.session_state.page == 'chat':
     chat_page(TESTING, clear_all_cookies, log_out, navigate_to)
+    
