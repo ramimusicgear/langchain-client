@@ -11,6 +11,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
+from db import get_all_filtered
+
 # App title
 st.set_page_config(
     page_title="Rami Chatbot", page_icon="https://ramimusic.io/svg/IconLogo.svg"
@@ -20,40 +23,64 @@ st.set_page_config(
 st.markdown(
     f"""
         <style>
-       
-        .stApp {{
-            background-image: url("https://ramimusic.io/shop/wp-content/uploads/2024/01/background.png");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }}
-        header {{
-            display: none !important;
-        }}
-        .stChatFloatingInputContainer {{
-            background-color: transparent !important;
-        }}
-        .stChatMessage {{
-            background-color: transparent !important;
-        }}
-        .stChatMessage * {{
-            color: white !important;
-        }}
-        button *{{
-            color: black !important;
-        }}
-        .main p {{
-            color: white;
-        }}
-        # .row-widget {{
-        #     color: white !important;
-        # }}
-        .main h1{{
-            color: white !important;
-        }}
-        .main span{{
-            color: white !important;
-        }}
+            .element-container:has(.selected) + div button{{
+                border: 1.5px black solid !important;
+            }}
+            .element-container:has(.button-after-red) + div button{{
+                background-color: #ff9999 !important;
+            }}
+            .element-container:has(.button-after-green) + div button{{
+                background-color: #90ee90 !important;
+            }}
+            .element-container:has(.button-after-orange) + div button{{
+                background-color: #ffcc99 !important;
+            }}
+            .element-container:has(.button-after-gray) + div button{{
+                background-color: #d3d3d3 !important;
+            }}
+            .element-container:has(.button-after-load-more) + div button{{
+                background-color: #800080a8 !important;
+            }}
+            .element-container:has(.button-after-load-more) + div *{{
+                color: white !important;
+            }}
+
+            .stApp {{
+                background-image: url("https://ramimusic.io/shop/wp-content/uploads/2024/01/background.png");
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+            header {{
+                display: none !important;
+            }}
+            [data-testid="stBottom"]>div{{
+                background-color: transparent !important;
+            }}
+            .stChatFloatingInputContainer {{
+                background-color: transparent !important;
+            }}
+            .stChatMessage {{
+                background-color: transparent !important;
+            }}
+            .stChatMessage * {{
+                color: white !important;
+            }}
+            button *{{
+                color: black !important;
+            }}
+            .main p {{
+                color: white;
+            }}
+            # .row-widget {{
+            #     color: white !important;
+            # }}
+            .main h1{{
+                color: white !important;
+            }}
+            .main span{{
+                color: white !important;
+            }}
         </style>
         """,
     unsafe_allow_html=True,
@@ -94,6 +121,11 @@ if "show_filter_popup" not in st.session_state:
 
 if "filters" not in st.session_state:
     st.session_state.filters = {}
+if 'page_size' not in st.session_state:
+    st.session_state.page_size = 50
+
+if 'page_number' not in st.session_state:
+    st.session_state.page_number = 1
 
 # Initialize the active tab state if it doesn't exist
 if "active_tab" not in st.session_state:
@@ -149,7 +181,18 @@ if jwt_cookie and not st.session_state.token_loaded:
         st.session_state.user = payload["user"]
         st.session_state.jwt = jwt_cookie
         st.session_state.token_loaded = True
-
+        if 'conversations' not in st.session_state or 'total_prices' not in st.session_state or 'conversations_total_count' not in st.session_state:
+            conversations, total_prices, query, total_count = get_all_filtered(
+                st.session_state.filters if "filters" in st.session_state else {},
+                False,
+                st.session_state.page_number if "page_number" in st.session_state else 1,
+                st.session_state.page_size if "page_size" in st.session_state else 50
+            )
+            st.session_state.conversations = conversations   
+            st.session_state.conversations_total_count = total_count
+            st.session_state.total_prices = total_prices
+ 
+   
 
 # functions
 def clear_all_cookies():
@@ -191,9 +234,30 @@ def select(conv_id):
 def change_active_tab(tab_name):
     st.session_state.active_tab = tab_name
 
+def increase_page_number():
+    conversations, total_prices, query, total_count = get_all_filtered(
+        st.session_state.filters,
+        False,
+        st.session_state.page_number + 1,
+        st.session_state.page_size 
+    )
+    st.session_state.conversations += conversations
+    st.session_state.conversations_total_count += total_count
+    st.session_state.page_number += 1
 
 def change_filtes(filters):
     st.session_state.filters = filters
+    conversations, total_prices, query, total_count = get_all_filtered(
+        filters,
+        False,
+        1,
+        50
+    )
+    st.session_state.page_number = 50
+    st.session_state.page_size = 50
+    st.session_state.conversations = conversations   
+    st.session_state.conversations_total_count = total_count
+    st.session_state.total_prices = total_prices
     st.session_state.show_filter_popup = False
 
 
@@ -203,6 +267,19 @@ def show_hide_filters():
     else:
         st.session_state.show_filter_popup = True
 
+def no_filters():
+    conversations, total_prices, query, total_count = get_all_filtered(
+        {},
+        False,
+        1,
+        50
+    )
+    st.session_state.page_number = 50
+    st.session_state.page_size = 50
+    st.session_state.conversations = conversations   
+    st.session_state.conversations_total_count = total_count
+    st.session_state.total_prices = total_prices
+    st.session_state.show_filter_popup = False
 
 def log_out():
     st.session_state.page = "chat"
@@ -280,7 +357,7 @@ elif st.session_state.page == "register":
     registration_page(navigate_to, register)
 
 elif st.session_state.page == "admin":
-    admin_page(navigate_to, select, show_hide_filters, change_filtes, change_active_tab)
+    admin_page(navigate_to, select, show_hide_filters, no_filters, change_filtes, change_active_tab, increase_page_number)
 
 elif st.session_state.page == "chat":
     chat_page(TESTING, clear_all_cookies, log_out, navigate_to)

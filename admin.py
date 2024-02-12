@@ -5,25 +5,27 @@ from db import get_selected, get_feedback_sender_names, get_all_filtered
 
 
 def get_card_color(user_actions):
-    backend_version = user_actions.get("backend_version", "0")
-    if backend_version == "0":
-        return "white"  # default to light gray if no match
+    price = user_actions.get("price", {"rating":"","reason":""})
+    product = user_actions.get("product", {"rating":"","reason":""})
+    demands = user_actions.get("demands", {"rating":"","reason":""})
+    phraise = user_actions.get("phraise", {"rating":"","reason":""})
 
-    overall_rate = user_actions.get("overall_rate", "0")
+    if price["rating"] == "Bad" or product["rating"] == "Bad" or demands["rating"] == "Bad" or phraise["rating"] == "Bad":
+        return "red"
+    elif price["rating"] == "Good" or product["rating"] == "Good" or demands["rating"] == "Good" or phraise["rating"] == "Good":
+        return "green"
+    elif price["rating"] == "Okay" or product["rating"] == "Okay" or demands["rating"] == "Okay" or phraise["rating"] == "Okay":
+        return "orange"
+    else:
+        return "gray"
 
-    colors = {
-        "good": "#90ee90",  # light green
-        "okay": "#ffcc99",  # light orange
-        "bad": "#ff9999",  # light red
-        "0": "#d3d3d3",  # light gray
-    }
 
-    return colors.get(overall_rate, "#d3d3d3")  # default to light gray if no match
 
 
 def admin_page(
-    navigate_to, select, show_hide_filters, change_filtes, change_active_tab
+    navigate_to, select, show_hide_filters, no_filters, change_filtes, change_active_tab, increase_page_number
 ):
+
     st.sidebar.button(
         "Back to Chat", key="back_btn", on_click=lambda: navigate_to("chat")
     )
@@ -147,7 +149,7 @@ def admin_page(
                             button_clicked = st.button(
                                 "No Filters",
                                 key="no_filters_btn",
-                                on_click=show_hide_filters,
+                                on_click=no_filters,
                             )
 
                 with tabs[1]:
@@ -194,13 +196,20 @@ def admin_page(
                                 on_click=lambda: change_filtes(filters),
                             )
 
-    conversations, total_prices = get_all_filtered(st.session_state.filters)
+    # Initialize conversations as an empty list outside the loop
+    conversations = st.session_state.conversations
+    total_prices = st.session_state.total_prices
+    conversations_total_count = st.session_state.conversations_total_count
+
     last_id = ""
     dates = []
     if st.session_state.filters != None:
         st.sidebar.markdown(
-            f"<p>Total Conversations: {len(conversations)}</p>", unsafe_allow_html=True
+            f"<p>Total Conversations: {conversations_total_count}</p>", unsafe_allow_html=True
         )
+
+
+
 
     for conv in conversations:
         conversation_id = conv["_id"]
@@ -233,16 +242,17 @@ def admin_page(
                 )
             dates.append(d)
         if conversation_id == id:
-            st.sidebar.markdown(
-                f"<p><strong>Selected Chat: </strong>{first_message_text}</p>",
-                unsafe_allow_html=True,
+            st.sidebar.markdown(f'<span key="{conversation_id}_btn_label" class="button-after-{card_color} selected"></span>', unsafe_allow_html=True)
+            button_clicked = st.sidebar.button(
+                first_message_text,
+                key=f"{conversation_id}_btn"
             )
         else:
             # button_style = f"style='background-color:{card_color}; width:100%; margin-bottom:5px;'"
             # button_html = f"<button type='button' {button_style}>{first_message_text}</button>"
             # st.sidebar.markdown(button_html, unsafe_allow_html=True)
             #     on_click=lambda cid=conversation_id: select(cid),
-
+            st.sidebar.markdown(f'<span key="{conversation_id}_btn_label" class="button-after-{card_color}"></span>', unsafe_allow_html=True)
             button_clicked = st.sidebar.button(
                 first_message_text,
                 key=f"{conversation_id}_btn",
@@ -251,6 +261,10 @@ def admin_page(
             if button_clicked:
                 st.session_state.selected_conversation = conversation_id
 
+    # Check if the user has scrolled to the bottom then Add a "Load More" button at the end
+    st.sidebar.markdown(f'<span key="load_more_btn_label" class="button-after-load-more"></span>', unsafe_allow_html=True)
+    st.sidebar.button("Load More", on_click=increase_page_number)
+            
     # print(f"selected: {st.session_state.selected_conversation}")
     conv = get_selected(
         st.session_state.selected_conversation

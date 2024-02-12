@@ -54,7 +54,7 @@ def get_feedback_sender_names():
     return unique_names
 
 
-def get_all_filtered(filter, test=False):
+def get_all_filtered(filter, test=False, page_number=1, page_size=50):
     if not test:
         payload = verify_jwt_token(st.session_state["jwt"], False)
         if not payload or not payload["is_admin"]:
@@ -208,6 +208,11 @@ def get_all_filtered(filter, test=False):
             if phraise_rating is not None:
                 query["user_actions.phraise.rating"] = phraise_rating
 
+
+        # Pagination logic
+        skip_count = (page_number - 1) * page_size
+        limit_count = page_size
+
         pipeline = [
             {
                 "$match": query  # Ensure this matches the filter criteria you want to apply before aggregation
@@ -221,6 +226,8 @@ def get_all_filtered(filter, test=False):
                 }
             },
             {"$sort": {"_id": -1}},  # Sorting by the grouped date in descending order
+            {"$skip": skip_count},  # Skip documents based on the calculated skip_count
+            {"$limit": page_size},  # Limit the number of documents in the result  # Sorting by the grouped date in descending order
         ]
 
         # Execute the aggregation pipeline
@@ -232,10 +239,12 @@ def get_all_filtered(filter, test=False):
             total_prices[date] = total_price
             # print(f"Date: {date}, Total Price: {total_price}")
 
-        # conversations = list(chats.find(query).sort("start_time", -1))
-        conversations = list(chats.find(query))
 
-        return conversations, total_prices, query
+        # conversations = list(chats.find(query).sort("start_time", -1))
+        conversations = list(chats.find(query).skip(skip_count).limit(limit_count))
+        total_count = chats.count_documents(query)
+
+        return conversations, total_prices, query, total_count
 
     except ValueError as ve:
         # Log or handle the ValueError as needed
