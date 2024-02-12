@@ -1,0 +1,936 @@
+[
+    {
+        "_id": "65b13ed96c4a9170e6d02efa",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0,
+        "start_time": "2024-01-24 16:46:12.311000",
+        "end_time": "2024-01-24 16:46:17.716000",
+        "messages": [
+            {
+                "timestamp": "2024-01-24 16:46:17.716000",
+                "sender": "user - 82.80.25.207",
+                "text": "i want a piano for beginnersfor my 44 years old"
+            }
+        ]
+    },
+    {
+        "_id": "65b13f2a6c4a9170e6d02efb",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.13029000000000002,
+        "start_time": "2024-01-24 16:47:26.090000",
+        "end_time": "2024-01-24 16:47:38.094000",
+        "messages": [
+            {
+                "timestamp": "2024-01-24 16:47:38.094000",
+                "sender": "user - 82.80.25.207",
+                "text": "i want a piano for my 44 years old father"
+            },
+            {
+                "timestamp": "2024-01-24 16:48:23.844000",
+                "sender": "bot",
+                "text": "That's wonderful! To help you choose the perfect piano for"
+            },
+            {
+                "timestamp": "2024-01-24 16:49:05.615000",
+                "sender": "user - 82.80.25.207",
+                "text": "he is a beginner"
+            },
+            {
+                "timestamp": "2024-01-24 16:49:36.868000",
+                "sender": "bot",
+                "text": "I understand that your father is a beginner. It's great"
+            }
+        ],
+        "category": "Keys",
+        "subcategory": "Digital Pianos"
+    },
+    {
+        "_id": "65b162d14aa651772e9aaa2f",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0,
+        "start_time": "2024-01-24 19:18:10.967000",
+        "end_time": "2024-01-24 19:19:45.188000",
+        "messages": [
+            {
+                "timestamp": "2024-01-24 19:19:45.188000",
+                "sender": "user - 82.80.25.207",
+                "text": "hi I really want to buy piano chair to myself"
+            },
+            {
+                "timestamp": "2024-01-24 19:20:00.455000",
+                "sender": "bot",
+                "text": "error, refresh and wait 1 minute Statement \"SELECT * FROM"
+            }
+        ]
+    },
+    {
+        "_id": "65b24ce64aa651772e9aaa30",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.20568000000000003,
+        "start_time": "2024-01-25 11:58:24.774000",
+        "end_time": "2024-01-25 11:58:30.401000",
+        "messages": [
+            {
+                "timestamp": "2024-01-25 11:58:30.401000",
+                "sender": "user - 82.80.25.207",
+                "text": "What's a good beginner electric guitar under $300?"
+            },
+            {
+                "timestamp": "2024-01-25 11:59:03.585000",
+                "sender": "bot",
+                "text": "Based on your budget and requirement, I have a few"
+            },
+            {
+                "timestamp": "2024-01-25 12:12:55.066000",
+                "sender": "user - 82.80.25.207",
+                "text": "It's still a bit difficult for me to choose, I'd"
+            },
+            {
+                "timestamp": "2024-01-25 12:13:37.770000",
+                "sender": "bot",
+                "text": "Absolutely, I'd be happy to help you narrow down your"
+            },
+            {
+                "timestamp": "2024-01-25 12:24:47.891000",
+                "sender": "user - 82.80.25.207",
+                "text": "I'm a beginner looking for a complete electric guitar package,"
+            },
+            {
+                "timestamp": "2024-01-25 12:25:12.549000",
+                "sender": "bot",
+                "text": "That's fantastic! It's always exciting to start a new musical"
+            }
+        ],
+        "category": "Guitars & Basses",
+        "subcategory": "Electric Guitars"
+    },
+    {
+        "_id": "65b2533c4aa651772e9aaa31",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.06789,
+        "start_time": "2024-01-25 12:25:27.424000",
+        "end_time": "2024-01-25 12:25:32.996000",
+        "messages": [
+            {
+                "timestamp": "2024-01-25 12:25:32.996000",
+                "sender": "user - 82.80.25.207",
+                "text": "I'm a beginner looking for a complete electric guitar package,"
+            },
+            {
+                "timestamp": "2024-01-25 12:26:12.603000",
+                "sender": "bot",
+                "text": "Based on your requirements, I would recommend the Ibanez GRG121DX-WNF"
+            }
+        ],
+        "category": "Guitars & Basses",
+        "subcategory": "Guitar/Bass Accessories"
+    },
+    {
+        "_id": "65b276a64aa651772e9aaa32",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0,
+        "start_time": "2024-01-25 14:34:07.289000",
+        "end_time": "2024-01-25 14:56:38.303000",
+        "messages": [
+            {
+                "timestamp": "2024-01-25 14:56:38.303000",
+                "sender": "user - 82.80.25.207",
+                "text": "I'm a rook fun looking for a complete electric guitar"
+            },
+            {
+                "timestamp": "2024-01-25 14:56:58.725000",
+                "sender": "bot",
+                "text": "error, refresh and wait 1 minute Statement \"SELECT * FROM"
+            }
+        ]
+    },
+    {
+        "_id": "65b27d014aa651772e9aaa33",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.0543,
+        "start_time": "2024-01-25 15:06:01.714000",
+        "end_time": "2024-01-25 15:23:45.675000",
+        "messages": [
+            {
+                "timestamp": "2024-01-25 15:23:45.675000",
+                "sender": "user - 82.80.25.207",
+                "text": "hi I would like to buy piano chair to my"
+            },
+            {
+                "timestamp": "2024-01-25 15:24:09.074000",
+                "sender": "bot",
+                "text": "Hello! It's great that your son is into music. For"
+            }
+        ],
+        "category": "Keys",
+        "subcategory": "Piano Accessories"
+    },
+    {
+        "_id": "65b27d864aa651772e9aaa34",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.060930000000000005,
+        "start_time": "2024-01-25 15:24:53.881000",
+        "end_time": "2024-01-25 15:25:58.847000",
+        "messages": [
+            {
+                "timestamp": "2024-01-25 15:25:58.847000",
+                "sender": "user - 82.80.25.207",
+                "text": "hi I really want to buy piano to myself I"
+            },
+            {
+                "timestamp": "2024-01-25 15:26:41.243000",
+                "sender": "bot",
+                "text": "Hello! It's great to hear that you're interested in continuing"
+            }
+        ]
+    },
+    {
+        "_id": "65b2aed04aa651772e9aaa35",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.06909,
+        "start_time": "2024-01-25 18:36:31.345000",
+        "end_time": "2024-01-25 18:56:16.341000",
+        "messages": [
+            {
+                "timestamp": "2024-01-25 18:56:16.341000",
+                "sender": "user - 82.80.25.207",
+                "text": "I'm interested in a ukulele kit suitable for beginners, complete"
+            },
+            {
+                "timestamp": "2024-01-25 18:57:02.098000",
+                "sender": "bot",
+                "text": "That's great! We have a few options that might suit"
+            }
+        ],
+        "category": "Guitars & Basses",
+        "subcategory": "Ukuleles"
+    },
+    {
+        "_id": "65b3feea4aa651772e9aaa36",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0,
+        "start_time": "2024-01-26 18:49:51.114000",
+        "end_time": "2024-01-26 18:50:18.027000",
+        "messages": [
+            {
+                "timestamp": "2024-01-26 18:50:18.027000",
+                "sender": "user - 82.80.25.207",
+                "text": "How much will an electric guitar coat"
+            },
+            {
+                "timestamp": "2024-01-26 18:50:22.415000",
+                "sender": "bot",
+                "text": "error, refresh and wait 1 minute tuple index out of"
+            },
+            {
+                "timestamp": "2024-01-26 18:50:50.755000",
+                "sender": "user - 82.80.25.207",
+                "text": "How much will an electric guitar cost"
+            },
+            {
+                "timestamp": "2024-01-26 18:51:00.570000",
+                "sender": "bot",
+                "text": "error, refresh and wait 1 minute Error code: 429 -"
+            }
+        ]
+    },
+    {
+        "_id": "65b632204aa651772e9aaa37",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0,
+        "start_time": "2024-01-28 10:52:18.427000",
+        "end_time": "2024-01-28 10:53:20.361000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 10:53:20.361000",
+                "sender": "user - 82.80.25.207",
+                "text": "hi I want to buy to my son a piano"
+            },
+            {
+                "timestamp": "2024-01-28 10:53:27.839000",
+                "sender": "bot",
+                "text": "error, refresh and wait 1 minute Error code: 429 -"
+            }
+        ]
+    },
+    {
+        "_id": "65b639344aa651772e9aaa38",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.061200000000000004,
+        "start_time": "2024-01-28 11:23:15.124000",
+        "end_time": "2024-01-28 11:23:32.552000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 11:23:32.552000",
+                "sender": "user - 82.80.25.207",
+                "text": "Looking for a powerful bass amp suitable for large venues."
+            },
+            {
+                "timestamp": "2024-01-28 11:23:47.117000",
+                "sender": "bot",
+                "text": "Based on your requirements, I would suggest considering the GR"
+            }
+        ],
+        "category": "Guitars & Basses",
+        "subcategory": "Bass Amps"
+    },
+    {
+        "_id": "65b63c044aa651772e9aaa39",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.05598,
+        "start_time": "2024-01-28 11:34:30.766000",
+        "end_time": "2024-01-28 11:35:32.952000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 11:35:32.952000",
+                "sender": "user - 82.80.25.207",
+                "text": "hi I want to buy to my son a piano"
+            },
+            {
+                "timestamp": "2024-01-28 11:35:44.215000",
+                "sender": "bot",
+                "text": "Hello! It's great to hear that your son has been"
+            }
+        ],
+        "user_actions": {
+            "name": "lustman Yoav ",
+            "product": {
+                "rating": "Okay",
+                "reason": "He could have found another piano  chair that is actually more suitable for his needs at a better price, but he did choose this one.Thomann KB-15 Upholstered Seat VBR is not a piano chair "
+            },
+            "phraise": {
+                "rating": "Okay",
+                "reason": "Both options are from our 'Piano Accessories' sub-category in the 'Keys' category. Which one do you think your son would prefer?  The sentence is not humane"
+            },
+            "demands": {
+                "rating": "Okay",
+                "reason": ""
+            },
+            "price": {
+                "rating": "Bad",
+                "reason": "251,26 \u20ac at at thomann"
+            },
+            "other": " Thomann KB-15 Upholstered Seat VBR \nIsn't piano chair ",
+            "feedback": " Thomann KB-15 Upholstered Seat VBR \nIsn't piano chair  251,26 \u20ac at at thomann He could have found another piano  chair that is actually more suitable for his needs at a better price, but he did choose this one.Thomann KB-15 Upholstered Seat VBR is not a piano chair   Both options are from our 'Piano Accessories' sub-category in the 'Keys' category. Which one do you think your son would prefer?  The sentence is not humane"
+        },
+        "category": "Keys",
+        "subcategory": "Piano Accessories"
+    },
+    {
+        "_id": "65b63fb74aa651772e9aaa3a",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.10044,
+        "start_time": "2024-01-28 11:48:46.277000",
+        "end_time": "2024-01-28 11:51:19.562000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 11:51:19.562000",
+                "sender": "user - 82.80.25.207",
+                "text": "hi I want to buy stand for me electric piano"
+            },
+            {
+                "timestamp": "2024-01-28 11:51:30.110000",
+                "sender": "bot",
+                "text": "Hello! Based on your requirement, I would recommend the K&M"
+            },
+            {
+                "timestamp": "2024-01-28 11:53:16.389000",
+                "sender": "user - 82.80.25.207",
+                "text": "I want a simple stand please"
+            },
+            {
+                "timestamp": "2024-01-28 11:53:25.951000",
+                "sender": "bot",
+                "text": "I understand that you're looking for a simple stand for"
+            }
+        ],
+        "user_actions": {
+            "name": "",
+            "product": {
+                "rating": "Bad",
+                "reason": ""
+            },
+            "phraise": {
+                "rating": "Bad",
+                "reason": ""
+            },
+            "demands": {
+                "rating": "Okay",
+                "reason": ""
+            },
+            "price": {
+                "rating": "Bad",
+                "reason": "K&M 18804 isn't a piano stand"
+            },
+            "other": "I understand that you're looking for a simple stand for your electric piano. However, the products listed here are all keyboard amplifiers and dust covers, not stands. Could you please clarify if you're also interested in amplifiers or dust covers for your piano? If not, I'd be happy to help you find the perfect stand for your electric piano.\n\"not stands\" \nHe can't find piano stands, and he also writes that he has no information.\nA simple stand should cost around 100 NIS in the area",
+            "feedback": "I understand that you're looking for a simple stand for your electric piano. However, the products listed here are all keyboard amplifiers and dust covers, not stands. Could you please clarify if you're also interested in amplifiers or dust covers for your piano? If not, I'd be happy to help you find the perfect stand for your electric piano.\n\"not stands\" \nHe can't find piano stands, and he also writes that he has no information.\nA simple stand should cost around 100 NIS in the area K&M 18804 isn't a piano stand   "
+        },
+        "category": "Keys",
+        "subcategory": "Piano Accessories"
+    },
+    {
+        "_id": "65b6445b4aa651772e9aaa3b",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.05124,
+        "start_time": "2024-01-28 12:10:05.777000",
+        "end_time": "2024-01-28 12:11:07.587000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 12:11:07.587000",
+                "sender": "user - 82.80.25.207",
+                "text": "I really want to buy to my friend a Guitar"
+            },
+            {
+                "timestamp": "2024-01-28 12:11:21.709000",
+                "sender": "bot",
+                "text": "Based on your friend's interest in jazz music, I would"
+            }
+        ],
+        "user_actions": {
+            "name": "Lustman Yoav ",
+            "product": {
+                "rating": "Bad",
+                "reason": "A bass guitar typically wouldn't be the first recommendation for a jazz style"
+            },
+            "phraise": {
+                "rating": "Bad",
+                "reason": "Guitars & Basses' category"
+            },
+            "demands": {
+                "rating": null,
+                "reason": ""
+            },
+            "price": {
+                "rating": "Bad",
+                "reason": "very high "
+            },
+            "other": "",
+            "feedback": " very high  A bass guitar typically wouldn't be the first recommendation for a jazz style  Guitars & Basses' category"
+        },
+        "category": "Guitars & Basses",
+        "subcategory": "Electric Basses"
+    },
+    {
+        "_id": "65b649504aa651772e9aaa3c",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.16143000000000002,
+        "start_time": "2024-01-28 12:27:45.203000",
+        "end_time": "2024-01-28 12:32:16.195000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 12:32:16.195000",
+                "sender": "user - 82.80.25.207",
+                "text": "a beginner price friendly piano"
+            },
+            {
+                "timestamp": "2024-01-28 12:32:25.092000",
+                "sender": "bot",
+                "text": "I understand you're looking for a beginner-friendly and price-friendly digital"
+            },
+            {
+                "timestamp": "2024-01-28 12:32:54.068000",
+                "sender": "user - 82.80.25.207",
+                "text": "350 dollar piano and 49 keys"
+            },
+            {
+                "timestamp": "2024-01-28 12:33:03.871000",
+                "sender": "bot",
+                "text": "I understand that you're looking for a digital piano with"
+            },
+            {
+                "timestamp": "2024-01-28 12:33:24.732000",
+                "sender": "user - 82.80.25.207",
+                "text": "yes 61 key the best"
+            },
+            {
+                "timestamp": "2024-01-28 12:33:33.258000",
+                "sender": "bot",
+                "text": "I understand you're looking for a 61-key digital piano. However,"
+            }
+        ]
+    },
+    {
+        "_id": "65b64e054aa651772e9aaa3d",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.19188,
+        "start_time": "2024-01-28 12:48:30.763000",
+        "end_time": "2024-01-28 12:52:21.830000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 12:52:21.830000",
+                "sender": "user - 82.80.25.207",
+                "text": "Hello Rami! How are you? Im looking to get an"
+            },
+            {
+                "timestamp": "2024-01-28 12:52:39.214000",
+                "sender": "bot",
+                "text": "Hello! It's great to hear from an experienced piano player"
+            },
+            {
+                "timestamp": "2024-01-28 12:55:54.362000",
+                "sender": "user - 82.80.25.207",
+                "text": "Hi! good questions :) I do need a midi connection"
+            },
+            {
+                "timestamp": "2024-01-28 12:56:14.724000",
+                "sender": "bot",
+                "text": "Based on your requirements, I would recommend considering the Gewa"
+            },
+            {
+                "timestamp": "2024-01-28 13:00:50.823000",
+                "sender": "user - 82.80.25.207",
+                "text": "Hi, sure. but the Kawai is a large upright heavy"
+            },
+            {
+                "timestamp": "2024-01-28 13:01:17.264000",
+                "sender": "bot",
+                "text": "Based on your requirements, I would recommend the Gewa DP"
+            }
+        ],
+        "category": "Keys",
+        "subcategory": "Digital Pianos"
+    },
+    {
+        "_id": "65b670344aa651772e9aaa3e",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.047310000000000005,
+        "start_time": "2024-01-28 15:17:47.096000",
+        "end_time": "2024-01-28 15:18:12.350000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 15:18:12.350000",
+                "sender": "user - 82.80.25.207",
+                "text": "i need a beginner friendly piano kit"
+            },
+            {
+                "timestamp": "2024-01-28 15:18:36.969000",
+                "sender": "bot",
+                "text": "That's great! We have a few options that could be"
+            }
+        ],
+        "category": "Keys",
+        "subcategory": "Keyboards"
+    },
+    {
+        "_id": "65b68d3c4aa651772e9aaa3f",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.07619999999999999,
+        "start_time": "2024-01-28 17:21:26.453000",
+        "end_time": "2024-01-28 17:22:04.479000",
+        "messages": [
+            {
+                "timestamp": "2024-01-28 17:22:04.479000",
+                "sender": "user - 82.80.25.207",
+                "text": "can you find me a piano for my son he"
+            },
+            {
+                "timestamp": "2024-01-28 17:22:30.793000",
+                "sender": "bot",
+                "text": "Absolutely, I'd be delighted to help you find the perfect"
+            },
+            {
+                "timestamp": "2024-01-28 17:23:05.608000",
+                "sender": "user - 82.80.25.207",
+                "text": "he really like to play pop music like Adel"
+            },
+            {
+                "timestamp": "2024-01-28 17:23:33.955000",
+                "sender": "bot",
+                "text": "That's great to hear! Pop music like Adele's often requires"
+            }
+        ],
+        "category": "Keys",
+        "subcategory": "Digital Pianos"
+    },
+    {
+        "_id": "65b784594aa651772e9aaa40",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.09045,
+        "start_time": "2024-01-29 10:55:49.162000",
+        "end_time": "2024-01-29 10:56:25.375000",
+        "messages": [
+            {
+                "timestamp": "2024-01-29 10:56:25.375000",
+                "sender": "user - 82.80.25.207",
+                "text": "hi I am 33 years old and I am playing"
+            },
+            {
+                "timestamp": "2024-01-29 10:57:01.647000",
+                "sender": "bot",
+                "text": "Hello! It's great to hear that you're looking to invest"
+            },
+            {
+                "timestamp": "2024-01-29 10:58:25.530000",
+                "sender": "user - 82.80.25.207",
+                "text": "electric guitar I play like to play pop"
+            },
+            {
+                "timestamp": "2024-01-29 10:59:19.525000",
+                "sender": "bot",
+                "text": "It's great to hear that you're looking to invest in"
+            }
+        ],
+        "user_actions": {
+            "name": "lustman Yoav ",
+            "product": {
+                "rating": null,
+                "reason": ""
+            },
+            "phraise": {
+                "rating": "Okay",
+                "reason": ""
+            },
+            "demands": {
+                "rating": null,
+                "reason": ""
+            },
+            "price": {
+                "rating": "Bad",
+                "reason": "I have a budget of 2000$ "
+            },
+            "other": "Harley Benton RG-Junior BK Bundle \nthis guitar cost 100$ and for \"Junior\"\n\"playing for 3 years\"he isn't Junior",
+            "feedback": "Harley Benton RG-Junior BK Bundle \nthis guitar cost 100$ and for \"Junior\"\n\"playing for 3 years\"he isn't Junior I have a budget of 2000$    "
+        },
+        "category": "Guitars & Basses",
+        "subcategory": "Electric Guitars"
+    },
+    {
+        "_id": "65b8bf4d4aa651772e9aaa41",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.13227,
+        "start_time": "2024-01-30 09:18:23.129000",
+        "end_time": "2024-01-30 09:20:13.848000",
+        "messages": [
+            {
+                "timestamp": "2024-01-30 09:20:13.848000",
+                "sender": "user - 82.80.25.207",
+                "text": "What doo u think about Eko CS-10 Natural?"
+            },
+            {
+                "timestamp": "2024-01-30 09:20:49.661000",
+                "sender": "bot",
+                "text": "The Eko CS-10 Natural is indeed a fantastic choice, especially"
+            },
+            {
+                "timestamp": "2024-01-30 09:23:15.928000",
+                "sender": "user - 82.80.25.207",
+                "text": "im a complete beginner, I have no specific genre, I"
+            },
+            {
+                "timestamp": "2024-01-30 09:23:53.982000",
+                "sender": "bot",
+                "text": "That's great to hear that you're interested in the Eko"
+            },
+            {
+                "timestamp": "2024-01-30 09:25:14.337000",
+                "sender": "user - 82.80.25.207",
+                "text": "acoustic. softer sound"
+            },
+            {
+                "timestamp": "2024-01-30 09:26:10.303000",
+                "sender": "bot",
+                "text": "I see that you're interested in the Eko CS-10 Natural,"
+            },
+            {
+                "timestamp": "2024-01-30 09:27:00.159000",
+                "sender": "user - 82.80.25.207",
+                "text": "I already bought it. is it a good choice"
+            },
+            {
+                "timestamp": "2024-01-30 09:27:33.310000",
+                "sender": "bot",
+                "text": "Absolutely, the Eko CS-10 Natural is a fantastic choice! It's"
+            }
+        ],
+        "user_actions": {
+            "name": "",
+            "product": {
+                "rating": null,
+                "reason": ""
+            },
+            "phraise": {
+                "rating": null,
+                "reason": ""
+            },
+            "demands": {
+                "rating": null,
+                "reason": ""
+            },
+            "price": {
+                "rating": null,
+                "reason": ""
+            },
+            "other": "",
+            "feedback": "    "
+        },
+        "category": "Guitars & Basses",
+        "subcategory": "Acoustic Guitars"
+    },
+    {
+        "_id": "65b91d9d4aa651772e9aaa42",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.09885000000000001,
+        "start_time": "2024-01-30 16:01:49.705000",
+        "end_time": "2024-01-30 16:02:37.066000",
+        "messages": [
+            {
+                "timestamp": "2024-01-30 16:02:37.066000",
+                "sender": "user - 82.80.25.207",
+                "text": "Do you have any acoustic basses that are good for"
+            },
+            {
+                "timestamp": "2024-01-30 16:03:21.914000",
+                "sender": "bot",
+                "text": "Absolutely, we have a few options that might be suitable"
+            }
+        ],
+        "category": "Guitars & Basses",
+        "subcategory": "Acoustic & Semi-Acoustic Basses"
+    },
+    {
+        "_id": "65b9247104251004c2b5f359",
+        "user_ip": "77.125.59.85",
+        "user_device": "Desktop",
+        "price": 0.02535,
+        "start_time": "2024-01-30 18:27:33.499000",
+        "end_time": "2024-01-30 18:31:45.675000",
+        "messages": [
+            {
+                "timestamp": "2024-01-30 18:31:45.675000",
+                "sender": "user - 77.125.59.85",
+                "text": "I need a replacement bridge for my Fender bass guitar."
+            },
+            {
+                "timestamp": "2024-01-30 18:32:23.770000",
+                "sender": "bot",
+                "text": "I'm glad you reached out! We have a variety of"
+            }
+        ]
+    },
+    {
+        "_id": "65baa40e4aa651772e9aaa43",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.31242000000000003,
+        "start_time": "2024-01-31 19:47:32.661000",
+        "end_time": "2024-01-31 19:48:30.732000",
+        "messages": [
+            {
+                "timestamp": "2024-01-31 19:48:30.732000",
+                "sender": "user - 82.80.25.207",
+                "text": "I want to buy a piano for my son he"
+            },
+            {
+                "timestamp": "2024-01-31 19:49:05.290000",
+                "sender": "bot",
+                "text": "That's wonderful! It's great to hear that your son has"
+            },
+            {
+                "timestamp": "2024-01-31 19:50:36.332000",
+                "sender": "user - 82.80.25.207",
+                "text": "advanced digital piano about 2000$"
+            },
+            {
+                "timestamp": "2024-01-31 19:51:13.099000",
+                "sender": "bot",
+                "text": "Based on your budget and the need for an advanced"
+            },
+            {
+                "timestamp": "2024-01-31 19:53:38.659000",
+                "sender": "user - 82.80.25.207",
+                "text": "I like to explore other brands"
+            },
+            {
+                "timestamp": "2024-01-31 19:54:06.677000",
+                "sender": "bot",
+                "text": "That's great! Exploring different brands can help you find the"
+            },
+            {
+                "timestamp": "2024-01-31 20:05:07.157000",
+                "sender": "user - 82.80.25.207",
+                "text": "lets go with Yamaha I herd good stuff on this"
+            },
+            {
+                "timestamp": "2024-01-31 20:06:24.475000",
+                "sender": "bot",
+                "text": "That's a great choice! Yamaha is indeed a reputable brand"
+            },
+            {
+                "timestamp": "2024-01-31 20:07:21.517000",
+                "sender": "user - 82.80.25.207",
+                "text": "he like playing pop music but sometimes classical music"
+            },
+            {
+                "timestamp": "2024-01-31 20:08:24.882000",
+                "sender": "bot",
+                "text": "That's great to know! Given your son's interest in both"
+            },
+            {
+                "timestamp": "2024-01-31 20:10:31.847000",
+                "sender": "user - 82.80.25.207",
+                "text": "yea 88 keys will be good"
+            },
+            {
+                "timestamp": "2024-01-31 20:11:04.126000",
+                "sender": "bot",
+                "text": "That's great! With 88 keys, your son will have the"
+            },
+            {
+                "timestamp": "2024-01-31 20:11:42.265000",
+                "sender": "user - 82.80.25.207",
+                "text": "weighted"
+            },
+            {
+                "timestamp": "2024-01-31 20:12:08.931000",
+                "sender": "bot",
+                "text": "That's great to hear that your son is an advanced"
+            }
+        ],
+        "user_actions": {
+            "name": "Lustman Yoav",
+            "product": {
+                "rating": "Okay",
+                "reason": ""
+            },
+            "phraise": {
+                "rating": "Okay",
+                "reason": "he forgot the price of  Yamaha YDP-184R Arius "
+            },
+            "demands": {
+                "rating": "Okay",
+                "reason": ""
+            },
+            "price": {
+                "rating": "Okay",
+                "reason": ""
+            },
+            "other": "What level of expertise does your son have? Is he a beginner, intermediate, or advanced player?\nnot a good question I told rami my son is playing for long time\n\nThe bot keeps asking questions and needs to give more options faster ",
+            "feedback": "What level of expertise does your son have? Is he a beginner, intermediate, or advanced player?\nnot a good question I told rami my son is playing for long time\n\nThe bot keeps asking questions and needs to give more options faster     he forgot the price of  Yamaha YDP-184R Arius "
+        },
+        "category": "Keys",
+        "subcategory": "Digital Pianos"
+    },
+    {
+        "_id": "65bb7fdf4aa651772e9aaa44",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.062040000000000005,
+        "start_time": "2024-02-01 11:25:47.799000",
+        "end_time": "2024-02-01 11:26:23.284000",
+        "messages": [
+            {
+                "timestamp": "2024-02-01 11:26:23.284000",
+                "sender": "user - 82.80.25.207",
+                "text": "I really like to buy guitar for myself I am"
+            },
+            {
+                "timestamp": "2024-02-01 11:27:27.123000",
+                "sender": "bot",
+                "text": "That's fantastic! Rock music and guitar go hand in hand."
+            },
+            {
+                "timestamp": "2024-02-01 11:29:13.969000",
+                "sender": "user - 82.80.25.207",
+                "text": "I have around 500$"
+            },
+            {
+                "timestamp": "2024-02-01 11:29:58.204000",
+                "sender": "bot",
+                "text": "Hello there! It's great to hear that you're starting your"
+            }
+        ],
+        "user_actions": {
+            "name": "",
+            "product": {
+                "rating": null,
+                "reason": ""
+            },
+            "phraise": {
+                "rating": null,
+                "reason": ""
+            },
+            "demands": {
+                "rating": null,
+                "reason": ""
+            },
+            "price": {
+                "rating": "Okay",
+                "reason": "when we talk about beginners they want  something not that expensive for the First choice  "
+            },
+            "other": "Fender Player Stratocaster\nEpiphone Les Paul Studio\n\nthey both aren't a product they are series.",
+            "feedback": "Fender Player Stratocaster\nEpiphone Les Paul Studio\n\nthey both aren't a product they are series. when we talk about beginners they want  something not that expensive for the First choice     "
+        }
+    },
+    {
+        "_id": "65bba69f4aa651772e9aaa45",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.028500000000000004,
+        "start_time": "2024-02-01 13:56:49.433000",
+        "end_time": "2024-02-01 14:11:43.588000",
+        "messages": [
+            {
+                "timestamp": "2024-02-01 14:11:43.588000",
+                "sender": "user - 82.80.25.207",
+                "text": "can you recommend on a piano chair for 14 years"
+            },
+            {
+                "timestamp": "2024-02-01 14:12:23.786000",
+                "sender": "bot",
+                "text": "Absolutely, I'd be happy to help you find the perfect"
+            }
+        ]
+    },
+    {
+        "_id": "65bf85aa4aa651772e9aaa46",
+        "user_ip": "82.80.25.207",
+        "user_device": "Desktop",
+        "price": 0.033299999999999996,
+        "start_time": "2024-02-04 12:28:50.949000",
+        "end_time": "2024-02-04 12:40:10.836000",
+        "messages": [
+            {
+                "timestamp": "2024-02-04 12:40:10.836000",
+                "sender": "user - 82.80.25.207",
+                "text": "can you recommend on a Guitar pedal I have electric"
+            },
+            {
+                "timestamp": "2024-02-04 12:40:33.855000",
+                "sender": "bot",
+                "text": "Absolutely, I'd be happy to help you find the perfect"
+            },
+            {
+                "timestamp": "2024-02-04 12:41:08.199000",
+                "sender": "user - 82.80.25.207",
+                "text": "ammm delay and around 150$"
+            },
+            {
+                "timestamp": "2024-02-04 12:41:25.848000",
+                "sender": "bot",
+                "text": "error, refresh and wait 1 minute"
+            }
+        ]
+    }
+]

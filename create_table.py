@@ -4,6 +4,7 @@ import pymongo
 from datetime import timedelta
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
@@ -14,7 +15,7 @@ MONGODB_COLLECTION = os.environ.get("MONGODB_COLLECTION")
 # Connect to MongoDB
 client = pymongo.MongoClient(MONGODB_URL)
 
-db = client[MONGODB_DB]  
+db = client[MONGODB_DB]
 
 init = False
 
@@ -22,11 +23,10 @@ init = False
 chat_schema = {
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["_id", "start_time","end_time", "messages","prompts"],
+        "required": ["_id", "start_time", "end_time", "messages", "prompts"],
         "properties": {
             "_id": {"bsonType": "objectId"},
-
-            # user	
+            # user
             "user_ip": {"bsonType": "string"},
             "user_device": {"bsonType": "string"},
             "version": {"bsonType": "string"},
@@ -44,22 +44,53 @@ chat_schema = {
                         "timestamp": {"bsonType": "date"},
                         "sender": {"bsonType": "string"},
                         "text": {"bsonType": "string"},
-                    }
-                }
+                    },
+                },
             },
             "prompts": {
                 "bsonType": "object",
                 "properties": {
                     "template_prompt": {"bsonType": "string"},
                     "search_prompt": {"bsonType": "string"},
-                    "response_query": {"bsonType": "string"}
-                }
+                    "response_query": {"bsonType": "string"},
+                },
             },
             "user_actions": {
                 "bsonType": "object",
                 "properties": {
+                    "name": {"bsonType": "string"},
+                    "overall_rate": {"bsonType": "string"},
+                    "price": {
+                        "bsonType": "object",
+                        "properties": {
+                            "rating": {"bsonType": "string"},
+                            "reason": {"bsonType": "string"},
+                        },
+                    },
+                    "product": {
+                        "bsonType": "object",
+                        "properties": {
+                            "rating": {"bsonType": "string"},
+                            "reason": {"bsonType": "string"},
+                        },
+                    },
+                    "demands": {
+                        "bsonType": "object",
+                        "properties": {
+                            "rating": {"bsonType": "string"},
+                            "reason": {"bsonType": "string"},
+                        },
+                    },
+                    "phraise": {
+                        "bsonType": "object",
+                        "properties": {
+                            "rating": {"bsonType": "string"},
+                            "reason": {"bsonType": "string"},
+                        },
+                    },
+                    "other": {"bsonType": "string"},
                     "feedback": {"bsonType": "string"},
-                    "feedback_text": {"bsonType": "string"},
+                    "name": {"bsonType": "string"},
                     "actions": {
                         "bsonType": "array",
                         "items": {
@@ -67,11 +98,11 @@ chat_schema = {
                             "required": ["action"],
                             "properties": {
                                 "product_id": {"bsonType": "string"},
-                                "action": {"bsonType": "string"}
-                            }
-                        }
-                    }
-                }
+                                "action": {"bsonType": "string"},
+                            },
+                        },
+                    },
+                },
             },
             "product_references": {
                 "bsonType": "array",
@@ -82,11 +113,11 @@ chat_schema = {
                         "name": {"bsonType": "string"},
                         "description": {"bsonType": "string"},
                         "price": {"bsonType": "double"},
-                        "categories": {"bsonType": "string"}
-                    }
-                }
-            }
-        }
+                        "categories": {"bsonType": "string"},
+                    },
+                },
+            },
+        },
     }
 }
 
@@ -102,4 +133,6 @@ if init:
     chats = db.create_collection(MONGODB_COLLECTION, validator=chat_schema)
 
     # Add indexes on 'category' and 'subcategory'
-    chats.create_index([("category", pymongo.ASCENDING), ("subcategory", pymongo.ASCENDING)])
+    chats.create_index(
+        [("category", pymongo.ASCENDING), ("subcategory", pymongo.ASCENDING)]
+    )

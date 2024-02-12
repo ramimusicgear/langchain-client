@@ -1,0 +1,32 @@
+{
+    "Guitars & Basses": [
+        "Electric Guitars",
+        "Acoustic Guitars",
+        "Classical Guitars",
+        "Electric Basses",
+        "Acoustic & Semi-Acoustic Basses",
+        "Ukuleles",
+        "Guitar/Bass Accessories",
+        "Bluegrass Instruments",
+        "Strings",
+        "Guitar & Bass Spare Parts",
+        "Pickups",
+        "Travel Guitars",
+        "Misc. Stringed Instruments",
+        "Electric Guitar Amps",
+        "Bass Amps",
+        "Guitar & Bass Effects",
+        "Acoustic Guitar Amps"
+    ],
+    "Keys": [
+        "Keyboards",
+        "Keyboard Amps",
+        "Synthesizers",
+        "Piano Accessories",
+        "MIDI Master Keyboards",
+        "Stage Pianos",
+        "Digital Pianos",
+        "Electric Organs",
+        "Classical Organs"
+    ]
+}

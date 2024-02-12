@@ -5,13 +5,15 @@ import hashlib
 import datetime
 import streamlit as st
 
-SECRET_KEY = os.environ.get('JWT_SECRET_KEY')
-ADMIN_USERNAME = os.environ.get('ADMIN_USERNAME')
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD')
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+
 
 # Function to validate login (implement proper validation here)
 def validate_login(username, password):
     return username == ADMIN_USERNAME and password == ADMIN_PASSWORD
+
 
 def create_jwt_token(username, password):
     """
@@ -23,21 +25,22 @@ def create_jwt_token(username, password):
 
     # Token expiration time
     expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-    
+
     # Payload with hashed password
     payload = {
         "user": username,
         "password": hashed_password,  # Storing hashed password (be cautious)
         "exp": expiration_time,
-        "is_admin": validate_login(username, password)
+        "is_admin": validate_login(username, password),
     }
 
     # Create JWT token
     token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
     return token
 
+
 def verify_jwt_token(token, triggered=True):
-    """ Verify the given JWT token """
+    """Verify the given JWT token"""
     if triggered:
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
