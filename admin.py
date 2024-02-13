@@ -8,15 +8,15 @@ from db import get_selected
 def set_tab(tab_name):
     st.session_state.current_tab = tab_name
 
-def get_help_from_color(color):
+def get_help_from_color(color, selected=False):
     if color == "red":
-        return "Bad Feedback"
+        return f"{'selected chat - ' if selected else ''}Bad Feedback"
     elif color == "orange":
-        return "Okay Feedback"
+        return f"{'selected chat - ' if selected else ''}Okay Feedback"
     elif color == "green":
-        return "Good Feedback"
+        return f"{'selected chat - ' if selected else ''}Good Feedback"
     else:
-        return "No Feedback"
+        return f"{'selected chat - ' if selected else ''}No Feedback"
 
 
 def get_card_color(user_actions):
@@ -334,7 +334,14 @@ def admin_page(cookie_manager):
             if st.session_state.selected_conversation
             else last_id
         )
-        # print(f"{str(conversation_id)} - {first_message_text}")
+
+        # print(f"selected: {str(
+        #     st.session_state.selected_conversation
+        #     if st.session_state.selected_conversation
+        #     else last_id
+        # )}")
+
+        print(f"{str(conversation_id)} - {first_message_text}")
         d = str(conv["start_time"]).split()[0]
 
         if d not in dates:
@@ -349,14 +356,15 @@ def admin_page(cookie_manager):
                     unsafe_allow_html=True,
                 )
             dates.append(d)
-        if conversation_id == id:
+            
+        if str(conversation_id) == str(id):
             st.sidebar.markdown(
                 f'<span key="{conversation_id}_btn_label" class="button-after-{card_color} selected"></span>',
                 unsafe_allow_html=True,
             )
-            button_clicked = st.sidebar.button(
+            st.sidebar.button(
                 first_message_text,
-                help=get_help_from_color(card_color),
+                help=get_help_from_color(card_color, True),
                 key=f"{conversation_id}_btn",
             )
         else:
@@ -364,23 +372,21 @@ def admin_page(cookie_manager):
                 f'<span key="{conversation_id}_btn_label" class="button-after-{card_color}"></span>',
                 unsafe_allow_html=True,
             )
-            button_clicked = st.sidebar.button(
+            st.sidebar.button(
                 first_message_text,
                 help=get_help_from_color(card_color),
                 key=f"{conversation_id}_btn",
                 on_click=lambda cid=conversation_id: select(str(cid), cookie_manager),
             )
-            if button_clicked:
-                st.session_state.selected_conversation = conversation_id
 
     # Check if the user has scrolled to the bottom then Add a "Load More" button at the end
     st.sidebar.markdown(
         f'<span key="load_more_btn_label" class="button-after-load-more"></span>',
         unsafe_allow_html=True,
     )
-    st.sidebar.button("Load More", on_click=increase_page_number)
+    if len(conversations) != conversations_total_count:
+        st.sidebar.button("Load More", on_click=increase_page_number)
 
-    # print(f"selected: {st.session_state.selected_conversation}")
     conv = get_selected(
         st.session_state.selected_conversation
         if st.session_state.selected_conversation
@@ -448,7 +454,7 @@ def admin_page(cookie_manager):
                     f"<p>Rate: {conv['user_actions']['product']['rating']}</p>",
                     unsafe_allow_html=True,
                 )
-                
+
                 st.markdown(
                     f"<p>{conv['user_actions']['product']['reason']}</p>",
                     unsafe_allow_html=True,

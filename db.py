@@ -66,13 +66,7 @@ def get_filtered_predata():
     unique_backend_versions = data.get("unique_backend_versions", [])
     first_chat_date = data.get("first_chat_date", None)
     last_chat_date = data.get("last_chat_date", None)
-    print(
-        {
-            "db_sender_names": unique_names,
-            "db_backend_versions": unique_backend_versions,
-            "db_first_last_dates": [first_chat_date, last_chat_date],
-        }
-    )
+
     return {
         "db_sender_names": unique_names,
         "db_backend_versions": unique_backend_versions,
@@ -320,7 +314,7 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
             total_prices[date] = total_price
             # print(f"Date: {date}, Total Price: {total_price}")
 
-        conversations = list(chats.find(query_db).skip(skip_count).limit(limit_count))
+        conversations = list(chats.find(query_db).sort("start_time", -1).skip(skip_count).limit(limit_count))
         total_count = chats.count_documents(query_db)
 
         return conversations, total_prices, query, total_count
@@ -368,14 +362,22 @@ def get_selected(selected_conversation):
     if payload and payload["is_admin"]:
         try:
             # Convert string to ObjectId
-            ObjectId(selected_conversation)
+            selected_conversation_ObjectId = ObjectId(selected_conversation)
+            
             # Query the database with ObjectId
-            conversation = chats.find_one({"_id": selected_conversation})
+            conversation = chats.find_one({"_id": selected_conversation_ObjectId})
             return conversation
         except Exception as e:
-            print(e)
-            # Handle invalid ObjectId string
-            return None
+            print(f"ERR1 - {str(e)}")
+            try:
+                # Query the database with ObjectId
+                conversation = chats.find_one({"_id": selected_conversation_ObjectId})
+                return conversation
+            
+            except Exception as e:
+                print(f"ERR2 - {str(e)}")
+                # Handle invalid ObjectId string
+                return None
 
     return None
 

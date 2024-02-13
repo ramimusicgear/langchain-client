@@ -93,6 +93,9 @@ st.markdown(
             .stChatMessage * {{
                 color: white !important;
             }}
+            ol *{{
+                color: white !important;
+            }}
             button *{{
                 color: black !important;
             }}
