@@ -41,4 +41,4 @@ def registration_page(cookie_manager):
 
     submit = f.form_submit_button("Register")
     if submit:
-        register(new_username, new_password)
+        register(new_username, new_password, cookie_manager)

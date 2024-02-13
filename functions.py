@@ -125,9 +125,9 @@ def log_in(username, password, cookie_manager):
         st.session_state.jwt = token  # Store the JWT in session state
         st.session_state.user = username  # Store the JWT in session state
         if payload["is_admin"]:
-            navigate_to("admin")
+            navigate_to("admin", cookie_manager)
         else:
-            navigate_to("chat")
+            navigate_to("chat", cookie_manager)
     else:
         st.error("Log In failed. Please try again.")
     # st.rerun()
@@ -148,9 +148,9 @@ def register(username, password, cookie_manager):
         st.session_state.jwt = token  # Store the JWT in session state
         st.session_state.user = username  # Store the JWT in session state
         if payload["is_admin"]:
-            navigate_to("admin")
+            navigate_to("admin", cookie_manager)
         else:
-            navigate_to("chat")
+            navigate_to("chat", cookie_manager)
     else:
         st.error("Registration failed. Please try again.")
 

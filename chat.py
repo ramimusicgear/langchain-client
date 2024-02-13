@@ -35,7 +35,7 @@ def chat_page(TESTING, cookie_manager):
     st.sidebar.button("New chat", on_click=clear_chat_history)
     if st.session_state.user:
         if st.sidebar.button("Logout", key="to_logout_btn"):
-            log_out()
+            log_out(cookie_manager)
         if st.session_state.user:
             st.sidebar.write(f"# Welcome, {st.session_state.user}!")
 

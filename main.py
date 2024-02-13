@@ -13,6 +13,8 @@ load_dotenv()
 
 from db import get_all_filtered, get_filtered_predata
 
+from functions import clear_all_cookies
+
 # App title
 st.set_page_config(
     page_title="Rami Chatbot", page_icon="https://ramimusic.io/svg/IconLogo.svg"
@@ -120,7 +122,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-from login_utils import verify_jwt_token, create_jwt_token
+from login_utils import verify_jwt_token
 
 # states
 if "messages" not in st.session_state:
@@ -253,23 +255,23 @@ if jwt_cookie and not st.session_state.token_loaded:
                 st.session_state.total_prices = []
                 st.session_state.filter_errors = query["errors"]
 
+if st.sidebar.button("Reset Cookies", key='reset_btn'):
+    clear_all_cookies(cookie_manager)
 
 
-TESTING = False
 
 from admin import admin_page
 from chat import chat_page
 from login_pages import login_page, registration_page
 
+TESTING = False
+
 # App Routing
 if st.session_state.page == "login":
     login_page(cookie_manager)
-
 elif st.session_state.page == "register":
     registration_page(cookie_manager)
-
 elif st.session_state.page == "admin":
     admin_page(cookie_manager)
-
 elif st.session_state.page == "chat":
     chat_page(TESTING, cookie_manager)
