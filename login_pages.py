@@ -19,7 +19,7 @@ def login_page(cookie_manager):
 
     submit = f.form_submit_button("Login")
     if submit:
-        log_in(username, password)
+        log_in(username, password, cookie_manager)
 
 
 def registration_page(cookie_manager):
