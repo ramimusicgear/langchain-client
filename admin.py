@@ -442,7 +442,7 @@ def admin_page(cookie_manager):
                 unsafe_allow_html=True,
             )
         try:
-            conv["category"] = f"{conv["category"]} - " if conv["category"] != "" else "Backend didn't provide the catgories"
+            conv["category"] = f"{conv['category']} - " if conv["category"] != "" else "Backend didn't provide the categories"
             st.write("## categories")
             st.markdown(
                 f"<p><strong>{conv['category']}{conv['subcategory']}</strong></p>",
