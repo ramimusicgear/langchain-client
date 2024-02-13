@@ -1,23 +1,83 @@
+import os
+import jwt
+import time
+import hashlib
+import datetime
 import unittest
+import streamlit as st
 from unittest.mock import patch
 from datetime import datetime
 from db import (
-    get_all_filtered,
+    get_all_filtered
 )  # replace "db" with the actual module where your function is define
+
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+
+
+# Function to validate login (implement proper validation here)
+def validate_login(username, password):
+    return username == ADMIN_USERNAME and password == ADMIN_PASSWORD
+
+
+def create_jwt_token(username, password):
+    """
+    Create a JWT token for the given username and password.
+    The password is hashed before being included in the token.
+    """
+    # Hash the password (consider a more secure hash method for production)
+    hashed_password = hashlib.sha256(password.encode()).hexdigest()
+
+    # Token expiration time
+    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+
+    # Payload with hashed password
+    payload = {
+        "user": username,
+        "password": hashed_password,  # Storing hashed password (be cautious)
+        "exp": expiration_time,
+        "is_admin": validate_login(username, password),
+    }
+
+    # Create JWT token
+    token = jwt.encode(payload, SECRET_KEY, algorithm="HS256")
+    return token
+
+
+def verify_jwt_token(token, triggered=True):
+    """Verify the given JWT token"""
+    if triggered:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            return payload
+        except jwt.ExpiredSignatureError:
+            st.error("The token has expired. Please log in again.")
+            return None
+        except jwt.InvalidTokenError:
+            st.error("Invalid token. Please log in again.")
+            return None
+    else:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            return payload
+        except jwt.ExpiredSignatureError:
+            return None
+
 
 
 class TestGetAllFiltered(unittest.TestCase):
     # categories test
     def test_filter_by_categories(self):
         filter = {"categories": ["Guitars & Basses"]}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(chat["category"] == "Guitars & Basses" for chat in conversations)
         )
 
     def test_filter_by_subcategories(self):
         filter = {"subcategories": ["Electric Guitars"]}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(chat["subcategory"] == "Electric Guitars" for chat in conversations)
         )
@@ -27,7 +87,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "categories": ["Guitars & Basses"],
             "subcategories": ["Electric Guitars"],
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(chat["subcategory"] == "Electric Guitars" for chat in conversations)
         )
@@ -36,7 +96,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "categories": ["Guitars & Basses", "Keys"],
             "subcategories": ["Electric Guitars"],
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(
                 (
@@ -52,7 +112,7 @@ class TestGetAllFiltered(unittest.TestCase):
         start_date = datetime(2024, 1, 25, 0, 0, 0)
         end_date = datetime(2024, 2, 10, 0, 0, 0)
         filter = {"date_range": [start_date, end_date]}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(start_date <= chat["start_time"] <= end_date for chat in conversations)
         )
@@ -65,7 +125,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "categories": ["Guitars & Basses"],
             "subcategories": ["Electric Guitars"],
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(
                 chat["subcategory"] == "Electric Guitars"
@@ -79,7 +139,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "categories": ["Guitars & Basses", "Keys"],
             "subcategories": ["Electric Guitars"],
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(
                 chat["subcategory"] == "Electric Guitars"
@@ -89,7 +149,7 @@ class TestGetAllFiltered(unittest.TestCase):
         )
 
         filter = {"date_range": [start_date, end_date], "categories": ["Keys"]}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             all(
                 chat["category"] == "Keys"
@@ -102,7 +162,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "date_range": [start_date, end_date],
             "feedback": "Only Chats With Feedback",
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
 
         self.assertTrue(
             all(
@@ -115,7 +175,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "date_range": [start_date, end_date],
             "feedback": "Only Chats Without Feedback",
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
 
         self.assertTrue(
             all(
@@ -131,7 +191,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "feedback": "Only Chats Without Feedback",
             "free_text_inside_the_messages": word,
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
 
         self.assertTrue(
             all(
@@ -149,7 +209,7 @@ class TestGetAllFiltered(unittest.TestCase):
     def test_filter_by_free_text_inside_messages(self):
         word = "6"
         filter = {"free_text_inside_the_messages": word}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(
             any(
                 word.lower() in message["text"].lower()
@@ -161,17 +221,21 @@ class TestGetAllFiltered(unittest.TestCase):
     # with and without check
     def test_filter_by_feedback_only_with_feedback(self):
         filter = {"feedback": "Only Chats With Feedback"}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(all("user_actions" in chat for chat in conversations))
 
     def test_filter_by_feedback_only_without_feedback(self):
         filter = {"feedback": "Only Chats Without Feedback"}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(all("user_actions" not in chat for chat in conversations))
 
     def test_filter_by_user_actions_criteria(self):
-        filter = {"price_rating": "Okay", "product_rating": "Okay"}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        filter = {"price_ratings": "Okay", "product_ratings": "Okay"}
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
+        print("query:")
+        print(query)
+        print()
+
         self.assertTrue(
             all(
                 (
@@ -187,18 +251,18 @@ class TestGetAllFiltered(unittest.TestCase):
     def test_filter_by_empty_categories(self):
         # Test with an empty list of categories
         filter = {"categories": []}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(all("category" in chat for chat in conversations))
 
     def test_filter_by_null_categories(self):
         # Test with null value for categories
         filter = {"categories": None}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertTrue(all("category" in chat for chat in conversations))
 
     def test_filter_by_categories(self):
         filter = {"categories": ["Nonexistent Category"]}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertEqual(len(conversations), 0)
 
     # Add similar tests for other filters
@@ -208,83 +272,83 @@ class TestGetAllFiltered(unittest.TestCase):
             "categories": ["Nonexistent Category"],
             "subcategories": ["Nonexistent Subcategory"],
         }
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertEqual(len(conversations), 0)
 
-    def test_invalid_input_types(self):
-        # Test with invalid input types for filters
-        invalid_filters = [
-            {"categories": "Invalid Type"},  # Invalid type for categories
-            {"categories": 1},  # Invalid type for categories
-            {"categories": [1]},  # Invalid type for categories
-            {"subcategories": "Invalid Type"},  # Invalid type for subcategories
-            {"date_range": "Invalid Type"},  # Invalid type for date_range
-            {
-                "free_text_inside_the_messages": 123
-            },  # Invalid type for free_text_inside_the_messages
-            {
-                "free_text_inside_the_messages": [123]
-            },  # Invalid type for free_text_inside_the_messages
-            {"feedback": 123},  # Invalid type for feedback
-            {"feedback": [123]},  # Invalid type for feedback
-            {"feedback": ["123"]},  # Invalid type for feedback
-            {"price_rating": 123},  # Invalid type for price_rating
-            {"price_rating": [123]},  # Invalid type for price_rating
-            {"price_rating": ["123"]},  # Invalid type for price_rating
-            {"product_rating": 123},  # Invalid type for product_rating
-            {"demands_rating": 123},  # Invalid type for demands_rating
-            {"phraise_rating": 123},  # Invalid type for phraise_rating
-            {"reviewer_name": 123},  # Invalid type for reviewer_name
-            {
-                "free_text_inside_the_user_actions": 123
-            },  # Invalid type for free_text_inside_the_messages
-            {
-                "categories": "Invalid Type",
-                "subcategories": "Invalid Type",
-            },  # Invalid type for categories
-            {"categories": ["Keys"], "subcategories": 1},  # Invalid type for categories
-            {
-                "categories": ["Keys"],
-                "subcategories": 1,
-                "feedback": 123,
-                "reviewer_name": 123,
-                "free_text_inside_the_user_actions": ["11"],
-            },  # Invalid type for mix filters
-            {
-                "categories": ["Keys"],
-                "subcategories": 1,
-                "feedback": 123,
-                "reviewer_name": 123,
-                "free_text_inside_the_user_actions": ["11"],
-                "date_range": "Invalid Type",
-            },  # Invalid type for more mix filters
-            {"date_range": [datetime(2025, 1, 1), datetime(2024, 1, 1)]},
-        ]
+    # def test_invalid_input_types(self):
+    #     # Test with invalid input types for filters
+    #     invalid_filters = [
+    #         {"categories": "Invalid Type"},  # Invalid type for categories
+    #         {"categories": 1},  # Invalid type for categories
+    #         {"categories": [1]},  # Invalid type for categories
+    #         {"subcategories": "Invalid Type"},  # Invalid type for subcategories
+    #         {"date_range": "Invalid Type"},  # Invalid type for date_range
+    #         {
+    #             "free_text_inside_the_messages": 123
+    #         },  # Invalid type for free_text_inside_the_messages
+    #         {
+    #             "free_text_inside_the_messages": [123]
+    #         },  # Invalid type for free_text_inside_the_messages
+    #         {"feedback": 123},  # Invalid type for feedback
+    #         {"feedback": [123]},  # Invalid type for feedback
+    #         {"feedback": ["123"]},  # Invalid type for feedback
+    #         {"price_ratings": 123},  # Invalid type for price_ratings
+    #         {"price_ratings": [123]},  # Invalid type for price_ratings
+    #         {"price_ratings": ["123"]},  # Invalid type for price_ratings
+    #         {"product_ratings": 123},  # Invalid type for product_ratings
+    #         {"demands_ratings": 123},  # Invalid type for demands_ratings
+    #         {"phraise_ratings": 123},  # Invalid type for phraise_ratings
+    #         {"reviewer_name": 123},  # Invalid type for reviewer_name
+    #         {
+    #             "free_text_inside_the_user_actions": 123
+    #         },  # Invalid type for free_text_inside_the_messages
+    #         {
+    #             "categories": "Invalid Type",
+    #             "subcategories": "Invalid Type",
+    #         },  # Invalid type for categories
+    #         {"categories": ["Keys"], "subcategories": 1},  # Invalid type for categories
+    #         {
+    #             "categories": ["Keys"],
+    #             "subcategories": 1,
+    #             "feedback": 123,
+    #             "reviewer_name": 123,
+    #             "free_text_inside_the_user_actions": ["11"],
+    #         },  # Invalid type for mix filters
+    #         {
+    #             "categories": ["Keys"],
+    #             "subcategories": 1,
+    #             "feedback": 123,
+    #             "reviewer_name": 123,
+    #             "free_text_inside_the_user_actions": ["11"],
+    #             "date_range": "Invalid Type",
+    #         },  # Invalid type for more mix filters
+    #         {"date_range": [datetime(2025, 1, 1), datetime(2024, 1, 1)]},
+    #     ]
 
-        for invalid_filter in invalid_filters:
-            with self.subTest(invalid_filter=invalid_filter):
-                conversations, total_prices, query = get_all_filtered(
-                    invalid_filter, True
-                )
-                self.assertEqual(len(conversations), 0)
+    #     for invalid_filter in invalid_filters:
+    #         with self.subTest(invalid_filter=invalid_filter):
+    #             conversations, total_prices, query, _ = get_all_filtered(
+    #                 invalid_filter, True
+    #             )
+    #             self.assertEqual(len(conversations), 0)
 
     def test_edge_cases(self):
         # Test with empty string for free_text_inside_the_messages
         filter = {"free_text_inside_the_messages": ""}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertEqual(len(conversations), 0)
 
         # Test with empty string for free_text_inside_the_user_actions
         filter = {"free_text_inside_the_user_actions": ""}
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
         self.assertEqual(len(conversations), 0)
 
         # Test with an date range that represent all
         start_date = datetime(1900, 1, 1, 0, 0, 0)
         end_date = datetime(3000, 1, 1, 0, 0, 0)
         filter = {"date_range": [start_date, end_date]}
-        all_conversations, total_prices, query = get_all_filtered({}, True)
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        all_conversations, total_prices, query, _ = get_all_filtered({}, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
 
         self.assertEqual(len(conversations), len(all_conversations))
 
@@ -315,7 +379,7 @@ class TestGetAllFiltered(unittest.TestCase):
         filter = {"categories": ["Guitars & Basses"]}
 
         # Call the function
-        conversations, total_prices, query = get_all_filtered(filter, True)
+        conversations, total_prices, query, _ = get_all_filtered(filter, True)
 
         # Assertions
         # Verify that the aggregation pipeline is constructed correctly

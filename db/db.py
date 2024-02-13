@@ -1,5 +1,6 @@
 import os
 import re
+import jwt
 import time
 import traceback
 import pymongo
@@ -7,22 +8,36 @@ import streamlit as st
 from bson import ObjectId
 from datetime import datetime
 from datetime import date as datetime_date
-
-from login_utils import verify_jwt_token
-
 from dotenv import load_dotenv
 
 load_dotenv()
-
+SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 MONGODB_URL = os.environ.get("MONGODB_URL")
 MONGODB_DB = os.environ.get("MONGODB_DB")
 MONGODB_COLLECTION = os.environ.get("MONGODB_COLLECTION")
-
 # Connect to MongoDB
 client = pymongo.MongoClient(MONGODB_URL)
 db = client[MONGODB_DB]
 chats = db[MONGODB_COLLECTION]
 
+def verify_jwt_token(token, triggered=True):
+    """Verify the given JWT token"""
+    if triggered:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            return payload
+        except jwt.ExpiredSignatureError:
+            st.error("The token has expired. Please log in again.")
+            return None
+        except jwt.InvalidTokenError:
+            st.error("Invalid token. Please log in again.")
+            return None
+    else:
+        try:
+            payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+            return payload
+        except jwt.ExpiredSignatureError:
+            return None
 
 # GET
 def get_filtered_predata(selected_db_collection):
@@ -72,7 +87,7 @@ def get_filtered_predata(selected_db_collection):
         "db_first_last_dates": [first_chat_date, last_chat_date],
     }
 
-def get_all_filtered(filter, test=False, page_number=1, page_size=50, selected_db_collection=MONGODB_COLLECTION ):
+def get_all_filtered(filter, test=False, page_number=1, page_size=50, selected_db_collection=MONGODB_COLLECTION):
     if not test:
         payload = verify_jwt_token(st.session_state["jwt"], False)
         if not payload or not payload["is_admin"]:
@@ -150,8 +165,16 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50, selected_d
         if feedback == "not valid":
             valid_messages.append("the with or without feedback answer is invalid")
 
-        # Ensure price_ratings, product_ratings, demands_ratings, and phraise_ratings are valid strings
+        # Ensure price_ratings, product_ratings, demands_ratings, and phraise_ratings are valid string arrays
         valid_rating_values = [None, "", "Good", "Okay", "Bad"]
+
+        price_ratings = (
+            price_ratings
+            if isinstance(price_ratings, list)
+            else [price_ratings]
+            if price_ratings
+            else None
+        )
 
         if price_ratings and len(price_ratings) != 0:
             for rating in price_ratings:
@@ -159,7 +182,14 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50, selected_d
                     valid_messages.append("price ratings is invalid")
         else:
             price_ratings = None
-
+        
+        product_ratings = (
+            product_ratings
+            if isinstance(product_ratings, list)
+            else [product_ratings]
+            if product_ratings
+            else None
+        )
         if product_ratings and len(product_ratings) != 0:
             for rating in product_ratings:
                 if rating not in valid_rating_values:
@@ -167,13 +197,28 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50, selected_d
         else:
             product_ratings = None
 
+        demands_ratings = (
+            demands_ratings
+            if isinstance(demands_ratings, list)
+            else [demands_ratings]
+            if demands_ratings
+            else None
+        )
+
         if demands_ratings and len(demands_ratings) != 0:
             for rating in demands_ratings:
                 if rating not in valid_rating_values:
                     valid_messages.append("demands ratings is invalid")
         else:
             demands_ratings = None
-
+        
+        phraise_ratings = (
+            phraise_ratings
+            if isinstance(phraise_ratings, list)
+            else [phraise_ratings]
+            if phraise_ratings
+            else None
+        )
         if phraise_ratings and len(phraise_ratings) != 0:
             for rating in phraise_ratings:
                 if rating not in valid_rating_values:
