@@ -4,9 +4,11 @@ from datetime import date as datetime_date
 
 from db import get_selected
 
+
 # Function to set the current tab
 def set_tab(tab_name):
     st.session_state.current_tab = tab_name
+
 
 def get_help_from_color(color, selected=False):
     if color == "red":
@@ -49,11 +51,22 @@ def get_card_color(user_actions):
     else:
         return "gray"
 
-from functions import navigate_to, select, show_hide_filters, no_filters, change_filtes, increase_page_number  
-    
+
+from functions import (
+    navigate_to,
+    select,
+    show_hide_filters,
+    no_filters,
+    change_filtes,
+    increase_page_number,
+)
+
+
 def admin_page(cookie_manager):
     st.sidebar.button(
-        "Back to Chat", key="back_btn", on_click=lambda: navigate_to("chat", cookie_manager)
+        "Back to Chat",
+        key="back_btn",
+        on_click=lambda: navigate_to("chat", cookie_manager),
     )
     st.sidebar.write("# Conversations")
 
@@ -69,7 +82,7 @@ def admin_page(cookie_manager):
                     '<span  class="black-background"></span>',
                     unsafe_allow_html=True,
                 )
-                if st.session_state.current_tab == 'Basic':
+                if st.session_state.current_tab == "Basic":
                     with st.container(border=True):
                         # Category Selection
 
@@ -126,9 +139,7 @@ def admin_page(cookie_manager):
                             "Select Subcategories:",
                             options=subcategories_options,
                             key="subcategories_select_in_form",
-                            default=st.session_state.filters.get(
-                                "subcategories", []
-                            ),
+                            default=st.session_state.filters.get("subcategories", []),
                         )
 
                         # backend version Selection
@@ -137,9 +148,7 @@ def admin_page(cookie_manager):
                         # Update with actual backend version
                         selected_backend_version = st.multiselect(
                             "Select backend version",
-                            st.session_state.db_filter_predata[
-                                "db_backend_versions"
-                            ],
+                            st.session_state.db_filter_predata["db_backend_versions"],
                             default=st.session_state.filters.get(
                                 "backend_versions", []
                             ),
@@ -154,20 +163,18 @@ def admin_page(cookie_manager):
                         # Date Range Selection
 
                         # Simplified access to 'date_range' with fallback
-                        date_range = st.session_state.filters.get(
-                            "date_range", False
-                        )
+                        date_range = st.session_state.filters.get("date_range", False)
                         now = datetime.now()
                         if date_range and len(date_range) > 1:
                             start_value = date_range[0]
                             end_value = date_range[1]
                         else:
                             start_value = st.session_state.db_filter_predata.get(
-                                "db_first_last_dates", [datetime(2023,12,1)]
+                                "db_first_last_dates", [datetime(2023, 12, 1)]
                             )[0]
                             end_value = st.session_state.db_filter_predata.get(
                                 "db_first_last_dates",
-                                [datetime(2023,12,1), now],
+                                [datetime(2023, 12, 1), now],
                             )[1]
                         start_date = st.date_input(
                             "Select Start Date",
@@ -230,9 +237,13 @@ def admin_page(cookie_manager):
                                 key="no_filters_btn",
                                 on_click=no_filters,
                             )
-                        st.button('Filter By Feedback', key='By Feedback', on_click=lambda: set_tab('By Feedback'))
+                        st.button(
+                            "Filter By Feedback",
+                            key="By Feedback",
+                            on_click=lambda: set_tab("By Feedback"),
+                        )
 
-                if st.session_state.current_tab == 'By Feedback':
+                if st.session_state.current_tab == "By Feedback":
                     with st.container(border=True):
                         with_or_without = st.selectbox(
                             "With/Without Feedback",
@@ -242,14 +253,12 @@ def admin_page(cookie_manager):
                                 "Only Chats Without Feedback",
                             ],
                         )
-                 
+
                         # Update with actual sender names
                         selected_senders = st.multiselect(
                             "Select Sender’s Name",
                             st.session_state.db_filter_predata["db_sender_names"],
-                            default=st.session_state.filters.get(
-                                "reviewer_names", []
-                            ),
+                            default=st.session_state.filters.get("reviewer_names", []),
                         )
                         # Free Text Search in Review
                         review_search_text = st.text_input(
@@ -263,9 +272,7 @@ def admin_page(cookie_manager):
                         price_match_rating = st.multiselect(
                             "Price Match Rating",
                             ["Good", "Okay", "Bad"],
-                            default=st.session_state.filters.get(
-                                "price_ratings", None
-                            ),
+                            default=st.session_state.filters.get("price_ratings", None),
                         )
                         product_match_rating = st.multiselect(
                             "Product Match Rating",
@@ -304,7 +311,11 @@ def admin_page(cookie_manager):
                             key="feedback_submit_filters_btn",
                             on_click=lambda: change_filtes(filters),
                         )
-                        st.button('Basic Filtering', key='By Feedback', on_click=lambda: set_tab('Basic'))
+                        st.button(
+                            "Basic Filtering",
+                            key="By Feedback",
+                            on_click=lambda: set_tab("Basic"),
+                        )
 
     conversations = st.session_state.get("conversations", [])
     total_prices = st.session_state.get("total_prices", [])
@@ -356,7 +367,7 @@ def admin_page(cookie_manager):
                     unsafe_allow_html=True,
                 )
             dates.append(d)
-            
+
         if str(conversation_id) == str(id):
             st.sidebar.markdown(
                 f'<span key="{conversation_id}_btn_label" class="button-after-{card_color} selected"></span>',
@@ -418,12 +429,15 @@ def admin_page(cookie_manager):
                 unsafe_allow_html=True,
             )
         try:
+            print(conv["category"])
             conv["category"]
             st.write("## categories")
             st.markdown(
-                f"<p><strong>{conv['category']} - {conv['subcategory']}</strong></p>", unsafe_allow_html=True
+                f"<p><strong>{conv['category']} - {conv['subcategory']}</strong></p>",
+                unsafe_allow_html=True,
             )
         except Exception as e:
+            print(e)
             pass
 
         try:

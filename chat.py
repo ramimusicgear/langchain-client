@@ -15,6 +15,7 @@ SERVER_URL = os.environ.get("SERVER_URL")
 
 from functions import clear_chat_history, log_out, navigate_to
 
+
 def chat_page(TESTING, cookie_manager):
     # Navigation buttons
 
@@ -52,10 +53,14 @@ def chat_page(TESTING, cookie_manager):
     else:
         st.sidebar.write("# Login/Register")
         st.sidebar.button(
-            "Login", key="to_login_btn", on_click=lambda: navigate_to("login", cookie_manager)
+            "Login",
+            key="to_login_btn",
+            on_click=lambda: navigate_to("login", cookie_manager),
         )
         st.sidebar.button(
-            "Register", key="to_register_btn", on_click=lambda: navigate_to("register", cookie_manager)
+            "Register",
+            key="to_register_btn",
+            on_click=lambda: navigate_to("register", cookie_manager),
         )
 
     # sidebar feedback
@@ -216,7 +221,7 @@ def chat_page(TESTING, cookie_manager):
         category = result.get("category", "")
         subcategory = result.get("sub category", "")
         backend_version = result.get("version", "")
-        
+
         try:
             price = float(price_str)  # Attempt to convert the price to a float
         except ValueError:
@@ -227,5 +232,14 @@ def chat_page(TESTING, cookie_manager):
             "sender": "bot",
             "text": full_response,
         }
+        print(category)
+        print(subcategory)
         if not TESTING:
-            insert_message(st.session_state.document_id, new_message, category, subcategory, backend_version, price)
+            insert_message(
+                st.session_state.document_id,
+                new_message,
+                category,
+                subcategory,
+                backend_version,
+                price,
+            )

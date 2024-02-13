@@ -49,6 +49,7 @@ def update_chat(id, new_values):
             retry += 1
             time.sleep(1)
 
+
 # Function to find matches for each product in the chat text
 def find_best_matches_in_text(text, products, limit=3):
     matches = {}
@@ -60,8 +61,9 @@ def find_best_matches_in_text(text, products, limit=3):
 
     return matches
 
-with open(prodcuts_data_path,"r") as f:
-	products = json.load(f)
+
+with open(prodcuts_data_path, "r") as f:
+    products = json.load(f)
 
 conversations = chats.find({}).sort("start_time", -1)
 
@@ -71,26 +73,26 @@ for conv in conversations:
     j += 1
 
     user_actions = conv.get("user_actions", None)
-    if user_actions:    
+    if user_actions:
         name = user_actions.get("name", "")
         name = user_actions.get("sender", name)
         other = user_actions.get("feedback_text", "")
         other = user_actions.get("other", other)
 
-        price = user_actions.get("price", {"rating":"","reason":""})
-        product = user_actions.get("product", {"rating":"","reason":""})
-        demands = user_actions.get("demands", {"rating":"","reason":""})
-        phraise = user_actions.get("phraise", {"rating":"","reason":""})
-        
-        feedback = f"{other} {price["reason"]} {product["reason"]} {demands["reason"]} {phraise["reason"]}"
+        price = user_actions.get("price", {"rating": "", "reason": ""})
+        product = user_actions.get("product", {"rating": "", "reason": ""})
+        demands = user_actions.get("demands", {"rating": "", "reason": ""})
+        phraise = user_actions.get("phraise", {"rating": "", "reason": ""})
+
+        feedback = f'{other} {price["reason"]} {product["reason"]} {demands["reason"]} {phraise["reason"]}'
 
         new_values = {
             "user_actions": {
                 "name": name,
-                "product":product,
-                "phraise":phraise,
-                "demands":demands,
-                "price":price,
+                "product": product,
+                "phraise": phraise,
+                "demands": demands,
+                "price": price,
                 "other": other,
                 "feedback": feedback,
             }
@@ -98,33 +100,35 @@ for conv in conversations:
 
         update_chat(conv["_id"], new_values)
 
-    chat_text = " ".join([item["text"] for item in conv['messages']])
+    chat_text = " ".join([item["text"] for item in conv["messages"]])
 
     # Find best matches
     best_matches = find_best_matches_in_text(chat_text, products.keys())
     if best_matches == {}:
         continue
-    
+
     references = []
     # Display the best matches and their scores
     for product_name, match in best_matches.items():
-        print(f"product_name: {product_name}, Match Score: {match[1]}")
+        # print(f"product_name: {product_name}, Match Score: {match[1]}")
         obj = products[product_name]
         category = obj["category"]
         subcategory = obj["sub_category"]
-        references.append({
-            'name': product_name,
-            'description': obj["description"],
-            'price': obj["price"],
-            'categories': f"{category} - {subcategory}"
-        })
-    
+        references.append(
+            {
+                "name": product_name,
+                "description": obj["description"],
+                "price": obj["price"],
+                "categories": f"{category} - {subcategory}",
+            }
+        )
+
     new_values = {
         "category": category,
         "subcategory": subcategory,
-        "product_references": references
+        "product_references": references,
     }
-    
+
     update_chat(conv["_id"], new_values)
-    
+
     print(j)

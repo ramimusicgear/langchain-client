@@ -5,6 +5,7 @@ from datetime import datetime
 from login_utils import verify_jwt_token, create_jwt_token
 from db import get_all_filtered
 
+
 # functions
 def clear_all_cookies(cookie_manager):
     st.session_state.messages = [
@@ -53,8 +54,6 @@ def increase_page_number():
         st.session_state.page_number + 1,
         st.session_state.page_size,
     )
-    print()
-    print(query)
     st.session_state.conversations += conversations
     st.session_state.total_prices = total_prices
     st.session_state.conversations_total_count = total_count
@@ -66,8 +65,6 @@ def change_filtes(filters):
     conversations, total_prices, query, total_count = get_all_filtered(
         filters, False, 1, 50
     )
-    print()
-    print(query)
 
     if len(query["errors"]) == 0:
         st.session_state.conversations = conversations
@@ -94,8 +91,6 @@ def show_hide_filters():
 
 def no_filters():
     conversations, total_prices, query, total_count = get_all_filtered({}, False, 1, 50)
-    print()
-    print(query)
     st.session_state.page_number = 50
     st.session_state.page_size = 50
     st.session_state.conversations = conversations
@@ -164,4 +159,3 @@ def clear_chat_history():
     ]
     st.session_state.start_time = datetime.now()
     st.session_state.document_id = ""
-

@@ -168,8 +168,8 @@ if "db_filter_predata" not in st.session_state:
     st.session_state.db_filter_predata = {}
 
 # Initialize or update the current tab based on user interaction
-if 'current_tab' not in st.session_state:
-    st.session_state.current_tab = 'Basic'
+if "current_tab" not in st.session_state:
+    st.session_state.current_tab = "Basic"
 
 if "page_size" not in st.session_state:
     st.session_state.page_size = 50
@@ -258,9 +258,8 @@ if jwt_cookie and not st.session_state.token_loaded:
                 st.session_state.total_prices = []
                 st.session_state.filter_errors = query["errors"]
 
-if st.sidebar.button("Reset Cookies", key='reset_btn'):
+if st.sidebar.button("Reset Cookies", key="reset_btn"):
     clear_all_cookies(cookie_manager)
-
 
 
 from admin import admin_page

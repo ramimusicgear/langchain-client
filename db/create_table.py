@@ -126,8 +126,8 @@ if init:
     # Check if the MONGODB_COLLECTION collection exists
     collection_names = db.list_collection_names()
     if MONGODB_COLLECTION in collection_names:
-        print(f"Collection {MONGODB_COLLECTION} already exists. Deleting it.")
-        db[MONGODB_COLLECTION].drop()
+        print(f"Collection {MONGODB_COLLECTION} already exists.now way im Deleting it.")
+        # db[MONGODB_COLLECTION].drop()
 
     # Create or update the collection with the new validator
     chats = db.create_collection(MONGODB_COLLECTION, validator=chat_schema)

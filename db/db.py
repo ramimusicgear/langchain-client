@@ -314,7 +314,12 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
             total_prices[date] = total_price
             # print(f"Date: {date}, Total Price: {total_price}")
 
-        conversations = list(chats.find(query_db).sort("start_time", -1).skip(skip_count).limit(limit_count))
+        conversations = list(
+            chats.find(query_db)
+            .sort("start_time", -1)
+            .skip(skip_count)
+            .limit(limit_count)
+        )
         total_count = chats.count_documents(query_db)
 
         return conversations, total_prices, query, total_count
@@ -363,7 +368,7 @@ def get_selected(selected_conversation):
         try:
             # Convert string to ObjectId
             selected_conversation_ObjectId = ObjectId(selected_conversation)
-            
+
             # Query the database with ObjectId
             conversation = chats.find_one({"_id": selected_conversation_ObjectId})
             return conversation
@@ -373,7 +378,7 @@ def get_selected(selected_conversation):
                 # Query the database with ObjectId
                 conversation = chats.find_one({"_id": selected_conversation_ObjectId})
                 return conversation
-            
+
             except Exception as e:
                 print(f"ERR2 - {str(e)}")
                 # Handle invalid ObjectId string
@@ -491,19 +496,35 @@ def insert_first_message(chat_document):
             time.sleep(1)
 
 
-def insert_message(document_id, new_message, category=None, subcategory=None, backend_version=None, price=0):
+def insert_message(
+    document_id,
+    new_message,
+    category=None,
+    subcategory=None,
+    backend_version=None,
+    price=0,
+):
     retry = 0
     while True:
         try:
-            if price == 0:
+            if new_message["sender"] != "bot":
                 update_result = chats.update_one(
-                    {"_id": document_id},
-                    {"$push": {"messages": new_message}}
+                    {"_id": document_id}, {"$push": {"messages": new_message}}
                 )
             else:
+                print(category)
+                print(subcategory)
                 update_result = chats.update_one(
                     {"_id": document_id},
-                    {"$push": {"messages": new_message}, "$inc": {"price": price}, "$set": {"category": category, "subcategory": subcategory, "backend_version": backend_version }}
+                    {
+                        "$push": {"messages": new_message},
+                        "$inc": {"price": price},
+                        "$set": {
+                            "category": category,
+                            "subcategory": subcategory,
+                            "backend_version": backend_version,
+                        },
+                    },
                 )
             # Check if the update was successful
             if update_result.modified_count > 0:
