@@ -91,7 +91,7 @@ def admin_page(cookie_manager):
         with st.sidebar:
             filters = {}
             st.markdown(
-                '<span  class="black-background"></span>',
+                '<span class="black-background"></span>',
                 unsafe_allow_html=True,
             )
             if st.session_state.current_tab == "Basic":
@@ -442,11 +442,10 @@ def admin_page(cookie_manager):
                 unsafe_allow_html=True,
             )
         try:
-            print(conv["category"])
-            conv["category"]
+            conv["category"] = f"{conv["category"]} - " if conv["category"] != "" else "Backend didn't provide the catgories"
             st.write("## categories")
             st.markdown(
-                f"<p><strong>{conv['category']} - {conv['subcategory']}</strong></p>",
+                f"<p><strong>{conv['category']}{conv['subcategory']}</strong></p>",
                 unsafe_allow_html=True,
             )
         except Exception as e:

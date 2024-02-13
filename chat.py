@@ -220,7 +220,7 @@ def chat_page(TESTING, cookie_manager):
         price_str = result.get("price", "0.0")
         category = result.get("category", "")
         if category == "":
-            category = "backend didn't provide the catgories"
+            category = "Backend didn't provide the catgories"
         subcategory = result.get("sub category", "")
         backend_version = result.get("version", "")
 
