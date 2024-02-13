@@ -219,6 +219,8 @@ def chat_page(TESTING, cookie_manager):
         # Fetch the price; default to '0.0' if not found
         price_str = result.get("price", "0.0")
         category = result.get("category", "")
+        if category == "":
+            category = "backend didn't provide the catgories"
         subcategory = result.get("sub category", "")
         backend_version = result.get("version", "")
 
@@ -232,8 +234,6 @@ def chat_page(TESTING, cookie_manager):
             "sender": "bot",
             "text": full_response,
         }
-        print(category)
-        print(subcategory)
         if not TESTING:
             insert_message(
                 st.session_state.document_id,

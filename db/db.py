@@ -10,7 +10,6 @@ from datetime import date as datetime_date
 
 from login_utils import verify_jwt_token
 
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -26,7 +25,7 @@ chats = db[MONGODB_COLLECTION]
 
 
 # GET
-def get_filtered_predata():
+def get_filtered_predata(selected_db_collection):
     payload = verify_jwt_token(st.session_state["jwt"], False)
     if not payload or not payload["is_admin"]:
         return {
@@ -58,7 +57,7 @@ def get_filtered_predata():
     ]
 
     # Execute the aggregation pipeline
-    result = chats.aggregate(pipeline)
+    result = db[selected_db_collection].aggregate(pipeline)
 
     # Extract the results from the aggregation
     data = next(result, {})
@@ -73,43 +72,7 @@ def get_filtered_predata():
         "db_first_last_dates": [first_chat_date, last_chat_date],
     }
 
-
-def get_feedback_sender_names():
-    payload = verify_jwt_token(st.session_state["jwt"], False)
-    if not payload or not payload["is_admin"]:
-        return []
-
-    # Aggregation pipeline to find unique feedback sender names
-    pipeline = [
-        {
-            "$group": {
-                "_id": None,  # Group all documents together
-                "unique_feedback_senders": {"$addToSet": "$user_actions.name"},
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,  # Exclude the _id field from the result
-                "unique_feedback_senders": 1,  # Include the unique feedback senders
-            }
-        },
-    ]
-
-    # Execute the aggregation pipeline
-    result = chats.aggregate(pipeline)
-
-    # Extract the unique names from the aggregation result
-    unique_names = next(result, {}).get("unique_feedback_senders", [])
-
-    return unique_names
-
-
-# def db_backend_versions():
-
-# def get_first_last_chat_date():
-
-
-def get_all_filtered(filter, test=False, page_number=1, page_size=50):
+def get_all_filtered(filter, test=False, page_number=1, page_size=50, selected_db_collection=MONGODB_COLLECTION ):
     if not test:
         payload = verify_jwt_token(st.session_state["jwt"], False)
         if not payload or not payload["is_admin"]:
@@ -306,7 +269,7 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
         ]
 
         # Execute the aggregation pipeline
-        total_prices_by_date = chats.aggregate(pipeline)
+        total_prices_by_date = db[selected_db_collection].aggregate(pipeline)
         total_prices = {}
         for result in total_prices_by_date:
             date = result["_id"]
@@ -315,12 +278,12 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
             # print(f"Date: {date}, Total Price: {total_price}")
 
         conversations = list(
-            chats.find(query_db)
+            db[selected_db_collection].find(query_db)
             .sort("start_time", -1)
             .skip(skip_count)
             .limit(limit_count)
         )
-        total_count = chats.count_documents(query_db)
+        total_count = db[selected_db_collection].count_documents(query_db)
 
         return conversations, total_prices, query, total_count
 
@@ -362,7 +325,7 @@ def get_all():
     return [], {}
 
 
-def get_selected(selected_conversation):
+def get_selected(selected_conversation, selected_db_collection):
     payload = verify_jwt_token(st.session_state.jwt, False)
     if payload and payload["is_admin"]:
         try:
@@ -370,13 +333,15 @@ def get_selected(selected_conversation):
             selected_conversation_ObjectId = ObjectId(selected_conversation)
 
             # Query the database with ObjectId
-            conversation = chats.find_one({"_id": selected_conversation_ObjectId})
+            conversation = db[selected_db_collection].find_one({"_id": selected_conversation_ObjectId})
+            if conversation == None:
+                conversation = db[selected_db_collection].find_one({"_id": selected_conversation})
             return conversation
         except Exception as e:
             print(f"ERR1 - {str(e)}")
             try:
                 # Query the database with ObjectId
-                conversation = chats.find_one({"_id": selected_conversation_ObjectId})
+                conversation = db[selected_db_collection].find_one({"_id": selected_conversation})
                 return conversation
 
             except Exception as e:

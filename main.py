@@ -1,3 +1,4 @@
+import os
 import urllib3
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -152,11 +153,17 @@ if "jwt" not in st.session_state:
 if "user" not in st.session_state:
     st.session_state.user = None
 
+if "selected_db_collection" not in st.session_state:
+    st.session_state.selected_db_collection = os.environ.get("MONGODB_COLLECTION")
+
 if "selected_conversation" not in st.session_state:
     st.session_state.selected_conversation = None
 
-if "show_filter_popup" not in st.session_state:
-    st.session_state.show_filter_popup = False
+if "show_filter_expander" not in st.session_state:
+    st.session_state.show_filter_expander = False
+
+if "show_collection_expander" not in st.session_state:
+    st.session_state.show_collection_expander = False
 
 if "filters" not in st.session_state:
     st.session_state.filters = {}
@@ -238,7 +245,7 @@ if jwt_cookie and not st.session_state.token_loaded:
             or not "db_filter_predata" in st.session_state
             or not "filter_errors" in st.session_state
         ):
-            st.session_state.db_filter_predata = get_filtered_predata()
+            st.session_state.db_filter_predata = get_filtered_predata(st.session_state.selected_db_collection)
             conversations, total_prices, query, total_count = get_all_filtered(
                 st.session_state.filters if "filters" in st.session_state else {},
                 False,
