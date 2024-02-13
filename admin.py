@@ -341,7 +341,7 @@ def admin_page(cookie_manager):
         #     else last_id
         # )}")
 
-        print(f"{str(conversation_id)} - {first_message_text}")
+        # print(f"{str(conversation_id)} - {first_message_text}")
         d = str(conv["start_time"]).split()[0]
 
         if d not in dates:
