@@ -13,8 +13,9 @@ from db import update_feedback, insert_first_message, insert_message
 
 SERVER_URL = os.environ.get("SERVER_URL")
 
+from functions import clear_chat_history, log_out, navigate_to
 
-def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
+def chat_page(TESTING, cookie_manager):
     # Navigation buttons
 
     for message in st.session_state.messages:
@@ -46,15 +47,15 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
             st.sidebar.button(
                 "Go To Admin Dashboard",
                 key="admin_dashboard",
-                on_click=lambda: navigate_to("admin"),
+                on_click=lambda: navigate_to("admin", cookie_manager),
             )
     else:
         st.sidebar.write("# Login/Register")
         st.sidebar.button(
-            "Login", key="to_login_btn", on_click=lambda: navigate_to("login")
+            "Login", key="to_login_btn", on_click=lambda: navigate_to("login", cookie_manager)
         )
         st.sidebar.button(
-            "Register", key="to_register_btn", on_click=lambda: navigate_to("register")
+            "Register", key="to_register_btn", on_click=lambda: navigate_to("register", cookie_manager)
         )
 
     # sidebar feedback
@@ -212,6 +213,10 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
 
         # Fetch the price; default to '0.0' if not found
         price_str = result.get("price", "0.0")
+        category = result.get("category", "")
+        subcategory = result.get("sub category", "")
+        backend_version = result.get("version", "")
+        
         try:
             price = float(price_str)  # Attempt to convert the price to a float
         except ValueError:
@@ -223,4 +228,4 @@ def chat_page(TESTING, clear_chat_history, log_out, navigate_to):
             "text": full_response,
         }
         if not TESTING:
-            insert_message(st.session_state.document_id, new_message, price)
+            insert_message(st.session_state.document_id, new_message, category, subcategory, backend_version, price)

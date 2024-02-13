@@ -1,10 +1,12 @@
 import os
 import re
 import time
+import traceback
 import pymongo
 import streamlit as st
 from bson import ObjectId
 from datetime import datetime
+from datetime import date as datetime_date
 
 from login_utils import verify_jwt_token
 
@@ -24,6 +26,60 @@ chats = db[MONGODB_COLLECTION]
 
 
 # GET
+def get_filtered_predata():
+    payload = verify_jwt_token(st.session_state["jwt"], False)
+    if not payload or not payload["is_admin"]:
+        return {
+            "db_sender_names": None,
+            "db_backend_versions": None,
+            "db_first_last_dates": [],
+        }
+
+    # Aggregation pipeline to find unique feedback sender names, backend versions, and chat dates
+    pipeline = [
+        {
+            "$group": {
+                "_id": None,  # Group all documents together
+                "unique_feedback_senders": {"$addToSet": "$user_actions.name"},
+                "unique_backend_versions": {"$addToSet": "$backend_version"},
+                "first_chat_date": {"$min": "$start_time"},
+                "last_chat_date": {"$max": "$start_time"},
+            }
+        },
+        {
+            "$project": {
+                "_id": 0,  # Exclude the _id field
+                "unique_feedback_senders": 1,
+                "unique_backend_versions": 1,
+                "first_chat_date": 1,
+                "last_chat_date": 1,
+            }
+        },
+    ]
+
+    # Execute the aggregation pipeline
+    result = chats.aggregate(pipeline)
+
+    # Extract the results from the aggregation
+    data = next(result, {})
+    unique_names = data.get("unique_feedback_senders", [])
+    unique_backend_versions = data.get("unique_backend_versions", [])
+    first_chat_date = data.get("first_chat_date", None)
+    last_chat_date = data.get("last_chat_date", None)
+    print(
+        {
+            "db_sender_names": unique_names,
+            "db_backend_versions": unique_backend_versions,
+            "db_first_last_dates": [first_chat_date, last_chat_date],
+        }
+    )
+    return {
+        "db_sender_names": unique_names,
+        "db_backend_versions": unique_backend_versions,
+        "db_first_last_dates": [first_chat_date, last_chat_date],
+    }
+
+
 def get_feedback_sender_names():
     payload = verify_jwt_token(st.session_state["jwt"], False)
     if not payload or not payload["is_admin"]:
@@ -54,11 +110,16 @@ def get_feedback_sender_names():
     return unique_names
 
 
+# def db_backend_versions():
+
+# def get_first_last_chat_date():
+
+
 def get_all_filtered(filter, test=False, page_number=1, page_size=50):
     if not test:
         payload = verify_jwt_token(st.session_state["jwt"], False)
         if not payload or not payload["is_admin"]:
-            return [], {}, {"not valid": True}
+            return [], {}, {"errors": ["not admin"]}, 0
 
     backend_versions = filter.get("backend_versions", None)
     categories = filter.get("categories", None)
@@ -68,18 +129,18 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
 
     # feedbacks
     feedback = filter.get("feedback", None)
-    reviewer_name = filter.get("reviewer_name", None)
+    reviewer_names = filter.get("reviewer_names", None)
     free_text_inside_the_user_actions = filter.get(
         "free_text_inside_the_user_actions", None
     )
-    price_rating = filter.get("price_rating", None)
-    product_rating = filter.get("product_rating", None)
-    demands_rating = filter.get("demands_rating", None)
-    phraise_rating = filter.get("phraise_rating", None)
+    price_ratings = filter.get("price_ratings", None)
+    product_ratings = filter.get("product_ratings", None)
+    demands_ratings = filter.get("demands_ratings", None)
+    phraise_ratings = filter.get("phraise_ratings", None)
 
     try:
-        valid_types = True
-        # Ensure backend_versions, categories, and subcategories, reviewer_name are lists
+        valid_messages = []
+        # Ensure backend_versions, categories, and subcategories, reviewer_names are lists
         backend_versions = (
             backend_versions
             if isinstance(backend_versions, list)
@@ -101,23 +162,23 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
             if subcategories
             else None
         )
-        reviewer_name = (
-            reviewer_name
-            if isinstance(reviewer_name, list)
-            else [reviewer_name]
-            if reviewer_name
+        reviewer_names = (
+            reviewer_names
+            if isinstance(reviewer_names, list)
+            else [reviewer_names]
+            if reviewer_names
             else None
         )
 
         # Ensure free_text_inside_the_messages, free_text_inside_the_user_actions are strings
         if free_text_inside_the_messages is not None and not isinstance(
             free_text_inside_the_messages, str
-        ) or free_text_inside_the_messages == "":
-            valid_types = False
+        ):
+            valid_messages.append("the Search Text in the messages is invalid")
         if free_text_inside_the_user_actions is not None and not isinstance(
             free_text_inside_the_user_actions, str
-        ) or free_text_inside_the_user_actions == "":
-            valid_types = False
+        ):
+            valid_messages.append("the Search Text in the feedback section is invalid")
 
         # Ensure feedback is a valid string
         valid_feedback_values = [
@@ -126,35 +187,68 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
             "Only Chats With Feedback",
             "Only Chats Without Feedback",
         ]
+        if feedback == "":
+            feedback = None
         feedback = feedback if feedback in valid_feedback_values else "not valid"
         if feedback == "not valid":
-            valid_types = False
+            valid_messages.append("the with or without feedback answer is invalid")
 
-        # Ensure price_rating, product_rating, demands_rating, and phraise_rating are valid strings
-        valid_rating_values = [None, "Good", "Okay", "Bad"]
-        price_rating = (
-            price_rating if price_rating in valid_rating_values else "not valid"
-        )
-        product_rating = (
-            product_rating if product_rating in valid_rating_values else "not valid"
-        )
-        demands_rating = (
-            demands_rating if demands_rating in valid_rating_values else "not valid"
-        )
-        phraise_rating = (
-            phraise_rating if phraise_rating in valid_rating_values else "not valid"
-        )
-        if "not valid" in [
-            price_rating,
-            product_rating,
-            demands_rating,
-            phraise_rating,
-        ]:
-            valid_types = False
+        # Ensure price_ratings, product_ratings, demands_ratings, and phraise_ratings are valid strings
+        valid_rating_values = [None, "", "Good", "Okay", "Bad"]
 
-        if not valid_types:
-            return [], {}, {"not valid": True}
-        query = {}
+        if price_ratings and len(price_ratings) != 0:
+            for rating in price_ratings:
+                if rating not in valid_rating_values:
+                    valid_messages.append("price ratings is invalid")
+        else:
+            price_ratings = None
+
+        if product_ratings and len(product_ratings) != 0:
+            for rating in product_ratings:
+                if rating not in valid_rating_values:
+                    valid_messages.append("product recommendation ratings is invalid")
+        else:
+            product_ratings = None
+
+        if demands_ratings and len(demands_ratings) != 0:
+            for rating in demands_ratings:
+                if rating not in valid_rating_values:
+                    valid_messages.append("demands ratings is invalid")
+        else:
+            demands_ratings = None
+
+        if phraise_ratings and len(phraise_ratings) != 0:
+            for rating in phraise_ratings:
+                if rating not in valid_rating_values:
+                    phraise_ratings = "not valid"
+                    valid_messages.append("phraise ratings is invalid")
+        else:
+            phraise_ratings = None
+
+        query = {"errors": []}
+
+        # Ensure date_range is a list of two dates
+        if date_range:
+            if (
+                isinstance(date_range, list)
+                and len(date_range) == 2
+                and all(isinstance(date, datetime_date) for date in date_range)
+            ):
+                start_date, end_date = date_range
+
+                if start_date > end_date:
+                    valid_messages.append("date range is invalid")
+
+                start_date = datetime(start_date.year, start_date.month, start_date.day)
+                end_date = datetime(end_date.year, end_date.month, end_date.day)
+
+                query["start_time"] = {"$gte": start_date, "$lte": end_date}
+            else:
+                valid_messages.append("date range is invalid")
+
+        if len(valid_messages) != 0:
+            return [], {}, {"errors": valid_messages}, 0
+
         if categories:
             query["category"] = {"$in": categories}
 
@@ -163,21 +257,6 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
 
         if backend_versions:
             query["backend_version"] = {"$in": backend_versions}
-
-        # Ensure date_range is a list of two dates
-        if date_range:
-            if (
-                isinstance(date_range, list)
-                and len(date_range) == 2
-                and all(isinstance(date, datetime) for date in date_range)
-            ):
-                start_date, end_date = date_range
-                if start_date > end_date:
-                    return [], {}, {"not valid": True}
-
-                query["start_time"] = {"$gte": start_date, "$lte": end_date}
-            else:
-                return [], {}, {"not valid": True}
 
         if free_text_inside_the_messages:
             regex = re.compile(free_text_inside_the_messages, re.IGNORECASE)
@@ -189,33 +268,33 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
         elif feedback == "Only Chats Without Feedback":
             query["user_actions"] = {"$exists": False}
         else:
-            if reviewer_name:
-                query["user_actions.name"] = {"$in": reviewer_name}
+            if reviewer_names:
+                query["user_actions.name"] = {"$in": reviewer_names}
 
             if free_text_inside_the_user_actions:
                 regex = re.compile(free_text_inside_the_user_actions, re.IGNORECASE)
                 query["user_actions.feedback"] = {"$regex": regex}
 
-            if price_rating is not None:
-                query["user_actions.price.rating"] = price_rating
+            if price_ratings is not None:
+                query["user_actions.price.rating"] = price_ratings
 
-            if product_rating is not None:
-                query["user_actions.product.rating"] = product_rating
+            if product_ratings is not None:
+                query["user_actions.product.rating"] = product_ratings
 
-            if demands_rating is not None:
-                query["user_actions.demands.rating"] = demands_rating
+            if demands_ratings is not None:
+                query["user_actions.demands.rating"] = demands_ratings
 
-            if phraise_rating is not None:
-                query["user_actions.phraise.rating"] = phraise_rating
-
+            if phraise_ratings is not None:
+                query["user_actions.phraise.rating"] = phraise_ratings
 
         # Pagination logic
         skip_count = (page_number - 1) * page_size
         limit_count = page_size
+        query_db = {key: value for key, value in query.items() if key != "errors"}
 
         pipeline = [
             {
-                "$match": query  # Ensure this matches the filter criteria you want to apply before aggregation
+                "$match": query_db  # Ensure this matches the filter criteria you want to apply before aggregation
             },
             {
                 "$group": {
@@ -227,7 +306,9 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
             },
             {"$sort": {"_id": -1}},  # Sorting by the grouped date in descending order
             {"$skip": skip_count},  # Skip documents based on the calculated skip_count
-            {"$limit": page_size},  # Limit the number of documents in the result  # Sorting by the grouped date in descending order
+            {
+                "$limit": page_size
+            },  # Limit the number of documents in the result  # Sorting by the grouped date in descending order
         ]
 
         # Execute the aggregation pipeline
@@ -239,21 +320,21 @@ def get_all_filtered(filter, test=False, page_number=1, page_size=50):
             total_prices[date] = total_price
             # print(f"Date: {date}, Total Price: {total_price}")
 
-
-        # conversations = list(chats.find(query).sort("start_time", -1))
-        conversations = list(chats.find(query).skip(skip_count).limit(limit_count))
-        total_count = chats.count_documents(query)
+        conversations = list(chats.find(query_db).skip(skip_count).limit(limit_count))
+        total_count = chats.count_documents(query_db)
 
         return conversations, total_prices, query, total_count
 
     except ValueError as ve:
+        traceback.print_exc()
         # Log or handle the ValueError as needed
         print(f"ValueError in get_all_filtered: {ve}")
-        return [], {}, {"not valid": True}
+        return [], {}, {"errors": [f"ValueError in get_all_filtered: {ve}"]}, 0
     except Exception as e:
+        traceback.print_exc()
         # Log or handle other exceptions as needed
         print(f"Exception in get_all_filtered: {e}")
-        return [], {}, {"not valid": True}
+        return [], {}, {"errors": [f"ValueError in get_all_filtered: {e}"]}, 0
 
 
 def get_all():
@@ -283,18 +364,18 @@ def get_all():
 
 
 def get_selected(selected_conversation):
-    try:
-        # Convert string to ObjectId
-        selected_conversation_id = ObjectId(selected_conversation)
-    except Exception as e:
-        # Handle invalid ObjectId string
-        return None
-
     payload = verify_jwt_token(st.session_state.jwt, False)
     if payload and payload["is_admin"]:
-        # Query the database with ObjectId
-        conversation = chats.find_one({"_id": selected_conversation_id})
-        return conversation
+        try:
+            # Convert string to ObjectId
+            ObjectId(selected_conversation)
+            # Query the database with ObjectId
+            conversation = chats.find_one({"_id": selected_conversation})
+            return conversation
+        except Exception as e:
+            print(e)
+            # Handle invalid ObjectId string
+            return None
 
     return None
 
@@ -408,14 +489,20 @@ def insert_first_message(chat_document):
             time.sleep(1)
 
 
-def insert_message(document_id, new_message, price=0):
+def insert_message(document_id, new_message, category=None, subcategory=None, backend_version=None, price=0):
     retry = 0
     while True:
         try:
-            update_result = chats.update_one(
-                {"_id": document_id},
-                {"$push": {"messages": new_message}, "$inc": {"price": price}},
-            )
+            if price == 0:
+                update_result = chats.update_one(
+                    {"_id": document_id},
+                    {"$push": {"messages": new_message}}
+                )
+            else:
+                update_result = chats.update_one(
+                    {"_id": document_id},
+                    {"$push": {"messages": new_message}, "$inc": {"price": price}, "$set": {"category": category, "subcategory": subcategory, "backend_version": backend_version }}
+                )
             # Check if the update was successful
             if update_result.modified_count > 0:
                 break

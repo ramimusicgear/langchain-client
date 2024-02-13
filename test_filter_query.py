@@ -103,7 +103,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "feedback": "Only Chats With Feedback",
         }
         conversations, total_prices, query = get_all_filtered(filter, True)
-        
+
         self.assertTrue(
             all(
                 "user_actions" in chat and start_date <= chat["start_time"] <= end_date
@@ -116,7 +116,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "feedback": "Only Chats Without Feedback",
         }
         conversations, total_prices, query = get_all_filtered(filter, True)
-        
+
         self.assertTrue(
             all(
                 "user_actions" not in chat
@@ -132,7 +132,7 @@ class TestGetAllFiltered(unittest.TestCase):
             "free_text_inside_the_messages": word,
         }
         conversations, total_prices, query = get_all_filtered(filter, True)
-        
+
         self.assertTrue(
             all(
                 "user_actions" not in chat
@@ -267,8 +267,7 @@ class TestGetAllFiltered(unittest.TestCase):
                     invalid_filter, True
                 )
                 self.assertEqual(len(conversations), 0)
-   
-   
+
     def test_edge_cases(self):
         # Test with empty string for free_text_inside_the_messages
         filter = {"free_text_inside_the_messages": ""}
@@ -286,13 +285,12 @@ class TestGetAllFiltered(unittest.TestCase):
         filter = {"date_range": [start_date, end_date]}
         all_conversations, total_prices, query = get_all_filtered({}, True)
         conversations, total_prices, query = get_all_filtered(filter, True)
-        
+
         self.assertEqual(len(conversations), len(all_conversations))
 
-
     # test aggregate
-    @patch('db.chats.aggregate')
-    @patch('db.chats.find')
+    @patch("db.chats.aggregate")
+    @patch("db.chats.find")
     def test_aggregate_function(self, mock_find, mock_aggregate):
         # Mock the conversations data
         mock_conversations = [
@@ -322,7 +320,17 @@ class TestGetAllFiltered(unittest.TestCase):
         # Assertions
         # Verify that the aggregation pipeline is constructed correctly
         self.assertIn({"$match": query}, mock_aggregate.call_args[0][0])
-        self.assertIn({"$group": {"_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$start_time"}}, "total_price": {"$sum": "$price"}}}, mock_aggregate.call_args[0][0])
+        self.assertIn(
+            {
+                "$group": {
+                    "_id": {
+                        "$dateToString": {"format": "%Y-%m-%d", "date": "$start_time"}
+                    },
+                    "total_price": {"$sum": "$price"},
+                }
+            },
+            mock_aggregate.call_args[0][0],
+        )
 
         # Verify that the conversations match the mocked data
         self.assertEqual(conversations, mock_conversations)
@@ -330,6 +338,7 @@ class TestGetAllFiltered(unittest.TestCase):
         # Verify that the total_prices match the mocked aggregation result
         expected_total_prices = {"2024-01-01": 250, "2024-01-02": 200}
         self.assertEqual(total_prices, expected_total_prices)
+
 
 if __name__ == "__main__":
     unittest.main()

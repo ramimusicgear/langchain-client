@@ -1,19 +1,15 @@
-import os
-import jwt
-import time
-import hashlib
-import datetime
 import streamlit as st
 
+from functions import navigate_to, log_in, register
 
-def login_page(navigate_to, log_in):
+def login_page(cookie_manager):
     st.sidebar.button(
-        "Back to Chat", key="login_back_btn", on_click=lambda: navigate_to("chat")
+        "Back to Chat", key="login_back_btn", on_click=lambda: navigate_to("chat",cookie_manager)
     )
     st.sidebar.button(
         "Back to Register",
         key="login_back_register_btn",
-        on_click=lambda: navigate_to("login"),
+        on_click=lambda: navigate_to("login",cookie_manager),
     )
     st.title("Login")
     f = st.form("LoginForm", clear_on_submit=False, border=True)
@@ -26,14 +22,14 @@ def login_page(navigate_to, log_in):
         log_in(username, password)
 
 
-def registration_page(navigate_to, register):
+def registration_page(cookie_manager):
     st.sidebar.button(
-        "Back to Chat", key="register_back_btn", on_click=lambda: navigate_to("chat")
+        "Back to Chat", key="register_back_btn", on_click=lambda: navigate_to("chat", cookie_manager)
     )
     st.sidebar.button(
         "Back to Login",
         key="register_back_login_btn",
-        on_click=lambda: navigate_to("login"),
+        on_click=lambda: navigate_to("login", cookie_manager),
     )
     st.title("Registration")
     f = st.form("RegistrationForm", clear_on_submit=False, border=True)

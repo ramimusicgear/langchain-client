@@ -11,8 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
-from db import get_all_filtered
+from db import get_all_filtered, get_filtered_predata
 
 # App title
 st.set_page_config(
@@ -23,28 +22,54 @@ st.set_page_config(
 st.markdown(
     f"""
         <style>
-            .element-container:has(.selected) + div button{{
+            .filter-errors {{
+                color: red !important;
+            }}
+            .element-container:has(.btn-selected) + div button{{
                 border: 1.5px black solid !important;
             }}
+            .element-container:has(.selected) + div button {{
+                border: 1.5px black solid !important;
+            }}
+            .element-container:has(.black-background) + div{{
+                border-color: black !important; /* New border color on hover */
+            }}
+            .st-g1:focus {{
+                color: black !important; /* New border color on hover */
+            }}
+            [data-baseweb="tab-list"] p {{
+                color: white !important; /* New border color on hover */
+            }}
+            [data-baseweb="tab-highlight"] {{
+                background-color: white !important; /* New border color on hover */
+            }}
+            button:focus {{
+                border-color: black !important; /* New border color on hover */
+            }}
+            button:hover {{
+                border-color: black !important; /* New border color on hover */
+            }}
+            [data-testid="stSidebar"] {{
+                background-color: rgba(128, 0, 128, 0.66) !important; /* #800080a8 with 50% transparency */
+            }}
+            .element-container:has(.selected) + div p{{
+                font-weight: 600;
+            }}
             .element-container:has(.button-after-red) + div button{{
-                background-color: #ff9999 !important;
+                background-color: #f15454 !important;
             }}
             .element-container:has(.button-after-green) + div button{{
                 background-color: #90ee90 !important;
-            }}
+            }}            
             .element-container:has(.button-after-orange) + div button{{
                 background-color: #ffcc99 !important;
             }}
             .element-container:has(.button-after-gray) + div button{{
                 background-color: #d3d3d3 !important;
             }}
-            .element-container:has(.button-after-load-more) + div button{{
+            .element-container:has(.800080a8) + div button{{
                 background-color: #800080a8 !important;
             }}
-            .element-container:has(.button-after-load-more) + div *{{
-                color: white !important;
-            }}
-
             .stApp {{
                 background-image: url("https://ramimusic.io/shop/wp-content/uploads/2024/01/background.png");
                 background-size: cover;
@@ -68,6 +93,15 @@ st.markdown(
             }}
             button *{{
                 color: black !important;
+            }}
+            [data-testid="stSidebar"] p {{
+                color: white;
+            }}
+            [data-testid="stSidebar"] h1 {{
+                color: white;
+            }}
+            [data-testid="stSidebar"] span {{
+                color: white;
             }}
             .main p {{
                 color: white;
@@ -121,10 +155,21 @@ if "show_filter_popup" not in st.session_state:
 
 if "filters" not in st.session_state:
     st.session_state.filters = {}
-if 'page_size' not in st.session_state:
+
+if "filter_errors" not in st.session_state:
+    st.session_state.filter_errors = []
+
+if "db_filter_predata" not in st.session_state:
+    st.session_state.db_filter_predata = {}
+
+# Initialize or update the current tab based on user interaction
+if 'current_tab' not in st.session_state:
+    st.session_state.current_tab = 'Basic'
+
+if "page_size" not in st.session_state:
     st.session_state.page_size = 50
 
-if 'page_number' not in st.session_state:
+if "page_number" not in st.session_state:
     st.session_state.page_number = 1
 
 # Initialize the active tab state if it doesn't exist
@@ -181,166 +226,33 @@ if jwt_cookie and not st.session_state.token_loaded:
         st.session_state.user = payload["user"]
         st.session_state.jwt = jwt_cookie
         st.session_state.token_loaded = True
-        if 'conversations' not in st.session_state or 'total_prices' not in st.session_state or 'conversations_total_count' not in st.session_state:
+        if (
+            "conversations" not in st.session_state
+            or "total_prices" not in st.session_state
+            or "conversations_total_count" not in st.session_state
+            or not "db_filter_predata" in st.session_state
+            or not "filter_errors" in st.session_state
+        ):
+            st.session_state.db_filter_predata = get_filtered_predata()
             conversations, total_prices, query, total_count = get_all_filtered(
                 st.session_state.filters if "filters" in st.session_state else {},
                 False,
-                st.session_state.page_number if "page_number" in st.session_state else 1,
-                st.session_state.page_size if "page_size" in st.session_state else 50
+                st.session_state.page_number
+                if "page_number" in st.session_state
+                else 1,
+                st.session_state.page_size if "page_size" in st.session_state else 50,
             )
-            st.session_state.conversations = conversations   
-            st.session_state.conversations_total_count = total_count
-            st.session_state.total_prices = total_prices
- 
-   
+            if len(query["errors"]) == 0:
+                st.session_state.conversations = conversations
+                st.session_state.conversations_total_count = total_count
+                st.session_state.total_prices = total_prices
+                st.session_state.filter_errors = []
+            else:
+                st.session_state.conversations = []
+                st.session_state.conversations_total_count = 0
+                st.session_state.total_prices = []
+                st.session_state.filter_errors = query["errors"]
 
-# functions
-def clear_all_cookies():
-    st.session_state.messages = [
-        {
-            "role": "assistant",
-            "content": "Hey my name is Rami, How may I assist you today?",
-        }
-    ]
-    st.session_state.start_time = datetime.now()
-    st.session_state.document_id = ""
-    st.session_state.jwt = None
-    st.session_state.user = None
-    st.session_state.selected_conversation = None
-    st.session_state.page = "chat"
-    # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
-    cookie_manager.delete("rami-token", key=f"del_selected_token")
-    cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
-    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
-
-
-def navigate_to(page):
-    st.session_state.page = page
-    cookie_manager.set("page", page, key=f"set_page_cookie_{page}")
-
-
-def select(conv_id):
-    st.session_state.selected_conversation = conv_id
-    cookie_manager.set(
-        "selected_conversation",
-        conv_id,
-        key=f"set_selected_conversation_cookie_{conv_id}",
-    )
-
-
-# def no_filtes():
-#     st.session_state.show_filter_popup = False
-# Function to change the active tab
-def change_active_tab(tab_name):
-    st.session_state.active_tab = tab_name
-
-def increase_page_number():
-    conversations, total_prices, query, total_count = get_all_filtered(
-        st.session_state.filters,
-        False,
-        st.session_state.page_number + 1,
-        st.session_state.page_size 
-    )
-    st.session_state.conversations += conversations
-    st.session_state.conversations_total_count += total_count
-    st.session_state.page_number += 1
-
-def change_filtes(filters):
-    st.session_state.filters = filters
-    conversations, total_prices, query, total_count = get_all_filtered(
-        filters,
-        False,
-        1,
-        50
-    )
-    st.session_state.page_number = 50
-    st.session_state.page_size = 50
-    st.session_state.conversations = conversations   
-    st.session_state.conversations_total_count = total_count
-    st.session_state.total_prices = total_prices
-    st.session_state.show_filter_popup = False
-
-
-def show_hide_filters():
-    if st.session_state.show_filter_popup == True:
-        st.session_state.show_filter_popup = False
-    else:
-        st.session_state.show_filter_popup = True
-
-def no_filters():
-    conversations, total_prices, query, total_count = get_all_filtered(
-        {},
-        False,
-        1,
-        50
-    )
-    st.session_state.page_number = 50
-    st.session_state.page_size = 50
-    st.session_state.conversations = conversations   
-    st.session_state.conversations_total_count = total_count
-    st.session_state.total_prices = total_prices
-    st.session_state.show_filter_popup = False
-
-def log_out():
-    st.session_state.page = "chat"
-    st.session_state.jwt = None
-    st.session_state.user = None
-    st.session_state.selected_conversation = None
-    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
-    cookie_manager.delete("rami-token", key=f"del_page_cookie_chat")
-    cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
-
-
-def log_in(username, password):
-    token = create_jwt_token(username, password)
-    cookie_manager.set("rami-token", token, key=f"set_register_jwt_cookie_{token}")
-    payload = None
-    if token:
-        payload = verify_jwt_token(token)
-    if payload:
-        st.success(f"You are logged in successfully as {username}")
-        st.session_state.jwt = token  # Store the JWT in session state
-        st.session_state.user = username  # Store the JWT in session state
-        if payload["is_admin"]:
-            navigate_to("admin")
-        else:
-            navigate_to("chat")
-    else:
-        st.error("Log In failed. Please try again.")
-    # st.rerun()
-
-
-def register(username, password):
-    token = create_jwt_token(
-        username, password
-    )  # Reuse the JWT creation function from login
-
-    cookie_manager.set("rami-token", token, key=f"set_register_jwt_cookie_{token}")
-
-    payload = None
-    if token:
-        payload = verify_jwt_token(token)
-    if payload:
-        st.success(f"You are registered successfully as {username}")
-        st.session_state.jwt = token  # Store the JWT in session state
-        st.session_state.user = username  # Store the JWT in session state
-        if payload["is_admin"]:
-            navigate_to("admin")
-        else:
-            navigate_to("chat")
-    else:
-        st.error("Registration failed. Please try again.")
-
-
-def clear_chat_history():
-    st.session_state.messages = [
-        {
-            "role": "assistant",
-            "content": "Hey my name is Rami, How may I assist you today?",
-        }
-    ]
-    st.session_state.start_time = datetime.now()
-    st.session_state.document_id = ""
 
 
 TESTING = False
@@ -351,13 +263,13 @@ from login_pages import login_page, registration_page
 
 # App Routing
 if st.session_state.page == "login":
-    login_page(navigate_to, log_in)
+    login_page(cookie_manager)
 
 elif st.session_state.page == "register":
-    registration_page(navigate_to, register)
+    registration_page(cookie_manager)
 
 elif st.session_state.page == "admin":
-    admin_page(navigate_to, select, show_hide_filters, no_filters, change_filtes, change_active_tab, increase_page_number)
+    admin_page(cookie_manager)
 
 elif st.session_state.page == "chat":
-    chat_page(TESTING, clear_all_cookies, log_out, navigate_to)
+    chat_page(TESTING, cookie_manager)

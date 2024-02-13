@@ -1,17 +1,10 @@
-# TODO:
-# create a fake array of sender names.
-
-
-from faker import Faker
-import random
-from datetime import datetime, timedelta
 import os
-import re
-import time
+import sys
+import random
 import pymongo
-import streamlit as st
+from faker import Faker
 from bson import ObjectId
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 
@@ -25,6 +18,22 @@ MONGODB_COLLECTION = "chats-test"
 client = pymongo.MongoClient(MONGODB_URL)
 db = client[MONGODB_DB]
 chats = db[MONGODB_COLLECTION]
+
+
+def generate_fake_object_id():
+    timestamp = int((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds())
+    machine_id = random.randint(0, 16777215)  # 3 bytes
+    process_id = random.randint(0, 65535)  # 2 bytes
+    increment = random.randint(0, 16777215)  # 3 bytes
+
+    fake_object_id = ObjectId(
+        str(hex(timestamp))[2:]
+        + str(hex(machine_id))[2:].zfill(6)
+        + str(hex(process_id))[2:].zfill(4)
+        + str(hex(increment))[2:].zfill(6)
+    )
+
+    return str(fake_object_id)
 
 
 fake = Faker()
@@ -88,7 +97,7 @@ def fake_user_actions():
     phraise_reason = fake.sentence()
     other = fake.sentence()
     return {
-        "name": feedback_sender_name,
+        "name": "guest",
         "price": {"rating": random.choice(user_action_ratings), "reason": price_reason},
         "product": {
             "rating": random.choice(user_action_ratings),
@@ -112,7 +121,7 @@ def generate_fake_data(num_records=1000):
 
     for _ in range(num_records):
         category, subcategory = fake_category_subcategory()
-        # user_actions = fake_user_actions()
+        user_actions = fake_user_actions()
 
         # Generate multiple messages for each record
         num_messages = random.randint(1, 10)
@@ -121,13 +130,13 @@ def generate_fake_data(num_records=1000):
             {
                 "timestamp": start_time + timedelta(minutes=i),
                 "sender": random.choice(["user", "bot"]),
-                "text": f"Message {i + 1}",
+                "text": f"Message {i + 1} - {fake.sentence()}",
             }
             for i in range(num_messages)
         ]
-
+        id = generate_fake_object_id()
         record = {
-            "_id": fake.uuid4(),
+            "_id": id,
             "user_ip": fake.ipv4(),
             "user_device": random.choice(["Desktop", "Mobile"]),
             "price": round(random.uniform(0, 500), 2),
@@ -136,7 +145,7 @@ def generate_fake_data(num_records=1000):
             "category": category,
             "subcategory": subcategory,
             "messages": messages,
-            # "user_actions": user_actions,
+            "user_actions": user_actions,
             "summary": fake.sentence(),
             "product_references": [
                 {
@@ -155,6 +164,8 @@ def generate_fake_data(num_records=1000):
 
 
 if __name__ == "__main__":
+    # for c in chats.find({}).limit(50):
+    #     print(c["_id"])
     fake_data = generate_fake_data(5000)  # Adjust the number of records as needed
 
     # Insert the fake data into the MongoDB collection
