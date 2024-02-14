@@ -7,6 +7,13 @@ from db import get_all_filtered, get_filtered_predata
 
 
 # functions
+
+
+# Function to set the current tab
+def set_tab(tab_name):
+    st.session_state.current_tab = tab_name
+
+
 def clear_all_cookies(cookie_manager):
     st.session_state.messages = [
         {
@@ -46,6 +53,7 @@ def select(conv_id, cookie_manager):
 def change_active_tab(tab_name):
     st.session_state.active_tab = tab_name
 
+
 def change_collection(collection):
     if collection == "Test":
         st.session_state.selected_db_collection = "chats-test"
@@ -54,7 +62,10 @@ def change_collection(collection):
     if collection == "Production":
         st.session_state.selected_db_collection = "chats"
     st.session_state.selected_conversation = change_filtes(st.session_state.filters)
-    st.session_state.db_filter_predata = get_filtered_predata(st.session_state.selected_db_collection)
+    st.session_state.db_filter_predata = get_filtered_predata(
+        st.session_state.selected_db_collection, st.session_state.jwt
+    )
+
 
 def increase_page_number():
     conversations, total_prices, query, total_count = get_all_filtered(
@@ -62,7 +73,8 @@ def increase_page_number():
         False,
         st.session_state.page_number + 1,
         st.session_state.page_size,
-        st.session_state.selected_db_collection
+        st.session_state.selected_db_collection,
+        st.session_state.jwt,
     )
     st.session_state.conversations += conversations
     st.session_state.total_prices = total_prices
@@ -73,7 +85,12 @@ def increase_page_number():
 def change_filtes(filters):
     st.session_state.filters = filters
     conversations, total_prices, query, total_count = get_all_filtered(
-        filters, False, 1, 50, st.session_state.selected_db_collection
+        filters,
+        False,
+        1,
+        50,
+        st.session_state.selected_db_collection,
+        st.session_state.jwt,
     )
 
     if len(query["errors"]) == 0:
@@ -93,11 +110,13 @@ def change_filtes(filters):
 
     return conversations[0].get("_id", None)
 
+
 def show_hide_collection():
     if st.session_state.show_collection_expander == True:
         st.session_state.show_collection_expander = False
     else:
         st.session_state.show_collection_expander = True
+
 
 def show_hide_filters():
     if st.session_state.show_filter_expander == True:
@@ -107,7 +126,9 @@ def show_hide_filters():
 
 
 def no_filters():
-    conversations, total_prices, query, total_count = get_all_filtered({}, False, 1, 50, st.session_state.selected_db_collection)
+    conversations, total_prices, query, total_count = get_all_filtered(
+        {}, False, 1, 50, st.session_state.selected_db_collection, st.session_state.jwt
+    )
     st.session_state.page_number = 50
     st.session_state.page_size = 50
     st.session_state.conversations = conversations

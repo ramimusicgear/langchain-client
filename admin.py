@@ -1,6 +1,7 @@
 import streamlit as st
 from datetime import datetime
 
+from db import get_selected
 from functions import (
     navigate_to,
     select,
@@ -9,13 +10,10 @@ from functions import (
     no_filters,
     change_filtes,
     increase_page_number,
-    change_collection
+    change_collection,
+    set_tab,
 )
-from db import get_selected
 
-# Function to set the current tab
-def set_tab(tab_name):
-    st.session_state.current_tab = tab_name
 
 def get_help_from_color(color, selected=False):
     if color == "red":
@@ -78,10 +76,9 @@ def admin_page(cookie_manager):
                         "Development",
                         "Production",
                         "Test",
-                    ]
+                    ],
                 )
                 st.button("Submit", on_click=lambda: change_collection(collection))
-
 
     # Filter Button
     st.sidebar.button("Filter Conversations", on_click=show_hide_filters)
@@ -161,9 +158,7 @@ def admin_page(cookie_manager):
                     selected_backend_version = st.multiselect(
                         "Select backend version",
                         st.session_state.db_filter_predata["db_backend_versions"],
-                        default=st.session_state.filters.get(
-                            "backend_versions", []
-                        ),
+                        default=st.session_state.filters.get("backend_versions", []),
                     )
                     # Free Text Search
                     search_text = st.text_input(
@@ -289,23 +284,17 @@ def admin_page(cookie_manager):
                     product_match_rating = st.multiselect(
                         "Product Match Rating",
                         ["Good", "Okay", "Bad"],
-                        default=st.session_state.filters.get(
-                            "product_ratings", None
-                        ),
+                        default=st.session_state.filters.get("product_ratings", None),
                     )
                     recommendation_match_rating = st.multiselect(
                         "Recommendation Match Rating",
                         ["Good", "Okay", "Bad"],
-                        default=st.session_state.filters.get(
-                            "demands_ratings", None
-                        ),
+                        default=st.session_state.filters.get("demands_ratings", None),
                     )
                     chat_phrasing_rating = st.multiselect(
                         "Chat Phrasing Rating",
                         ["Good", "Okay", "Bad"],
-                        default=st.session_state.filters.get(
-                            "phraise_ratings", None
-                        ),
+                        default=st.session_state.filters.get("phraise_ratings", None),
                     )
                     # Submit Advanced Filtering Button
                     filters["feedback"] = with_or_without
@@ -314,9 +303,7 @@ def admin_page(cookie_manager):
                     filters["product_ratings"] = product_match_rating
                     filters["price_ratings"] = price_match_rating
                     filters["phraise_ratings"] = chat_phrasing_rating
-                    filters[
-                        "free_text_inside_the_user_actions"
-                    ] = review_search_text
+                    filters["free_text_inside_the_user_actions"] = review_search_text
                     filters["reviewer_name"] = selected_senders
                     st.button(
                         "Submit",
@@ -414,7 +401,8 @@ def admin_page(cookie_manager):
         st.session_state.selected_conversation
         if st.session_state.selected_conversation
         else last_id,
-        st.session_state.selected_db_collection
+        st.session_state.selected_db_collection,
+        st.session_state.jwt,
     )
     if conv is None:
         st.write("### Please select a conversation")
@@ -442,13 +430,17 @@ def admin_page(cookie_manager):
                 unsafe_allow_html=True,
             )
         try:
-            conv["category"] = f"{conv['category']} - " if conv["category"] != "" else "Backend didn't provide the categories"
+            conv["category"] = (
+                f"{conv['category']} - "
+                if conv["category"] != ""
+                else "Backend didn't provide the categories"
+            )
             st.write("## categories")
             st.markdown(
                 f"<p><strong>{conv['category']}{conv['subcategory']}</strong></p>",
                 unsafe_allow_html=True,
             )
-            
+
         except Exception as e:
             print(e)
             pass

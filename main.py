@@ -190,13 +190,6 @@ if "active_tab" not in st.session_state:
 
 if "ip" not in st.session_state:
     st.session_state.ip = ""
-try:
-    response = requests.get("https://api.ipify.org?format=json")
-    ip_data = response.json()
-    st.session_state.ip = ip_data["ip"]
-
-except requests.RequestException as e:
-    st.error("refresh please")
 
 # cookies
 
@@ -245,7 +238,9 @@ if jwt_cookie and not st.session_state.token_loaded:
             or not "db_filter_predata" in st.session_state
             or not "filter_errors" in st.session_state
         ):
-            st.session_state.db_filter_predata = get_filtered_predata(st.session_state.selected_db_collection)
+            st.session_state.db_filter_predata = get_filtered_predata(
+                st.session_state.selected_db_collection, st.session_state.jwt
+            )
             conversations, total_prices, query, total_count = get_all_filtered(
                 st.session_state.filters if "filters" in st.session_state else {},
                 False,
@@ -268,6 +263,13 @@ if jwt_cookie and not st.session_state.token_loaded:
 if st.sidebar.button("Reset Cookies", key="reset_btn"):
     clear_all_cookies(cookie_manager)
 
+try:
+    response = requests.get("https://api.ipify.org?format=json")
+    ip_data = response.json()
+    st.session_state.ip = ip_data["ip"]
+
+except requests.RequestException as e:
+    st.error("refresh please")
 
 from admin import admin_page
 from chat import chat_page
