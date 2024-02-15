@@ -19,23 +19,6 @@ client = pymongo.MongoClient(MONGODB_URL)
 db = client[MONGODB_DB]
 chats = db[MONGODB_COLLECTION]
 
-
-def generate_fake_object_id():
-    timestamp = int((datetime.utcnow() - datetime(1970, 1, 1)).total_seconds())
-    machine_id = random.randint(0, 16777215)  # 3 bytes
-    process_id = random.randint(0, 65535)  # 2 bytes
-    increment = random.randint(0, 16777215)  # 3 bytes
-
-    fake_object_id = ObjectId(
-        str(hex(timestamp))[2:]
-        + str(hex(machine_id))[2:].zfill(6)
-        + str(hex(process_id))[2:].zfill(4)
-        + str(hex(increment))[2:].zfill(6)
-    )
-
-    return str(fake_object_id)
-
-
 fake = Faker()
 
 categories = {
@@ -134,7 +117,7 @@ def generate_fake_data(num_records=1000):
             }
             for i in range(num_messages)
         ]
-        id = generate_fake_object_id()
+        id = ObjectId()
         record = {
             "_id": id,
             "user_ip": fake.ipv4(),

@@ -5,13 +5,10 @@ from bson import ObjectId
 from datetime import datetime
 
 from login_utils import verify_jwt_token
-
 from db import update_feedback, insert_first_message, insert_message
+from state_functions import clear_chat_history, log_out, navigate_to
 
 SERVER_URL = os.environ.get("SERVER_URL")
-
-from functions import clear_chat_history, log_out, navigate_to
-
 
 def chat_page(TESTING, cookie_manager):
     # Navigation buttons
@@ -70,54 +67,60 @@ def chat_page(TESTING, cookie_manager):
 
     st.sidebar.write("# Feedback")
     with st.sidebar:
+        st.markdown(
+            '<span class="black-background"></span>',
+            unsafe_allow_html=True,
+        )
         f = st.form("Feedback", clear_on_submit=True, border=True)
-    feedback_sender = f.text_input("Name (Not Required)", key="feedback_sender")
 
-    price = f.radio(
-        "Rate pricing match", ["Good", "Okay", "Bad"], index=None, horizontal=True
-    )
+        feedback_sender = f.text_input("Name (Not Required)", key="feedback_sender")
 
-    price_reasoning = f.text_input("Why? (Not Required)", key="price_reason")
+        price = f.radio(
+            "Rate pricing match", ["Good", "Okay", "Bad"], index=None, horizontal=True
+        )
 
-    product = f.radio(
-        "Rate product match", ["Good", "Okay", "Bad"], index=None, horizontal=True
-    )
+        price_reasoning = f.text_input("Why? (Not Required)", key="price_reason")
 
-    product_reasoning = f.text_input("Why? (Not Required)", key="produt_reason")
+        product = f.radio(
+            "Rate product match", ["Good", "Okay", "Bad"], index=None, horizontal=True
+        )
 
-    demands = f.radio(
-        "Rate demands match", ["Good", "Okay", "Bad"], index=None, horizontal=True
-    )
+        product_reasoning = f.text_input("Why? (Not Required)", key="produt_reason")
 
-    demands_reasoning = f.text_input("Why? (Not Required)", key="demands_reason")
+        demands = f.radio(
+            "Rate demands match", ["Good", "Okay", "Bad"], index=None, horizontal=True
+        )
 
-    phraise = f.radio(
-        "Rate phrasing", ["Good", "Okay", "Bad"], index=None, horizontal=True
-    )
+        demands_reasoning = f.text_input("Why? (Not Required)", key="demands_reason")
 
-    phraise_reasoning = f.text_input("Why? (Not Required)", key="phraise_reason")
+        phraise = f.radio(
+            "Rate phrasing", ["Good", "Okay", "Bad"], index=None, horizontal=True
+        )
 
-    feedback = f.text_area(
-        "Do you have anything else you would like to add?", key="extra feedback"
-    )
+        phraise_reasoning = f.text_input("Why? (Not Required)", key="phraise_reason")
 
-    submit = f.form_submit_button("Submit")
-    # submit the feedback
-    if submit:
-        if not TESTING:
-            if st.session_state.document_id != "":
-                new_values = {
-                    "user_actions": {
-                        "name": feedback_sender,
-                        "price": {"rating": price, "reason": price_reasoning},
-                        "product": {"rating": product, "reason": product_reasoning},
-                        "demands": {"rating": demands, "reason": demands_reasoning},
-                        "phraise": {"rating": phraise, "reason": phraise_reasoning},
-                        "other": feedback,
+        feedback = f.text_area(
+            "Do you have anything else you would like to add?", key="extra feedback"
+        )
+
+        submit = f.form_submit_button("Submit")
+        # submit the feedback
+        if submit:
+            if not TESTING:
+                if st.session_state.document_id != "":
+                    new_values = {
+                        "user_actions": {
+                            "name": feedback_sender,
+                            "price": {"rating": price, "reason": price_reasoning},
+                            "product": {"rating": product, "reason": product_reasoning},
+                            "demands": {"rating": demands, "reason": demands_reasoning},
+                            "phraise": {"rating": phraise, "reason": phraise_reasoning},
+                            "other": feedback,
+                        }
                     }
-                }
-                update_feedback(st.session_state.document_id, new_values)
-        st.rerun()
+                    update_feedback(st.session_state.document_id, new_values)
+                    st.success(f"Thank You For Your Feedback {feedback_sender}")
+            st.rerun()
 
     # Chat
 
@@ -128,8 +131,6 @@ def chat_page(TESTING, cookie_manager):
                 "_id": ObjectId(),  # Generates a unique Object ID
                 "user_ip": st.session_state.ip,  # Example IP address
                 "user_device": "Desktop",  # Example device type
-                # "category": category,
-                # "subcategory": subcategory,
                 "price": 0.0,
                 "start_time": st.session_state.start_time,
                 "end_time": datetime.now(),
@@ -139,21 +140,7 @@ def chat_page(TESTING, cookie_manager):
                         "sender": f"user - {str(st.session_state.ip)}",
                         "text": prompt,
                     }
-                ],
-                "prompts": {
-                    "template_prompt": """Given a conversation (between Human and Assistant) and a follow up question from the user
-    You are an assistant you help customers choose products using the given context (use only what is relevent) 
-    your output should be nicely phrased
-    ask the customer questions to figure out what he needs
-    in your questions behave a little bit like a salesman and try and figure out exactly what the customer is looking for
-    in your questions lead the customer to the right product for him""",
-                    "search_prompt": """you are a spec analiyzer you use the given chat history and question and give out the 
-    techincal specs that the product the customer is describing should have 
-    don't write anything other than the specs, do not explain why
-    the specs should be only technical
-    always follow the instructions""",
-                },
-                # "product_references": references
+                ]
             }
 
             if TESTING:

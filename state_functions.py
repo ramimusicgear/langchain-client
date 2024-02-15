@@ -6,8 +6,6 @@ from login_utils import verify_jwt_token, create_jwt_token
 from db import get_all_filtered, get_filtered_predata
 
 
-# functions
-
 
 # Function to set the current tab
 def set_tab(tab_name):
@@ -154,12 +152,14 @@ def log_in(username, password, cookie_manager):
     if token:
         payload = verify_jwt_token(token)
     if payload:
-        st.success(f"You are logged in successfully as {username}")
         st.session_state.jwt = token  # Store the JWT in session state
         st.session_state.user = username  # Store the JWT in session state
         if payload["is_admin"]:
+            st.success(f"You are logged in successfully as The Admin! \n Navigate to the admin dashboard")
             navigate_to("admin", cookie_manager)
+            
         else:
+            st.success(f"You are logged in successfully as {username}")
             navigate_to("chat", cookie_manager)
     else:
         st.error("Log In failed. Please try again.")
