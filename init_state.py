@@ -122,7 +122,6 @@ def init(cookie_manager):
                 )
                 if len(query["errors"]) == 0:
                     st.session_state.conversations = conversations
-                    # print(f"selected-1: {str(conversations[0].get("_id", None))}")
                     if st.session_state.selected_conversation == None:
                         st.session_state.selected_conversation =  conversations[0].get("_id", None)
                     st.session_state.conversations_total_count = total_count
