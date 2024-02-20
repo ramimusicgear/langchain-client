@@ -68,6 +68,9 @@ def init(cookie_manager):
     if "ip" not in st.session_state:
         st.session_state.ip = ""
 
+
+
+
     # cookies
 
     if "token_loaded" not in st.session_state:

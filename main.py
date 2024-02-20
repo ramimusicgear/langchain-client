@@ -16,14 +16,12 @@ from state_functions import clear_all_cookies
 st.set_page_config(
     page_title="Rami Chatbot", page_icon="https://ramimusic.io/svg/IconLogo.svg"
 )
-from css import add_css
+from streamlit_css import add_css
 from init_state import init
 add_css()
 
 def get_manager():
     return stx.CookieManager()
-
-
 cookie_manager = get_manager()
 init(cookie_manager)
 

@@ -26,9 +26,12 @@ def clear_all_cookies(cookie_manager):
     st.session_state.selected_conversation = None
     st.session_state.page = "chat"
     # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
-    cookie_manager.delete("rami-token", key=f"del_selected_token")
-    cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
-    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
+    try:
+        cookie_manager.delete("rami-token", key=f"del_selected_token")
+        cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
+        cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
+    except Exception as e:
+        pass
 
 
 def navigate_to(page, cookie_manager):
