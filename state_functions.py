@@ -1,5 +1,5 @@
 import streamlit as st
-import extra_streamlit_components as stx
+import json
 from datetime import datetime
 
 from login_utils import verify_jwt_token, create_jwt_token
@@ -25,13 +25,17 @@ def clear_all_cookies(cookie_manager):
     st.session_state.user = None
     st.session_state.selected_conversation = None
     st.session_state.page = "chat"
-    # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
+    cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
     try:
-        cookie_manager.delete("rami-token", key=f"del_selected_token")
+        cookie_manager.delete("t", key=f"del_selected_token")
         cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
         cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     except Exception as e:
         pass
+
+def add_message(message, cookie_manager):
+    st.session_state.messages.append(message)
+    cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
 
 
 def navigate_to(page, cookie_manager):
@@ -144,13 +148,13 @@ def log_out(cookie_manager):
     st.session_state.user = None
     st.session_state.selected_conversation = None
     cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
-    cookie_manager.delete("rami-token", key=f"del_page_cookie_chat")
+    cookie_manager.delete("t", key=f"del_page_cookie_chat")
     cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
 
 
 def log_in(username, password, cookie_manager):
     token = create_jwt_token(username, password)
-    cookie_manager.set("rami-token", token, key=f"set_register_jwt_cookie_{token}")
+    cookie_manager.set("t", token, key=f"set_register_jwt_cookie_{token}")
     payload = None
     if token:
         payload = verify_jwt_token(token)
@@ -174,7 +178,7 @@ def register(username, password, cookie_manager):
         username, password
     )  # Reuse the JWT creation function from login
 
-    cookie_manager.set("rami-token", token, key=f"set_register_jwt_cookie_{token}")
+    cookie_manager.set("t", token, key=f"set_register_jwt_cookie_{token}")
 
     payload = None
     if token:

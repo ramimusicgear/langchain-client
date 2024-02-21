@@ -40,7 +40,7 @@ from admin_page import admin_page
 from chat_page import chat_page
 from login_pages import login_page, registration_page
 
-TESTING = False
+TESTING = True
 
 # App Routing
 if st.session_state.page == "login":

@@ -6,7 +6,7 @@ from datetime import datetime
 
 from login_utils import verify_jwt_token
 from db import update_feedback, insert_first_message, insert_message
-from state_functions import clear_chat_history, log_out, navigate_to
+from state_functions import clear_chat_history, log_out, navigate_to, add_message
 
 SERVER_URL = os.environ.get("SERVER_URL")
 
@@ -197,8 +197,7 @@ def chat_page(TESTING, cookie_manager):
                 )
 
         message = {"role": "assistant", "content": full_response}
-        st.session_state.messages.append(message)
-        # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
+        add_message(message, cookie_manager)
 
         # Fetch the price; default to '0.0' if not found
         price_str = result.get("price", "0.0")
