@@ -25,7 +25,7 @@ def clear_all_cookies(cookie_manager):
     st.session_state.user = None
     st.session_state.selected_conversation = None
     st.session_state.page = "chat"
-    cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
+    # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
     try:
         cookie_manager.delete("t", key=f"del_selected_token")
         cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
@@ -35,7 +35,7 @@ def clear_all_cookies(cookie_manager):
 
 def add_message(message, cookie_manager):
     st.session_state.messages.append(message)
-    cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
+    # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
 
 
 def navigate_to(page, cookie_manager):
@@ -202,6 +202,6 @@ def clear_chat_history(cookie_manager):
             "content": "Hey my name is Rami, How may I assist you today?",
         }
     ]
-    cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_new_chat")
+    # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_new_chat")
     st.session_state.start_time = datetime.now()
     st.session_state.document_id = ""

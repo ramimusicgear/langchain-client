@@ -79,18 +79,17 @@ def init(cookie_manager):
         st.session_state.page_loaded = False
     if "selected_conversation_loaded" not in st.session_state:
         st.session_state.selected_conversation_loaded = False
-    if "messages_loaded" not in st.session_state:
-        st.session_state.messages_loaded = False
+    # if "messages_loaded" not in st.session_state:
+    #     st.session_state.messages_loaded = False
 
 
     jwt_cookie = cookie_manager.get(cookie="t")
     page_cookie = cookie_manager.get(cookie="page")
-    messages_cookie = cookie_manager.get(cookie="messages")
+    # messages_cookie = cookie_manager.get(cookie="messages")
 
-
-    if messages_cookie and not st.session_state.messages_loaded:
-        st.session_state.messages = messages_cookie
-        st.session_state.messages_loaded = True
+    # if messages_cookie and not st.session_state.messages_loaded:
+    #     st.session_state.messages = messages_cookie
+    #     st.session_state.messages_loaded = True
 
 
     selected_conversation_cookie = cookie_manager.get(cookie="selected_conversation")
