@@ -27,7 +27,7 @@ def chat_page(TESTING, cookie_manager):
                 st.markdown(f"<p>{message['content']}</p>", unsafe_allow_html=True)
 
     # sidebar
-    st.sidebar.button("New chat", on_click=clear_chat_history)
+    st.sidebar.button("New chat", on_click=lambda: clear_chat_history(cookie_manager))
     if st.session_state.user:
         if st.sidebar.button("Logout", key="to_logout_btn"):
             log_out(cookie_manager)

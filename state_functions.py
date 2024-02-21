@@ -195,12 +195,13 @@ def register(username, password, cookie_manager):
         st.error("Registration failed. Please try again.")
 
 
-def clear_chat_history():
+def clear_chat_history(cookie_manager):
     st.session_state.messages = [
         {
             "role": "assistant",
             "content": "Hey my name is Rami, How may I assist you today?",
         }
     ]
+    cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_new_chat")
     st.session_state.start_time = datetime.now()
     st.session_state.document_id = ""
