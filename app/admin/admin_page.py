@@ -2,7 +2,7 @@ import streamlit as st
 
 from db import get_selected
 
-from admin_sidebar import admin_sidebar
+from .admin_sidebar import admin_sidebar
 
 def admin_page(cookie_manager):
 
@@ -51,7 +51,6 @@ def admin_page(cookie_manager):
             )
 
         except Exception as e:
-            print(e)
             pass
 
         try:

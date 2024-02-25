@@ -23,4 +23,4 @@ ENV DEV=${DEV}
 # EXPOSE 8502
 
 # Set the entrypoint for the container
-CMD streamlit run main.py --server.port=$(if [ "$DEV" = "True" ]; then echo 8502; else echo 8501; fi)
+CMD streamlit run app/main.py --server.port=$(if [ "$DEV" = "True" ]; then echo 8502; else echo 8501; fi)

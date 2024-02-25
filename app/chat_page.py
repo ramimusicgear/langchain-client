@@ -4,9 +4,9 @@ import streamlit as st
 from bson import ObjectId
 from datetime import datetime
 
-from login_utils import verify_jwt_token
+from login.login_utils import verify_jwt_token
 from db import update_feedback, insert_first_message, insert_message
-from state_functions import clear_chat_history, log_out, navigate_to, add_message
+from states import clear_chat_history, log_out, navigate_to, add_message, set_document_id
 
 SERVER_URL = os.environ.get("SERVER_URL")
 
@@ -123,12 +123,13 @@ def chat_page(TESTING, cookie_manager):
             st.rerun()
 
     # Chat
-
+    
     # User-provided prompt
+    generated_id = ObjectId()
     if prompt := st.chat_input(disabled=False):
         if len(st.session_state.messages) == 1:
             chat_document = {
-                "_id": ObjectId(),  # Generates a unique Object ID
+                "_id": generated_id,  # Generates a unique Object ID
                 "user_ip": st.session_state.ip,  # Example IP address
                 "user_device": "Desktop",  # Example device type
                 "price": 0.0,
@@ -144,9 +145,10 @@ def chat_page(TESTING, cookie_manager):
             }
 
             if TESTING:
-                st.session_state.document_id = "inserted_id"
+                set_document_id("generated_id", cookie_manager)
             else:
                 insert_first_message(chat_document)
+                set_document_id(generated_id, cookie_manager)
         else:
             new_message = {
                 "timestamp": datetime.now(),
@@ -155,8 +157,7 @@ def chat_page(TESTING, cookie_manager):
             }
             if not TESTING:
                 insert_message(st.session_state.document_id, new_message)
-
-        st.session_state.messages.append({"role": "user", "content": prompt})
+        add_message({"role": "user", "content": prompt}, cookie_manager)
         # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{prompt}")
 
         # show user message added to the chat when he submited the message
@@ -201,11 +202,9 @@ def chat_page(TESTING, cookie_manager):
 
         # Fetch the price; default to '0.0' if not found
         price_str = result.get("price", "0.0")
-        category = result.get("category", "")
-        if category == "":
-            category = "Backend didn't provide the catgories"
-        subcategory = result.get("sub category", "")
-        backend_version = result.get("version", "")
+        category = result.get("category", "Backend didn't provide the catgories")
+        backend_version = result.get("version", "0.0.1")
+        subcategory = result.get("sub category", "Backend didn't provide the catgories")
 
         try:
             price = float(price_str)  # Attempt to convert the price to a float
@@ -224,5 +223,5 @@ def chat_page(TESTING, cookie_manager):
                 category,
                 subcategory,
                 backend_version,
-                price,
+                price
             )

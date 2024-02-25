@@ -1,6 +1,7 @@
 import streamlit as st
 
-from state_functions import navigate_to, log_in, register
+from states.state_functions import navigate_to, log_in, register
+from login.login_utils import verify_jwt_token, create_jwt_token
 
 def login_page(cookie_manager):
     st.sidebar.button(
@@ -26,7 +27,7 @@ def login_page(cookie_manager):
     )
     submit = f.form_submit_button("Login")
     if submit:
-        log_in(username, password, cookie_manager)
+        log_in(username, password, cookie_manager, verify_jwt_token, create_jwt_token)
 
 def registration_page(cookie_manager):
     st.sidebar.button(
@@ -53,4 +54,4 @@ def registration_page(cookie_manager):
 
     submit = f.form_submit_button("Register")
     if submit:
-        register(new_username, new_password, cookie_manager)
+        register(new_username, new_password, cookie_manager, verify_jwt_token, create_jwt_token)

@@ -121,7 +121,7 @@ chat_schema = {
 # Check if the MONGODB_COLLECTION collection exists
 collection_names = db.list_collection_names()
 if MONGODB_COLLECTION in collection_names:
-    print(f"Collection {MONGODB_COLLECTION} already exists.now way im Deleting it.")
+    print(f"Collection {MONGODB_COLLECTION} already exists.no way im Deleting it.")
     # db[MONGODB_COLLECTION].drop()
 else:
     # Create or update the collection with the new validator

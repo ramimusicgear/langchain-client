@@ -2,7 +2,7 @@ import os
 import streamlit as st
 from datetime import datetime
 
-from login_utils import verify_jwt_token
+from login.login_utils import verify_jwt_token
 from db import get_all_filtered, get_filtered_predata
 
 def init(cookie_manager):

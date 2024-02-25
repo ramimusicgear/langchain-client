@@ -10,14 +10,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from state_functions import clear_all_cookies
+from states.state_functions import clear_all_cookies
+from states.init_state import init
 
 # App title
 st.set_page_config(
     page_title="Rami Chatbot", page_icon="https://ramimusic.io/svg/IconLogo.svg"
 )
-from streamlit_css import add_css
-from init_state import init
+from styles.streamlit_css import add_css
+
 add_css()
 
 def get_manager():
@@ -36,9 +37,9 @@ try:
 except requests.RequestException as e:
     st.error("refresh please")
 
-from admin_page import admin_page
+from admin.admin_page import admin_page
 from chat_page import chat_page
-from login_pages import login_page, registration_page
+from login.login_pages import login_page, registration_page
 
 TESTING = False
 

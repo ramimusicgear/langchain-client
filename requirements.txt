@@ -6,3 +6,4 @@ python-dotenv
 pyjwt
 faker
 pytest
+fuzzywuzzy

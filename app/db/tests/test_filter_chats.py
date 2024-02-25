@@ -7,9 +7,8 @@ import unittest
 import streamlit as st
 from unittest.mock import patch
 from datetime import datetime
-from functions import (
-    get_all_filtered,
-)  # replace "db" with the actual module where your function is define
+
+from ..functions import get_all_filtered
 
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 ADMIN_USERNAME = os.environ.get("ADMIN_USERNAME")

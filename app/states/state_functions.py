@@ -2,7 +2,6 @@ import streamlit as st
 import json
 from datetime import datetime
 
-from login_utils import verify_jwt_token, create_jwt_token
 from db import get_all_filtered, get_filtered_predata
 
 
@@ -37,6 +36,8 @@ def add_message(message, cookie_manager):
     st.session_state.messages.append(message)
     # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
 
+def set_document_id(document_id, cookie_manager):
+    st.session_state.document_id = document_id
 
 def navigate_to(page, cookie_manager):
     st.session_state.page = page
@@ -152,7 +153,7 @@ def log_out(cookie_manager):
     cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
 
 
-def log_in(username, password, cookie_manager):
+def log_in(username, password, cookie_manager, verify_jwt_token, create_jwt_token):
     token = create_jwt_token(username, password)
     cookie_manager.set("t", token, key=f"set_register_jwt_cookie_{token}")
     payload = None
@@ -173,7 +174,7 @@ def log_in(username, password, cookie_manager):
     # st.rerun()
 
 
-def register(username, password, cookie_manager):
+def register(username, password, cookie_manager, verify_jwt_token, create_jwt_token):
     token = create_jwt_token(
         username, password
     )  # Reuse the JWT creation function from login
