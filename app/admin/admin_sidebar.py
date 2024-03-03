@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import datetime
-
+from db import get_filtered_predata
 from states.state_functions import (
     navigate_to,
     select,
@@ -61,11 +61,12 @@ def show_filtered_converstaions(cookie_manager):
 
         last_id = ""
         dates = []
-        if st.session_state.filters != None:
-            st.markdown(
-                f"<p>Total Conversations: {conversations_total_count}</p>",
-                unsafe_allow_html=True,
-            )
+        
+        st.markdown(
+            f"<p>Total Conversations: {conversations_total_count}</p>",
+            unsafe_allow_html=True,
+        )
+        
         # show conversations
         for conv in conversations:
             conversation_id = conv["_id"]
@@ -138,19 +139,21 @@ def show_filtered_converstaions(cookie_manager):
 def filter_by_feedback_expander(filters):
     with st.sidebar:
         with st.container(border=True):
-            with_or_without = st.selectbox(
+            with_or_without_feedback = st.selectbox(
                 "With/Without Feedback",
                 [
                     "All Chats",
                     "Only Chats With Feedback",
                     "Only Chats Without Feedback",
                 ],
+                key="with_or_without_feedback_selectbox"
             )
 
             # Update with actual sender names
             selected_senders = st.multiselect(
                 "Select Sender’s Name",
                 st.session_state.db_filter_predata["db_sender_names"],
+                key="selected_senders_multiselect",
                 default=st.session_state.filters.get("reviewer_names", []),
             )
             # Free Text Search in Review
@@ -159,31 +162,36 @@ def filter_by_feedback_expander(filters):
                 value=st.session_state.filters.get(
                     "free_text_inside_the_user_actions", None
                 ),
+                key="review_search_text_input"
             )
 
             # Rating Selections
             price_match_rating = st.multiselect(
                 "Price Match Rating",
                 ["Good", "Okay", "Bad"],
+                key="price_match_rating_multiselect",
                 default=st.session_state.filters.get("price_ratings", None),
             )
             product_match_rating = st.multiselect(
                 "Product Match Rating",
                 ["Good", "Okay", "Bad"],
+                key="product_match_rating_multiselect",
                 default=st.session_state.filters.get("product_ratings", None),
             )
             recommendation_match_rating = st.multiselect(
                 "Recommendation Match Rating",
                 ["Good", "Okay", "Bad"],
+                key="recommendation_match_rating_multiselect",
                 default=st.session_state.filters.get("demands_ratings", None),
             )
             chat_phrasing_rating = st.multiselect(
                 "Chat Phrasing Rating",
                 ["Good", "Okay", "Bad"],
+                key="chat_phrasing_rating_multiselect",
                 default=st.session_state.filters.get("phraise_ratings", None),
             )
             # Submit Advanced Filtering Button
-            filters["feedback"] = with_or_without
+            filters["feedback"] = with_or_without_feedback
             filters["reviewer_names"] = selected_senders
             filters["demands_ratings"] = recommendation_match_rating
             filters["product_ratings"] = product_match_rating
@@ -193,12 +201,12 @@ def filter_by_feedback_expander(filters):
             filters["reviewer_name"] = selected_senders
             st.button(
                 "Submit",
-                key="feedback_submit_filters_btn",
+                key="submit_feedback_filters_btn",
                 on_click=lambda: change_filtes(filters),
             )
             st.button(
                 "Basic Filtering",
-                key="By Feedback",
+                key="back_to_basic_filters_btn",
                 on_click=lambda: set_tab("Basic"),
             )
 
@@ -244,7 +252,7 @@ def basic_filter_expander(filters):
             selected_categories = st.multiselect(
                 "Select Categories",
                 options=list(categories.keys()),
-                key="categories_select",
+                key="categories_multiselect",
                 default=st.session_state.filters.get("categories", []),
             )
 
@@ -259,7 +267,7 @@ def basic_filter_expander(filters):
             selected_subcategories = st.multiselect(
                 "Select Subcategories:",
                 options=subcategories_options,
-                key="subcategories_select_in_form",
+                key="subcategories_multiselect",
                 default=st.session_state.filters.get("subcategories", []),
             )
 
@@ -270,6 +278,7 @@ def basic_filter_expander(filters):
             selected_backend_version = st.multiselect(
                 "Select backend version",
                 st.session_state.db_filter_predata["db_backend_versions"],
+                key="versions_multiselect",
                 default=st.session_state.filters.get("backend_versions", []),
             )
             # Free Text Search
@@ -278,6 +287,8 @@ def basic_filter_expander(filters):
                 value=st.session_state.filters.get(
                     "free_text_inside_the_messages", None
                 ),
+                key="search_text_input"
+
             )
             # Date Range Selection
 
@@ -305,6 +316,8 @@ def basic_filter_expander(filters):
                 max_value=st.session_state.db_filter_predata[
                     "db_first_last_dates"
                 ][1],
+                key="start_date_input"
+
             )
             end_date = st.date_input(
                 "Select End Date",
@@ -318,6 +331,8 @@ def basic_filter_expander(filters):
                 max_value=st.session_state.db_filter_predata[
                     "db_first_last_dates"
                 ][1],
+                key="end_date_input"
+
             )
 
             filters["free_text_inside_the_messages"] = search_text
@@ -341,7 +356,7 @@ def basic_filter_expander(filters):
             with col1:
                 st.button(
                     "Submit",
-                    key="submit_filters_btn",
+                    key="submit_basic_filters_btn",
                     on_click=lambda: change_filtes(filters),
                 )
 
@@ -353,7 +368,7 @@ def basic_filter_expander(filters):
                 )
             st.button(
                 "Filter By Feedback",
-                key="By Feedback",
+                key="go_to_feedback_filters_btn",
                 on_click=lambda: set_tab("By Feedback"),
             )
 
@@ -365,7 +380,7 @@ def admin_sidebar(cookie_manager):
     )
     st.sidebar.write("# Conversations")
 
-    st.sidebar.button("Change Database Collection", on_click=show_hide_collection)
+    st.sidebar.button("Change Database Collection", key="change_database_collection_btn", on_click=show_hide_collection)
 
     if st.session_state.get("show_collection_expander", False):
         with st.sidebar:
@@ -375,13 +390,14 @@ def admin_sidebar(cookie_manager):
                     [
                         "Development",
                         "Production",
-                        "Test",
+                        "Test"
                     ],
+                    key="change_database_collection_selectbox"
                 )
-                st.button("Submit", on_click=lambda: change_collection(collection))
+                st.button("Submit", key="submit_collection_btn", on_click=lambda: change_collection(collection))
 
     # Filter Button
-    st.sidebar.button("Filter Conversations", on_click=show_hide_filters)
+    st.sidebar.button("Filter Conversations", key="filter_conversations_btn", on_click=show_hide_filters)
 
     # Popup for Filtering
     if st.session_state.get("show_filter_expander", False):
@@ -395,5 +411,6 @@ def admin_sidebar(cookie_manager):
             
         if st.session_state.current_tab == "By Feedback":
             filter_by_feedback_expander(filters)
+    # print(st.session_state.filters)
             
-    show_filtered_converstaions(cookie_manager)
+    # show_filtered_converstaions(cookie_manager)

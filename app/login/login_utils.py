@@ -2,7 +2,7 @@ import os
 import jwt
 import time
 import hashlib
-import datetime
+from datetime import datetime, timedelta, timezone
 import streamlit as st
 
 SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
@@ -23,7 +23,7 @@ def create_jwt_token(username, password):
     hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
     # Token expiration time
-    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    expiration_time = datetime.now(timezone.utc) + timedelta(hours=24)
 
     # Payload with hashed password
     payload = {

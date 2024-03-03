@@ -7,9 +7,15 @@ from .admin_sidebar import admin_sidebar
 def admin_page(cookie_manager):
 
     admin_sidebar(cookie_manager)
+    selected_id = None
+    if st.session_state.selected_conversation:
+        selected_id = st.session_state.selected_conversation 
+    else:
+        if len(st.session_state.conversations) != 0:
+            st.session_state.conversations[0].get("_id", None)
 
     conv = get_selected(
-        st.session_state.selected_conversation if st.session_state.selected_conversation else st.session_state.conversations[0].get("_id", None),
+        selected_id,
         st.session_state.selected_db_collection,
         st.session_state.jwt
     )

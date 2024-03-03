@@ -67,6 +67,9 @@ def change_collection(collection):
         st.session_state.selected_db_collection = "chats-dev"
     if collection == "Production":
         st.session_state.selected_db_collection = "chats"
+    
+    st.sidebar.success(f"Show chats form {collection}")
+    
     st.session_state.selected_conversation = change_filtes(st.session_state.filters)
     st.session_state.db_filter_predata = get_filtered_predata(
         st.session_state.selected_db_collection, st.session_state.jwt
@@ -164,14 +167,21 @@ def log_in(username, password, cookie_manager, verify_jwt_token, create_jwt_toke
         st.session_state.user = username  # Store the JWT in session state
         if payload["is_admin"]:
             st.success(f"You are logged in successfully as The Admin! \n Navigate to the admin dashboard")
-            navigate_to("admin", cookie_manager)
-            
+            page = "admin"
+            st.session_state.page = page
+            st.session_state.selected_conversation = change_filtes({})
+            st.session_state.db_filter_predata = get_filtered_predata(
+                st.session_state.selected_db_collection, st.session_state.jwt
+            )
+            cookie_manager.set("page", page, key=f"set_page_cookie_{page}")
         else:
             st.success(f"You are logged in successfully as {username}")
-            navigate_to("chat", cookie_manager)
+            page = "chat"
+            st.session_state.page = page
+            cookie_manager.set("page", page, key=f"set_page_cookie_{page}")
     else:
         st.error("Log In failed. Please try again.")
-    # st.rerun()
+    st.rerun()
 
 
 def register(username, password, cookie_manager, verify_jwt_token, create_jwt_token):

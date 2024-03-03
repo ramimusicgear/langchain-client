@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import datetime
 
 from login.login_utils import verify_jwt_token
-from db import get_all_filtered, get_filtered_predata
+from db import get_all_filtered
 
 def init(cookie_manager):
     if "messages" not in st.session_state:
@@ -19,6 +19,10 @@ def init(cookie_manager):
 
     if "document_id" not in st.session_state:
         st.session_state.document_id = ""
+
+    if "conversations" not in st.session_state:
+        st.session_state.conversations = []
+
 
     # Initialize page navigation
     if "page" not in st.session_state:
@@ -127,9 +131,6 @@ def init(cookie_manager):
                 or not "db_filter_predata" in st.session_state
                 or not "filter_errors" in st.session_state
             ):
-                st.session_state.db_filter_predata = get_filtered_predata(
-                    st.session_state.selected_db_collection, st.session_state.jwt
-                )
                 conversations, total_prices, query, total_count = get_all_filtered(
                     st.session_state.filters if "filters" in st.session_state else {},
                     False,
