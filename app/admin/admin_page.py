@@ -141,3 +141,14 @@ def admin_page(cookie_manager):
                     )
                 except Exception as e:
                     pass
+
+            if st.session_state.selected_db_collection == "chats-test":
+                collection = "Test"
+            if st.session_state.selected_db_collection == "chats-dev":
+                collection = "Development"
+            if st.session_state.selected_db_collection == "chats":
+                collection = "Production"
+            
+            st.markdown(
+                f"<p>Collection: <strong>{collection}</strong></p>", unsafe_allow_html=True
+            )
