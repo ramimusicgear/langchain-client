@@ -124,7 +124,7 @@ def generate_fake_data(num_records=1000):
             "user_device": random.choice(["Desktop", "Mobile"]),
             "price": round(random.uniform(0, 500), 2),
             "start_time": start_time,
-            "end_time": start_time + timedelta(minutes=random.randint(30, 120)),
+            "backend_version": random.choice(["0.0.1", "0.0.2","0.0.3","0.0.4","0.0.5"]),
             "category": category,
             "subcategory": subcategory,
             "messages": messages,
@@ -149,7 +149,7 @@ def generate_fake_data(num_records=1000):
 if __name__ == "__main__":
     # for c in chats.find({}).limit(50):
     #     print(c["_id"])
-    fake_data = generate_fake_data(5000)  # Adjust the number of records as needed
+    fake_data = generate_fake_data(25000)  # Adjust the number of records as needed
 
     # Insert the fake data into the MongoDB collection
     result = chats.insert_many(fake_data)

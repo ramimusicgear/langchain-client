@@ -190,7 +190,9 @@ def filter_by_feedback_expander(filters):
                 key="chat_phrasing_rating_multiselect",
                 default=st.session_state.filters.get("phraise_ratings", None),
             )
+            
             # Submit Advanced Filtering Button
+            filters = st.session_state.filters
             filters["feedback"] = with_or_without_feedback
             filters["reviewer_names"] = selected_senders
             filters["demands_ratings"] = recommendation_match_rating
@@ -198,7 +200,6 @@ def filter_by_feedback_expander(filters):
             filters["price_ratings"] = price_match_rating
             filters["phraise_ratings"] = chat_phrasing_rating
             filters["free_text_inside_the_user_actions"] = review_search_text
-            filters["reviewer_name"] = selected_senders
             st.button(
                 "Submit",
                 key="submit_feedback_filters_btn",
@@ -334,7 +335,7 @@ def basic_filter_expander(filters):
                 key="end_date_input"
 
             )
-
+            filters = st.session_state.filters
             filters["free_text_inside_the_messages"] = search_text
             filters["backend_versions"] = selected_backend_version
             filters["date_range"] = [start_date, end_date]

@@ -47,4 +47,4 @@ def filter_by_collection(at):
                 for message in chat["messages"]
             )
         )
-    at.button[10]
+    at.sidebar.button("change_database_collection_btn").click().run()

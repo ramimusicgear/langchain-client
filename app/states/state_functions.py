@@ -144,6 +144,7 @@ def no_filters():
     st.session_state.conversations_total_count = total_count
     st.session_state.total_prices = total_prices
     st.session_state.show_filter_expander = False
+    st.session_state.filters = {}
 
 
 def log_out(cookie_manager):
