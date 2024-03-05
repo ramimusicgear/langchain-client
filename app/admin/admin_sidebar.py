@@ -215,163 +215,163 @@ def basic_filter_expander(filters):
     with st.sidebar:
         with st.container(border=True):
             # Category Selection
+            if st.session_state.db_filter_predata.get("db_backend_versions", None):
+                # Define the categories and sub-categories
+                categories = {
+                    "Guitars & Basses": [
+                        "Electric Guitars",
+                        "Acoustic Guitars",
+                        "Classical Guitars",
+                        "Electric Basses",
+                        "Acoustic & Semi-Acoustic Basses",
+                        "Ukuleles",
+                        "Guitar/Bass Accessories",
+                        "Bluegrass Instruments",
+                        "Strings",
+                        "Guitar & Bass Spare Parts",
+                        "Pickups",
+                        "Travel Guitars",
+                        "Misc. Stringed Instruments",
+                        "Electric Guitar Amps",
+                        "Bass Amps",
+                        "Guitar & Bass Effects",
+                        "Acoustic Guitar Amps",
+                    ],
+                    "Keys": [
+                        "Keyboards",
+                        "Keyboard Amps",
+                        "Synthesizers",
+                        "Piano Accessories",
+                        "MIDI Master Keyboards",
+                        "Stage Pianos",
+                        "Digital Pianos",
+                        "Electric Organs",
+                        "Classical Organs",
+                    ],
+                }
+                # Multi-select widget for categories
+                selected_categories = st.multiselect(
+                    "Select Categories",
+                    options=list(categories.keys()),
+                    key="categories_multiselect",
+                    default=st.session_state.filters.get("categories", []),
+                )
 
-            # Define the categories and sub-categories
-            categories = {
-                "Guitars & Basses": [
-                    "Electric Guitars",
-                    "Acoustic Guitars",
-                    "Classical Guitars",
-                    "Electric Basses",
-                    "Acoustic & Semi-Acoustic Basses",
-                    "Ukuleles",
-                    "Guitar/Bass Accessories",
-                    "Bluegrass Instruments",
-                    "Strings",
-                    "Guitar & Bass Spare Parts",
-                    "Pickups",
-                    "Travel Guitars",
-                    "Misc. Stringed Instruments",
-                    "Electric Guitar Amps",
-                    "Bass Amps",
-                    "Guitar & Bass Effects",
-                    "Acoustic Guitar Amps",
-                ],
-                "Keys": [
-                    "Keyboards",
-                    "Keyboard Amps",
-                    "Synthesizers",
-                    "Piano Accessories",
-                    "MIDI Master Keyboards",
-                    "Stage Pianos",
-                    "Digital Pianos",
-                    "Electric Organs",
-                    "Classical Organs",
-                ],
-            }
-            # Multi-select widget for categories
-            selected_categories = st.multiselect(
-                "Select Categories",
-                options=list(categories.keys()),
-                key="categories_multiselect",
-                default=st.session_state.filters.get("categories", []),
-            )
+                # Add filter options here
 
-            # Add filter options here
+                # Display subcategories based on the selected categories
+                subcategories_options = [
+                    subcategory
+                    for category in selected_categories
+                    for subcategory in categories[category]
+                ]
+                selected_subcategories = st.multiselect(
+                    "Select Subcategories:",
+                    options=subcategories_options,
+                    key="subcategories_multiselect",
+                    default=st.session_state.filters.get("subcategories", []),
+                )
 
-            # Display subcategories based on the selected categories
-            subcategories_options = [
-                subcategory
-                for category in selected_categories
-                for subcategory in categories[category]
-            ]
-            selected_subcategories = st.multiselect(
-                "Select Subcategories:",
-                options=subcategories_options,
-                key="subcategories_multiselect",
-                default=st.session_state.filters.get("subcategories", []),
-            )
+                # backend version Selection
+                backend_versions = ["0.1.1", "0.1.2"]
 
-            # backend version Selection
-            backend_versions = ["0.1.1", "0.1.2"]
+                # Update with actual backend version
+                selected_backend_version = st.multiselect(
+                    "Select backend version",
+                    st.session_state.db_filter_predata["db_backend_versions"],
+                    key="versions_multiselect",
+                    default=st.session_state.filters.get("backend_versions", []),
+                )
+                # Free Text Search
+                search_text = st.text_input(
+                    "Search Text In Messages",
+                    value=st.session_state.filters.get(
+                        "free_text_inside_the_messages", None
+                    ),
+                    key="search_text_input"
 
-            # Update with actual backend version
-            selected_backend_version = st.multiselect(
-                "Select backend version",
-                st.session_state.db_filter_predata["db_backend_versions"],
-                key="versions_multiselect",
-                default=st.session_state.filters.get("backend_versions", []),
-            )
-            # Free Text Search
-            search_text = st.text_input(
-                "Search Text In Messages",
-                value=st.session_state.filters.get(
-                    "free_text_inside_the_messages", None
-                ),
-                key="search_text_input"
+                )
+                # Date Range Selection
 
-            )
-            # Date Range Selection
+                # Simplified access to 'date_range' with fallback
+                date_range = st.session_state.filters.get("date_range", False)
+                now = datetime.now()
+                if date_range and len(date_range) > 1:
+                    start_value = date_range[0]
+                    end_value = date_range[1]
+                else:
+                    start_value = st.session_state.db_filter_predata.get(
+                        "db_first_last_dates", [datetime(2023, 12, 1)]
+                    )[0]
+                    end_value = st.session_state.db_filter_predata.get(
+                        "db_first_last_dates",
+                        [datetime(2023, 12, 1), now],
+                    )[1]
+                start_date = st.date_input(
+                    "Select Start Date",
+                    value=start_value,
+                    format="DD/MM/YYYY",
+                    min_value=st.session_state.db_filter_predata[
+                        "db_first_last_dates"
+                    ][0],
+                    max_value=st.session_state.db_filter_predata[
+                        "db_first_last_dates"
+                    ][1],
+                    key="start_date_input"
 
-            # Simplified access to 'date_range' with fallback
-            date_range = st.session_state.filters.get("date_range", False)
-            now = datetime.now()
-            if date_range and len(date_range) > 1:
-                start_value = date_range[0]
-                end_value = date_range[1]
-            else:
-                start_value = st.session_state.db_filter_predata.get(
-                    "db_first_last_dates", [datetime(2023, 12, 1)]
-                )[0]
-                end_value = st.session_state.db_filter_predata.get(
-                    "db_first_last_dates",
-                    [datetime(2023, 12, 1), now],
-                )[1]
-            start_date = st.date_input(
-                "Select Start Date",
-                value=start_value,
-                format="DD/MM/YYYY",
-                min_value=st.session_state.db_filter_predata[
-                    "db_first_last_dates"
-                ][0],
-                max_value=st.session_state.db_filter_predata[
-                    "db_first_last_dates"
-                ][1],
-                key="start_date_input"
+                )
+                end_date = st.date_input(
+                    "Select End Date",
+                    value=end_value,
+                    format="DD/MM/YYYY",
+                    min_value=st.session_state.db_filter_predata[
+                        "db_first_last_dates"
+                    ][0]
+                    if start_date is None
+                    else start_date,
+                    max_value=st.session_state.db_filter_predata[
+                        "db_first_last_dates"
+                    ][1],
+                    key="end_date_input"
 
-            )
-            end_date = st.date_input(
-                "Select End Date",
-                value=end_value,
-                format="DD/MM/YYYY",
-                min_value=st.session_state.db_filter_predata[
-                    "db_first_last_dates"
-                ][0]
-                if start_date is None
-                else start_date,
-                max_value=st.session_state.db_filter_predata[
-                    "db_first_last_dates"
-                ][1],
-                key="end_date_input"
+                )
+                filters = st.session_state.filters
+                filters["free_text_inside_the_messages"] = search_text
+                filters["backend_versions"] = selected_backend_version
+                filters["date_range"] = [start_date, end_date]
+                filters["categories"] = selected_categories
+                filters["subcategories"] = selected_subcategories
+                errors = st.session_state.get("filter_errors", [])
+                if len(errors):
+                    for error in errors:
+                        st.markdown(
+                            f'<p class="filter-errors">{error}</p>',
+                            unsafe_allow_html=True,
+                        )
+                st.markdown(
+                    f'<p style="margin:5px"></p>',
+                    unsafe_allow_html=True,
+                )
+                col1, col2 = st.columns(2)
 
-            )
-            filters = st.session_state.filters
-            filters["free_text_inside_the_messages"] = search_text
-            filters["backend_versions"] = selected_backend_version
-            filters["date_range"] = [start_date, end_date]
-            filters["categories"] = selected_categories
-            filters["subcategories"] = selected_subcategories
-            errors = st.session_state.get("filter_errors", [])
-            if len(errors):
-                for error in errors:
-                    st.markdown(
-                        f'<p class="filter-errors">{error}</p>',
-                        unsafe_allow_html=True,
+                with col1:
+                    st.button(
+                        "Submit",
+                        key="submit_basic_filters_btn",
+                        on_click=lambda: change_filtes(filters),
                     )
-            st.markdown(
-                f'<p style="margin:5px"></p>',
-                unsafe_allow_html=True,
-            )
-            col1, col2 = st.columns(2)
 
-            with col1:
+                with col2:
+                    st.button(
+                        "No Filters",
+                        key="no_filters_btn",
+                        on_click=no_filters,
+                    )
                 st.button(
-                    "Submit",
-                    key="submit_basic_filters_btn",
-                    on_click=lambda: change_filtes(filters),
+                    "Filter By Feedback",
+                    key="go_to_feedback_filters_btn",
+                    on_click=lambda: set_tab("By Feedback"),
                 )
-
-            with col2:
-                st.button(
-                    "No Filters",
-                    key="no_filters_btn",
-                    on_click=no_filters,
-                )
-            st.button(
-                "Filter By Feedback",
-                key="go_to_feedback_filters_btn",
-                on_click=lambda: set_tab("By Feedback"),
-            )
 
 def admin_sidebar(cookie_manager):
     st.sidebar.button(

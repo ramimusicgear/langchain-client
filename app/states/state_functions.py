@@ -99,7 +99,7 @@ def change_filtes(filters):
         1,
         50,
         st.session_state.selected_db_collection,
-        st.session_state.jwt,
+        st.session_state.jwt
     )
 
     if len(query["errors"]) == 0:
@@ -116,8 +116,17 @@ def change_filtes(filters):
 
     st.session_state.page_number = 1
     st.session_state.page_size = 50
-
-    return conversations[0].get("_id", None)
+    
+    
+    # Check if 'conversations' is a non-empty list
+    if conversations and isinstance(conversations, list):
+        # Check if the first item exists and is a dict
+        first_conversation = conversations[0]
+        if isinstance(first_conversation, dict):
+            # Return the '_id' if it exists, else return None
+            return first_conversation.get("_id", None)
+    # Return None if 'conversations' is empty or not a list, or if the first item is not a dict
+    return None
 
 
 def show_hide_collection():
