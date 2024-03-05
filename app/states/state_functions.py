@@ -68,7 +68,7 @@ def change_collection(collection):
     if collection == "Production":
         st.session_state.selected_db_collection = "chats"
     
-    st.sidebar.success(f"Show chats form {collection}")
+    st.sidebar.success(f'Show chats from the "{collection}" collection')
     
     st.session_state.selected_conversation = change_filtes(st.session_state.filters)
     st.session_state.db_filter_predata = get_filtered_predata(
