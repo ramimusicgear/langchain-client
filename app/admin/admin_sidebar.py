@@ -139,15 +139,17 @@ def show_filtered_converstaions(cookie_manager):
 def filter_by_feedback_expander(filters):
     with st.sidebar:
         with st.container(border=True):
+            with_or_without_feedback_options = [
+                "All Chats",
+                "Only Chats With Feedback",
+                "Only Chats Without Feedback",
+            ]
+            
             with_or_without_feedback = st.selectbox(
                 "With/Without Feedback",
-                [
-                    "All Chats",
-                    "Only Chats With Feedback",
-                    "Only Chats Without Feedback",
-                ],
+                with_or_without_feedback_options,
                 key="with_or_without_feedback_selectbox",
-                default=st.session_state.filters.get("feedback", "All Chats"),
+                index=with_or_without_feedback_options.index(st.session_state.filters.get("feedback", "All Chats"))
             )
 
             # Update with actual sender names
@@ -392,13 +394,14 @@ def admin_sidebar(cookie_manager):
     if st.session_state.get("show_collection_expander", False):
         with st.sidebar:
             with st.container(border=True):
+                collection_options = [
+                    "Development",
+                    "Production",
+                    "Test"
+                ]
                 collection = st.selectbox(
                     "Select Database Collection",
-                    [
-                        "Development",
-                        "Production",
-                        "Test"
-                    ],
+                    collection_options,
                     key="change_database_collection_selectbox"
                 )
                 st.button("Submit", key="submit_collection_btn", on_click=lambda: change_collection(collection))
