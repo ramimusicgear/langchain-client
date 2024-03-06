@@ -200,6 +200,11 @@ def filter_by_feedback_expander(filters):
             filters["price_ratings"] = price_match_rating
             filters["phraise_ratings"] = chat_phrasing_rating
             filters["free_text_inside_the_user_actions"] = review_search_text
+            print(filters)
+            print()
+            print(st.session_state.filters)
+            print()
+            print()
             st.button(
                 "Submit",
                 key="submit_feedback_filters_btn",
@@ -400,9 +405,6 @@ def admin_sidebar(cookie_manager):
     # Filter Button
     st.sidebar.button("Filter Conversations", key="filter_conversations_btn", on_click=show_hide_filters)
     show_filter_expander = st.session_state.get("show_filter_expander", False)
-    print(show_filter_expander)
-    print()
-
     # Popup for Filtering
     if show_filter_expander:
         filters = {}
