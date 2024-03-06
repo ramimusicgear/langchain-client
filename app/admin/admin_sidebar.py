@@ -208,11 +208,12 @@ def filter_by_feedback_expander(filters):
             print(st.session_state.filters)
             print()
             print()
-            st.button(
+            if st.button(
                 "Submit",
                 key="submit_feedback_filters_btn",
-                on_click=lambda: change_filtes(filters),
-            )
+                # on_click=lambda: change_filtes(filters),
+            ):
+                change_filtes(filters)
             st.button(
                 "Basic Filtering",
                 key="back_to_basic_filters_btn",
@@ -363,11 +364,12 @@ def basic_filter_expander(filters):
                 col1, col2 = st.columns(2)
 
                 with col1:
-                    st.button(
+                    if st.button(
                         "Submit",
                         key="submit_basic_filters_btn",
-                        on_click=lambda: change_filtes(filters),
-                    )
+                        # on_click=lambda: change_filtes(filters),
+                    ):
+                        change_filtes(filters)
 
                 with col2:
                     st.button(
