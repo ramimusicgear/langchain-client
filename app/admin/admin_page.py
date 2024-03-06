@@ -56,12 +56,10 @@ def admin_page(cookie_manager):
                 f"<p>Backend Version: <strong>{conv['backend_version']}</strong></p>",
                 unsafe_allow_html=True,
             )
-            st.markdown(
-                f"<p>Subcategory: <strong>{conv['subcategory']}</strong></p>",
-                unsafe_allow_html=True,
-            )
 
         except Exception as e:
+            print(conv)
+            print()
             pass
     
         try:
@@ -81,6 +79,8 @@ def admin_page(cookie_manager):
             )
 
         except Exception as e:
+            print(conv)
+            print()
             pass
 
 
@@ -167,13 +167,13 @@ def admin_page(cookie_manager):
                 except Exception as e:
                     pass
 
-            if st.session_state.selected_db_collection == "chats-test":
-                collection = "Test"
-            if st.session_state.selected_db_collection == "chats-dev":
-                collection = "Development"
-            if st.session_state.selected_db_collection == "chats":
-                collection = "Production"
-            
-            st.markdown(
-                f"<p>Collection: <strong>{collection}</strong></p>", unsafe_allow_html=True
-            )
+        if st.session_state.selected_db_collection == "chats-test":
+            collection = "Test"
+        if st.session_state.selected_db_collection == "chats-dev":
+            collection = "Development"
+        if st.session_state.selected_db_collection == "chats":
+            collection = "Production"
+        
+        st.markdown(
+            f"<p>Collection: <strong>{collection}</strong></p>", unsafe_allow_html=True
+        )

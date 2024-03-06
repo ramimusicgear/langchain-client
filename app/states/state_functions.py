@@ -70,7 +70,7 @@ def change_collection(collection):
     
     st.sidebar.success(f"Show chats from the collection - {collection}")
     
-    st.session_state.selected_conversation = change_filtes(st.session_state.filters)
+    change_filtes(st.session_state.filters)
     st.session_state.db_filter_predata = get_filtered_predata(
         st.session_state.selected_db_collection, st.session_state.jwt
     )
@@ -117,17 +117,15 @@ def change_filtes(filters):
     st.session_state.page_number = 1
     st.session_state.page_size = 50
     
-    
+
     # Check if 'conversations' is a non-empty list
     if conversations and isinstance(conversations, list):
         # Check if the first item exists and is a dict
         first_conversation = conversations[0]
         if isinstance(first_conversation, dict):
             # Return the '_id' if it exists, else return None
-            return first_conversation.get("_id", None)
-    # Return None if 'conversations' is empty or not a list, or if the first item is not a dict
-    return None
-
+            st.session_state.selected_conversation = first_conversation.get("_id", None)
+            print(first_conversation.get("_id", None))
 
 def show_hide_collection():
     if st.session_state.show_collection_expander == True:
@@ -179,7 +177,7 @@ def log_in(username, password, cookie_manager, verify_jwt_token, create_jwt_toke
             st.success(f"You are logged in successfully as The Admin! \n Navigate to the admin dashboard")
             page = "admin"
             st.session_state.page = page
-            st.session_state.selected_conversation = change_filtes({})
+            change_filtes({})
             st.session_state.db_filter_predata = get_filtered_predata(
                 st.session_state.selected_db_collection, st.session_state.jwt
             )
