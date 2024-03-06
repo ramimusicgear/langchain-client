@@ -75,6 +75,10 @@ def change_collection(collection):
     st.session_state.db_filter_predata = get_filtered_predata(
         st.session_state.selected_db_collection, st.session_state.jwt
     )
+    with_date = st.session_state.filters.get("date_range", False)
+    if with_date:
+        st.session_state.filters["date_range"] = st.session_state.db_filter_predata.get("db_first_last_dates",[])
+    
     change_filtes(st.session_state.filters)
 
 
