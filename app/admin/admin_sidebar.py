@@ -146,7 +146,8 @@ def filter_by_feedback_expander(filters):
                     "Only Chats With Feedback",
                     "Only Chats Without Feedback",
                 ],
-                key="with_or_without_feedback_selectbox"
+                key="with_or_without_feedback_selectbox",
+                default=st.session_state.filters.get("feedback", "All Chats"),
             )
 
             # Update with actual sender names
