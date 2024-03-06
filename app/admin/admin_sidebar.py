@@ -399,9 +399,10 @@ def admin_sidebar(cookie_manager):
 
     # Filter Button
     st.sidebar.button("Filter Conversations", key="filter_conversations_btn", on_click=show_hide_filters)
-
+    show_filter_expander = st.session_state.get("show_filter_expander", False)
+    print(show_filter_expander)
     # Popup for Filtering
-    if st.session_state.get("show_filter_expander", False):
+    if show_filter_expander:
         filters = {}
         st.markdown(
             '<span class="black-background"></span>',
