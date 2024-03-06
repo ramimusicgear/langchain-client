@@ -142,6 +142,7 @@ def show_hide_filters():
         st.session_state.show_filter_expander = False
     else:
         st.session_state.show_filter_expander = True
+    st.rerun()
 
 
 def no_filters():
