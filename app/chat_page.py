@@ -6,9 +6,16 @@ from datetime import datetime
 
 from login.login_utils import verify_jwt_token
 from db import update_feedback, insert_first_message, insert_message
-from states import clear_chat_history, log_out, navigate_to, add_message, set_document_id
+from states import (
+    clear_chat_history,
+    log_out,
+    navigate_to,
+    add_message,
+    set_document_id,
+)
 
 SERVER_URL = os.environ.get("SERVER_URL")
+
 
 def chat_page(TESTING, cookie_manager):
     # Navigation buttons
@@ -123,7 +130,7 @@ def chat_page(TESTING, cookie_manager):
             st.rerun()
 
     # Chat
-    
+
     # User-provided prompt
     generated_id = ObjectId()
     if prompt := st.chat_input(disabled=False):
@@ -141,7 +148,7 @@ def chat_page(TESTING, cookie_manager):
                         "sender": f"user - {str(st.session_state.ip)}",
                         "text": prompt,
                     }
-                ]
+                ],
             }
 
             if TESTING:
@@ -223,5 +230,5 @@ def chat_page(TESTING, cookie_manager):
                 category,
                 subcategory,
                 backend_version,
-                price
+                price,
             )

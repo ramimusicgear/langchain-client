@@ -20,7 +20,7 @@ db = client[MONGODB_DB]
 chat_schema = {
     "$jsonSchema": {
         "bsonType": "object",
-        "required": ["_id", "version", "start_time", "messages"  ],
+        "required": ["_id", "version", "start_time", "messages"],
         "properties": {
             "_id": {"bsonType": "objectId"},
             # user

@@ -1,6 +1,7 @@
 import time
 from ..utills import chats
 
+
 def insert_first_message(chat_document):
     retry = 0
     inserted_id = None

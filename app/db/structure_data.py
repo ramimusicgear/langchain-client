@@ -60,6 +60,7 @@ def find_best_matches_in_text(text, products, limit=3):
 
     return matches
 
+
 try:
     with open(prodcuts_data_path, "r") as f:
         products = json.load(f)

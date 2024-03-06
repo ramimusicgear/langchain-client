@@ -5,6 +5,7 @@ from datetime import datetime
 from login.login_utils import verify_jwt_token
 from db import get_all_filtered
 
+
 def init(cookie_manager):
     if "messages" not in st.session_state:
         st.session_state.messages = [
@@ -22,7 +23,6 @@ def init(cookie_manager):
 
     if "conversations" not in st.session_state:
         st.session_state.conversations = []
-
 
     # Initialize page navigation
     if "page" not in st.session_state:
@@ -72,9 +72,6 @@ def init(cookie_manager):
     if "ip" not in st.session_state:
         st.session_state.ip = ""
 
-
-
-
     # cookies
 
     if "token_loaded" not in st.session_state:
@@ -86,7 +83,6 @@ def init(cookie_manager):
     # if "messages_loaded" not in st.session_state:
     #     st.session_state.messages_loaded = False
 
-
     jwt_cookie = cookie_manager.get(cookie="t")
     page_cookie = cookie_manager.get(cookie="page")
     # messages_cookie = cookie_manager.get(cookie="messages")
@@ -95,20 +91,18 @@ def init(cookie_manager):
     #     st.session_state.messages = messages_cookie
     #     st.session_state.messages_loaded = True
 
-
     selected_conversation_cookie = cookie_manager.get(cookie="selected_conversation")
 
-    if selected_conversation_cookie and not st.session_state.selected_conversation_loaded:
-        st.session_state.selected_conversation = (
-            selected_conversation_cookie  
-        )
+    if (
+        selected_conversation_cookie
+        and not st.session_state.selected_conversation_loaded
+    ):
+        st.session_state.selected_conversation = selected_conversation_cookie
         st.session_state.selected_conversation_loaded = True
 
     if page_cookie and not st.session_state.page_loaded:
         if page_cookie != "admin":
-            st.session_state.page = (
-                page_cookie  
-            )
+            st.session_state.page = page_cookie
             st.session_state.page_loaded = True
 
     if jwt_cookie and not st.session_state.token_loaded:
@@ -137,12 +131,16 @@ def init(cookie_manager):
                     st.session_state.page_number
                     if "page_number" in st.session_state
                     else 1,
-                    st.session_state.page_size if "page_size" in st.session_state else 50,
+                    st.session_state.page_size
+                    if "page_size" in st.session_state
+                    else 50,
                 )
                 if len(query["errors"]) == 0:
                     st.session_state.conversations = conversations
                     if st.session_state.selected_conversation == None:
-                        st.session_state.selected_conversation =  conversations[0].get("_id", None)
+                        st.session_state.selected_conversation = conversations[0].get(
+                            "_id", None
+                        )
                     st.session_state.conversations_total_count = total_count
                     st.session_state.total_prices = total_prices
                     st.session_state.filter_errors = []

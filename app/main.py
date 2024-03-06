@@ -21,8 +21,11 @@ from styles.streamlit_css import add_css
 
 add_css()
 
+
 def get_manager():
     return stx.CookieManager()
+
+
 cookie_manager = get_manager()
 init(cookie_manager)
 

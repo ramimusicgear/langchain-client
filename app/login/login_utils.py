@@ -14,6 +14,7 @@ ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
 def validate_login(username, password):
     return username == ADMIN_USERNAME and password == ADMIN_PASSWORD
 
+
 def create_jwt_token(username, password):
     """
     Create a JWT token for the given username and password.

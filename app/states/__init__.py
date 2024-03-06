@@ -15,6 +15,6 @@ from .state_functions import (
     add_message,
     set_document_id,
     change_active_tab,
-    clear_chat_history
+    clear_chat_history,
 )
 from .init_state import init

@@ -13,6 +13,7 @@ from states.state_functions import (
     set_tab,
 )
 
+
 def get_help_from_color(color, selected=False):
     if color == "red":
         return f"{'selected chat - ' if selected else ''}Bad Feedback"
@@ -22,6 +23,7 @@ def get_help_from_color(color, selected=False):
         return f"{'selected chat - ' if selected else ''}Good Feedback"
     else:
         return f"{'selected chat - ' if selected else ''}No Feedback"
+
 
 def get_card_color(user_actions):
     price = user_actions.get("price", {"rating": "", "reason": ""})
@@ -53,6 +55,7 @@ def get_card_color(user_actions):
     else:
         return "gray"
 
+
 def show_filtered_converstaions(cookie_manager):
     with st.sidebar:
         conversations = st.session_state.get("conversations", [])
@@ -61,12 +64,12 @@ def show_filtered_converstaions(cookie_manager):
 
         last_id = ""
         dates = []
-        
+
         st.markdown(
             f"<p>Total Conversations: {conversations_total_count}</p>",
             unsafe_allow_html=True,
         )
-        
+
         # show conversations
         for conv in conversations:
             conversation_id = conv["_id"]
@@ -125,7 +128,9 @@ def show_filtered_converstaions(cookie_manager):
                     first_message_text,
                     help=get_help_from_color(card_color),
                     key=f"{conversation_id}_btn",
-                    on_click=lambda cid=conversation_id: select(str(cid), cookie_manager),
+                    on_click=lambda cid=conversation_id: select(
+                        str(cid), cookie_manager
+                    ),
                 )
 
         # Check if the user has scrolled to the bottom then Add a "Load More" button at the end
@@ -136,6 +141,7 @@ def show_filtered_converstaions(cookie_manager):
         if len(conversations) != conversations_total_count:
             st.button("Load More", on_click=increase_page_number)
 
+
 def filter_by_feedback_expander(filters):
     with st.sidebar:
         with st.container(border=True):
@@ -144,12 +150,14 @@ def filter_by_feedback_expander(filters):
                 "Only Chats With Feedback",
                 "Only Chats Without Feedback",
             ]
-            
+
             with_or_without_feedback = st.selectbox(
                 "With/Without Feedback",
                 with_or_without_feedback_options,
                 key="with_or_without_feedback_selectbox",
-                index=with_or_without_feedback_options.index(st.session_state.filters.get("feedback", "All Chats"))
+                index=with_or_without_feedback_options.index(
+                    st.session_state.filters.get("feedback", "All Chats")
+                ),
             )
 
             # Update with actual sender names
@@ -165,7 +173,7 @@ def filter_by_feedback_expander(filters):
                 value=st.session_state.filters.get(
                     "free_text_inside_the_user_actions", None
                 ),
-                key="review_search_text_input"
+                key="review_search_text_input",
             )
 
             # Rating Selections
@@ -193,7 +201,7 @@ def filter_by_feedback_expander(filters):
                 key="chat_phrasing_rating_multiselect",
                 default=st.session_state.filters.get("phraise_ratings", None),
             )
-            
+
             # Submit Advanced Filtering Button
             filters = st.session_state.filters
             filters["feedback"] = with_or_without_feedback
@@ -219,6 +227,7 @@ def filter_by_feedback_expander(filters):
                 key="back_to_basic_filters_btn",
                 on_click=lambda: set_tab("Basic"),
             )
+
 
 def basic_filter_expander(filters):
     with st.sidebar:
@@ -297,8 +306,7 @@ def basic_filter_expander(filters):
                     value=st.session_state.filters.get(
                         "free_text_inside_the_messages", None
                     ),
-                    key="search_text_input"
-
+                    key="search_text_input",
                 )
                 # Date Range Selection
 
@@ -320,29 +328,27 @@ def basic_filter_expander(filters):
                     "Select Start Date",
                     value=start_value,
                     format="DD/MM/YYYY",
-                    min_value=st.session_state.db_filter_predata[
-                        "db_first_last_dates"
-                    ][0],
-                    max_value=st.session_state.db_filter_predata[
-                        "db_first_last_dates"
-                    ][1],
-                    key="start_date_input"
-
+                    min_value=st.session_state.db_filter_predata["db_first_last_dates"][
+                        0
+                    ],
+                    max_value=st.session_state.db_filter_predata["db_first_last_dates"][
+                        1
+                    ],
+                    key="start_date_input",
                 )
                 end_date = st.date_input(
                     "Select End Date",
                     value=end_value,
                     format="DD/MM/YYYY",
-                    min_value=st.session_state.db_filter_predata[
-                        "db_first_last_dates"
-                    ][0]
+                    min_value=st.session_state.db_filter_predata["db_first_last_dates"][
+                        0
+                    ]
                     if start_date is None
                     else start_date,
-                    max_value=st.session_state.db_filter_predata[
-                        "db_first_last_dates"
-                    ][1],
-                    key="end_date_input"
-
+                    max_value=st.session_state.db_filter_predata["db_first_last_dates"][
+                        1
+                    ],
+                    key="end_date_input",
                 )
                 filters = st.session_state.filters
                 filters["free_text_inside_the_messages"] = search_text
@@ -383,6 +389,7 @@ def basic_filter_expander(filters):
                     on_click=lambda: set_tab("By Feedback"),
                 )
 
+
 def admin_sidebar(cookie_manager):
     st.sidebar.button(
         "Back to Chat",
@@ -391,25 +398,34 @@ def admin_sidebar(cookie_manager):
     )
     st.sidebar.write("# Conversations")
 
-    st.sidebar.button("Change Database Collection", key="change_database_collection_btn", on_click=show_hide_collection)
+    st.sidebar.button(
+        "Change Database Collection",
+        key="change_database_collection_btn",
+        on_click=show_hide_collection,
+    )
 
     if st.session_state.get("show_collection_expander", False):
         with st.sidebar:
             with st.container(border=True):
-                collection_options = [
-                    "Development",
-                    "Production",
-                    "Test"
-                ]
+                collection_options = ["Development", "Production", "Test"]
                 collection = st.selectbox(
                     "Select Database Collection",
                     collection_options,
-                    key="change_database_collection_selectbox"
+                    key="change_database_collection_selectbox",
                 )
-                st.button("Submit", key="submit_collection_btn", on_click=lambda: change_collection(collection))
+                if st.button(
+                    "Submit",
+                    key="submit_collection_btn",
+                    #   on_click=lambda: change_collection(collection)
+                ):
+                    change_collection(collection)
 
     # Filter Button
-    st.sidebar.button("Filter Conversations", key="filter_conversations_btn", on_click=show_hide_filters)
+    st.sidebar.button(
+        "Filter Conversations",
+        key="filter_conversations_btn",
+        on_click=show_hide_filters,
+    )
     show_filter_expander = st.session_state.get("show_filter_expander", False)
     # Popup for Filtering
     if show_filter_expander:
@@ -420,8 +436,8 @@ def admin_sidebar(cookie_manager):
         )
         if st.session_state.current_tab == "Basic":
             basic_filter_expander(filters)
-            
+
         if st.session_state.current_tab == "By Feedback":
             filter_by_feedback_expander(filters)
-            
+
     show_filtered_converstaions(cookie_manager)

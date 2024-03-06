@@ -4,20 +4,18 @@ from db import get_selected
 
 from .admin_sidebar import admin_sidebar
 
-def admin_page(cookie_manager):
 
+def admin_page(cookie_manager):
     admin_sidebar(cookie_manager)
     selected_id = None
     if st.session_state.selected_conversation:
-        selected_id = st.session_state.selected_conversation 
+        selected_id = st.session_state.selected_conversation
     else:
         if len(st.session_state.conversations) != 0:
             st.session_state.conversations[0].get("_id", None)
 
     conv = get_selected(
-        selected_id,
-        st.session_state.selected_db_collection,
-        st.session_state.jwt
+        selected_id, st.session_state.selected_db_collection, st.session_state.jwt
     )
     if conv is None:
         st.write("### Please select a conversation")
@@ -47,7 +45,7 @@ def admin_page(cookie_manager):
 
         try:
             conv["backend_version"] = (
-                conv['backend_version']
+                conv["backend_version"]
                 if conv["backend_version"] != ""
                 else "No Backend Version..."
             )
@@ -59,10 +57,10 @@ def admin_page(cookie_manager):
 
         except Exception as e:
             pass
-    
+
         try:
             conv["category"] = (
-                conv['category']
+                conv["category"]
                 if conv["category"] != ""
                 else "Backend didn't provide the categories"
             )
@@ -84,7 +82,6 @@ def admin_page(cookie_manager):
 
         except Exception as e:
             pass
-
 
         try:
             conv["price"]

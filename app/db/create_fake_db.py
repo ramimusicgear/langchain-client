@@ -124,7 +124,9 @@ def generate_fake_data(num_records=1000):
             "user_device": random.choice(["Desktop", "Mobile"]),
             "price": round(random.uniform(0, 500), 2),
             "start_time": start_time,
-            "backend_version": random.choice(["0.0.1", "0.0.2","0.0.3","0.0.4","0.0.5"]),
+            "backend_version": random.choice(
+                ["0.0.1", "0.0.2", "0.0.3", "0.0.4", "0.0.5"]
+            ),
             "category": category,
             "subcategory": subcategory,
             "messages": messages,

@@ -4,6 +4,7 @@ from test_collection import filter_by_collection
 from test_basic_filters import filter_by_basic_filters
 from test_combine_filters import filter_by_combine_filters
 
+
 def login_as_admin(at):
     # go to login page
     at.sidebar.button("to_login_btn").click().run(timeout=10)
@@ -16,6 +17,7 @@ def login_as_admin(at):
 
     return at
 
+
 @pytest.mark.test_id("Test1")
 def test_all():
     # Initialize the Streamlit app for testing from a file
@@ -24,5 +26,6 @@ def test_all():
     filter_by_collection(at)
     # filter_by_basic_filters(at)
     filter_by_combine_filters(at)
+
 
 test_all()

@@ -3,6 +3,7 @@ import streamlit as st
 from states.state_functions import navigate_to, log_in, register
 from login.login_utils import verify_jwt_token, create_jwt_token
 
+
 def login_page(cookie_manager):
     st.sidebar.button(
         "Back to Chat",
@@ -22,12 +23,11 @@ def login_page(cookie_manager):
     f = st.form("LoginForm", clear_on_submit=False, border=True)
     username = f.text_input("Enter Your Username:", key="username")
 
-    password = f.text_input(
-        "Enter Your Password:", type="password", key="password"
-    )
+    password = f.text_input("Enter Your Password:", type="password", key="password")
     submit = f.form_submit_button("Login")
     if submit:
         log_in(username, password, cookie_manager, verify_jwt_token, create_jwt_token)
+
 
 def registration_page(cookie_manager):
     st.sidebar.button(
@@ -54,4 +54,10 @@ def registration_page(cookie_manager):
 
     submit = f.form_submit_button("Register")
     if submit:
-        register(new_username, new_password, cookie_manager, verify_jwt_token, create_jwt_token)
+        register(
+            new_username,
+            new_password,
+            cookie_manager,
+            verify_jwt_token,
+            create_jwt_token,
+        )

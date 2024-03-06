@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 def add_css():
     # Inject custom CSS to remove form borders using data-testid attribute
     st.markdown(

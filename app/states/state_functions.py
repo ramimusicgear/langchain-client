@@ -5,7 +5,6 @@ from datetime import datetime
 from db import get_all_filtered, get_filtered_predata
 
 
-
 # Function to set the current tab
 def set_tab(tab_name):
     st.session_state.current_tab = tab_name
@@ -32,12 +31,15 @@ def clear_all_cookies(cookie_manager):
     except Exception as e:
         pass
 
+
 def add_message(message, cookie_manager):
     st.session_state.messages.append(message)
     # cookie_manager.set("messages", json.dumps(st.session_state.messages), key=f"set_messages_cookie_{message}")
 
+
 def set_document_id(document_id, cookie_manager):
     st.session_state.document_id = document_id
+
 
 def navigate_to(page, cookie_manager):
     st.session_state.page = page
@@ -67,9 +69,9 @@ def change_collection(collection):
         st.session_state.selected_db_collection = "chats-dev"
     if collection == "Production":
         st.session_state.selected_db_collection = "chats"
-    
+
     st.sidebar.success(f"Show chats from the collection - {collection}")
-    
+
     st.session_state.db_filter_predata = get_filtered_predata(
         st.session_state.selected_db_collection, st.session_state.jwt
     )
@@ -99,7 +101,7 @@ def change_filtes(filters):
         1,
         50,
         st.session_state.selected_db_collection,
-        st.session_state.jwt
+        st.session_state.jwt,
     )
 
     if len(query["errors"]) == 0:
@@ -116,7 +118,6 @@ def change_filtes(filters):
 
     st.session_state.page_number = 1
     st.session_state.page_size = 50
-    
 
     # Check if 'conversations' is a non-empty list
     if conversations and isinstance(conversations, list):
@@ -127,6 +128,7 @@ def change_filtes(filters):
             st.session_state.selected_conversation = first_conversation.get("_id", None)
             print(first_conversation.get("_id", None))
     st.rerun()
+
 
 def show_hide_collection():
     if st.session_state.show_collection_expander == True:
@@ -175,7 +177,9 @@ def log_in(username, password, cookie_manager, verify_jwt_token, create_jwt_toke
         st.session_state.jwt = token  # Store the JWT in session state
         st.session_state.user = username  # Store the JWT in session state
         if payload["is_admin"]:
-            st.success(f"You are logged in successfully as The Admin! \n Navigate to the admin dashboard")
+            st.success(
+                f"You are logged in successfully as The Admin! \n Navigate to the admin dashboard"
+            )
             page = "admin"
             st.session_state.page = page
             change_filtes({})

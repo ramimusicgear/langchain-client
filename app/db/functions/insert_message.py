@@ -23,7 +23,7 @@ def insert_message(
                         "$push": {"messages": new_message},
                         "$set": {
                             "backend_version": backend_version,
-                        }
+                        },
                     }
                 else:
                     mutation = {
@@ -35,12 +35,9 @@ def insert_message(
                             "backend_version": backend_version,
                         },
                     }
-                    
-                update_result = chats.update_one(
-                    {"_id": document_id},
-                    mutation                    
-                )
-                
+
+                update_result = chats.update_one({"_id": document_id}, mutation)
+
             # Check if the update was successful
             if update_result.modified_count > 0:
                 break
