@@ -47,9 +47,9 @@ def admin_page(cookie_manager):
 
         try:
             conv["backend_version"] = (
-                f"{conv['backend_version']} - "
+                conv['backend_version']
                 if conv["backend_version"] != ""
-                else "No Backend Version"
+                else "No Backend Version..."
             )
             st.write("## Backend Version")
             st.markdown(
@@ -64,19 +64,25 @@ def admin_page(cookie_manager):
     
         try:
             conv["category"] = (
-                f"{conv['category']} - "
+                conv['category']
                 if conv["category"] != ""
                 else "Backend didn't provide the categories"
             )
             st.write("## categories")
-            st.markdown(
-                f"<p>Category: <strong>{conv['category']}</strong></p>",
-                unsafe_allow_html=True,
-            )
-            st.markdown(
-                f"<p>Subcategory: <strong>{conv['subcategory']}</strong></p>",
-                unsafe_allow_html=True,
-            )
+            if conv["category"] == "Backend didn't provide the categories":
+                st.markdown(
+                    f"<p><strong>{conv['category']}</strong></p>",
+                    unsafe_allow_html=True,
+                )
+            else:
+                st.markdown(
+                    f"<p>Category: <strong>{conv['category']}</strong></p>",
+                    unsafe_allow_html=True,
+                )
+                st.markdown(
+                    f"<p>Subcategory: <strong>{conv['subcategory']}</strong></p>",
+                    unsafe_allow_html=True,
+                )
 
         except Exception as e:
             print(conv)
@@ -150,8 +156,11 @@ def admin_page(cookie_manager):
                 st.markdown(
                     f"<p>{conv['user_actions']['other']}</p>", unsafe_allow_html=True
                 )
-
-                st.write(f"### The Feedback Is From - {conv['user_actions']['name']}")
+                st.write("##### The Feedback Is From:")
+                st.markdown(
+                    f"<p>{conv['user_actions']['name']}</p>",
+                    unsafe_allow_html=True,
+                )
             except Exception as e:
                 try:
                     conv["user_actions"]["feedback_text"]
@@ -160,9 +169,10 @@ def admin_page(cookie_manager):
                         f"<p>{conv['user_actions']['feedback_text']}</p>",
                         unsafe_allow_html=True,
                     )
-
-                    st.write(
-                        f"### The Feedback Is From - {conv['user_actions']['sender']}"
+                    st.write("##### The Feedback Is From:")
+                    st.markdown(
+                        f"<p>{conv['user_actions']['sender']}</p>",
+                        unsafe_allow_html=True,
                     )
                 except Exception as e:
                     pass
@@ -173,7 +183,8 @@ def admin_page(cookie_manager):
             collection = "Development"
         if st.session_state.selected_db_collection == "chats":
             collection = "Production"
-        
+        st.write("##### Collection")
         st.markdown(
-            f"<p>Collection: <strong>{collection}</strong></p>", unsafe_allow_html=True
+            f"<p>{collection}</p>",
+            unsafe_allow_html=True,
         )
