@@ -401,6 +401,8 @@ def admin_sidebar(cookie_manager):
     st.sidebar.button("Filter Conversations", key="filter_conversations_btn", on_click=show_hide_filters)
     show_filter_expander = st.session_state.get("show_filter_expander", False)
     print(show_filter_expander)
+    print()
+
     # Popup for Filtering
     if show_filter_expander:
         filters = {}

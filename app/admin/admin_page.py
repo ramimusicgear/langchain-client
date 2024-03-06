@@ -58,8 +58,6 @@ def admin_page(cookie_manager):
             )
 
         except Exception as e:
-            print(conv)
-            print()
             pass
     
         try:
@@ -85,8 +83,6 @@ def admin_page(cookie_manager):
                 )
 
         except Exception as e:
-            print(conv)
-            print()
             pass
 
 
