@@ -70,10 +70,10 @@ def change_collection(collection):
     
     st.sidebar.success(f"Show chats from the collection - {collection}")
     
-    change_filtes(st.session_state.filters)
     st.session_state.db_filter_predata = get_filtered_predata(
         st.session_state.selected_db_collection, st.session_state.jwt
     )
+    change_filtes(st.session_state.filters)
 
 
 def increase_page_number():
@@ -126,6 +126,7 @@ def change_filtes(filters):
             # Return the '_id' if it exists, else return None
             st.session_state.selected_conversation = first_conversation.get("_id", None)
             print(first_conversation.get("_id", None))
+    st.rerun()
 
 def show_hide_collection():
     if st.session_state.show_collection_expander == True:
