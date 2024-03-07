@@ -1,7 +1,6 @@
 import re
 import traceback
-from datetime import datetime
-from datetime import date as datetime_date
+from datetime import datetime, timedelta, date as datetime_date
 
 from ..utills import verify_jwt_token, db, MONGODB_COLLECTION
 
@@ -169,6 +168,8 @@ def get_all_filtered(
 
                 start_date = datetime(start_date.year, start_date.month, start_date.day)
                 end_date = datetime(end_date.year, end_date.month, end_date.day)
+                end_date = end_date + timedelta(days=1)
+
 
                 query["start_time"] = {"$gte": start_date, "$lte": end_date}
             else:
@@ -219,7 +220,7 @@ def get_all_filtered(
         skip_count = (page_number - 1) * page_size
         limit_count = page_size
         query_db = {key: value for key, value in query.items() if key != "errors"}
-
+        
         pipeline = [
             {
                 "$match": query_db  # Ensure this matches the filter criteria you want to apply before aggregation

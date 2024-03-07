@@ -426,7 +426,7 @@ def admin_sidebar(cookie_manager):
     show_filter_expander = st.session_state.get("show_filter_expander", False)
     # Popup for Filtering
     if show_filter_expander:
-        filters = {}
+        filters = st.session_state.filters
         st.markdown(
             '<span class="black-background"></span>',
             unsafe_allow_html=True,
