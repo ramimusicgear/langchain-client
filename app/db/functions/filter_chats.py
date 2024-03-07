@@ -193,7 +193,7 @@ def get_all_filtered(
         if feedback == "Only Chats With Feedback":
             query["user_actions"] = {"$exists": True}
 
-        elif feedback == "Only Chats Without Feedback":
+        if feedback == "Only Chats Without Feedback":
             query["user_actions"] = {"$exists": False}
         else:
             if reviewer_names:
