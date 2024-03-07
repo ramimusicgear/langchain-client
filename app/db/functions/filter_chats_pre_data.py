@@ -2,6 +2,7 @@ from ..utills import verify_jwt_token, db
 
 
 def get_filtered_predata(selected_db_collection, jwt):
+    print("worked")
     payload = verify_jwt_token(jwt)
     if not payload or not payload["is_admin"]:
         return {

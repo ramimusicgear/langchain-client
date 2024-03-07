@@ -1,5 +1,5 @@
+import os
 import streamlit as st
-import json
 from datetime import datetime
 
 from db import get_all_filtered, get_filtered_predata
@@ -23,13 +23,23 @@ def clear_all_cookies(cookie_manager):
     st.session_state.user = None
     st.session_state.selected_conversation = None
     st.session_state.page = "chat"
+
+    st.session_state.token_loaded = False
+    st.session_state.page_loaded = False
+    st.session_state.selected_conversation_loaded = False
+
     # cookie_manager.set("messages",json.dumps([{"role": "assistant", "content": "Hey my name is Rami, How may I assist you today?"}]), key=f"set_messages_cookie_first")
+    cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     try:
         cookie_manager.delete("t", key=f"del_selected_token")
-        cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
-        cookie_manager.set("page", "chat", key=f"set_page_cookie_chat")
     except Exception as e:
         pass
+
+    try:
+        cookie_manager.delete("selected_conversation", key=f"del_selected_conversation")
+    except Exception as e:
+        pass
+    st.rerun()
 
 
 def add_message(message, cookie_manager):
@@ -77,8 +87,10 @@ def change_collection(collection):
     )
     with_date = st.session_state.filters.get("date_range", False)
     if with_date:
-        st.session_state.filters["date_range"] = st.session_state.db_filter_predata.get("db_first_last_dates",[])
-    
+        st.session_state.filters["date_range"] = st.session_state.db_filter_predata.get(
+            "db_first_last_dates", []
+        )
+
     change_filtes(st.session_state.filters)
 
 
@@ -97,7 +109,9 @@ def increase_page_number():
     st.session_state.page_number += 1
 
 
-def change_filtes(filters):
+def change_filtes(filters, with_rerun=True, jwt=None):
+    if jwt == None:
+        jwt = st.session_state.jwt
     st.session_state.filters = filters
     conversations, total_prices, query, total_count = get_all_filtered(
         filters,
@@ -105,7 +119,7 @@ def change_filtes(filters):
         1,
         50,
         st.session_state.selected_db_collection,
-        st.session_state.jwt,
+        jwt,
     )
 
     if len(query["errors"]) == 0:
@@ -130,8 +144,8 @@ def change_filtes(filters):
         if isinstance(first_conversation, dict):
             # Return the '_id' if it exists, else return None
             st.session_state.selected_conversation = first_conversation.get("_id", None)
-            print(first_conversation.get("_id", None))
-    st.rerun()
+    if with_rerun:
+        st.rerun()
 
 
 def show_hide_collection():
@@ -186,11 +200,14 @@ def log_in(username, password, cookie_manager, verify_jwt_token, create_jwt_toke
                 f"You are logged in successfully as The Admin! \n Navigate to the admin dashboard"
             )
             page = "admin"
-            st.session_state.page = page
-            change_filtes({})
+            change_filtes({}, False, token)
             st.session_state.db_filter_predata = get_filtered_predata(
-                st.session_state.selected_db_collection, st.session_state.jwt
+                st.session_state.selected_db_collection
+                if "selected_db_collection" in st.session_state
+                else os.environ.get("MONGODB_COLLECTION"),
+                token,
             )
+            st.session_state.page = page
             cookie_manager.set("page", page, key=f"set_page_cookie_{page}")
         else:
             st.success(f"You are logged in successfully as {username}")

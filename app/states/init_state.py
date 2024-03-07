@@ -3,7 +3,7 @@ import streamlit as st
 from datetime import datetime
 
 from login.login_utils import verify_jwt_token
-from db import get_all_filtered
+from db import get_all_filtered, get_filtered_predata
 
 
 def init(cookie_manager):
@@ -110,11 +110,6 @@ def init(cookie_manager):
         if jwt_cookie:
             payload = verify_jwt_token(jwt_cookie, False)
         if payload:
-            if page_cookie and not st.session_state.page_loaded:
-                if not payload["is_admin"] and page_cookie == "admin":
-                    page_cookie == "chat"
-                st.session_state.page = page_cookie  # Store the JWT in session state
-                st.session_state.page_loaded = True
             st.session_state.user = payload["user"]
             st.session_state.jwt = jwt_cookie
             st.session_state.token_loaded = True
@@ -134,13 +129,30 @@ def init(cookie_manager):
                     st.session_state.page_size
                     if "page_size" in st.session_state
                     else 50,
+                    st.session_state.selected_db_collection
+                    if "selected_db_collection" in st.session_state
+                    else os.environ.get("MONGODB_COLLECTION"),
+                    st.session_state.jwt if "jwt" in st.session_state else jwt_cookie,
+                )
+                st.session_state.db_filter_predata = get_filtered_predata(
+                    st.session_state.selected_db_collection
+                    if "selected_db_collection" in st.session_state
+                    else os.environ.get("MONGODB_COLLECTION"),
+                    st.session_state.jwt if "jwt" in st.session_state else jwt_cookie,
                 )
                 if len(query["errors"]) == 0:
                     st.session_state.conversations = conversations
                     if st.session_state.selected_conversation == None:
-                        st.session_state.selected_conversation = conversations[0].get(
-                            "_id", None
-                        )
+                        # Check if 'conversations' is a non-empty list
+                        if conversations and isinstance(conversations, list):
+                            # Check if the first item exists and is a dict
+                            first_conversation = conversations[0]
+                            if isinstance(first_conversation, dict):
+                                # Return the '_id' if it exists, else return None
+                                st.session_state.selected_conversation = (
+                                    first_conversation.get("_id", None)
+                                )
+
                     st.session_state.conversations_total_count = total_count
                     st.session_state.total_prices = total_prices
                     st.session_state.filter_errors = []
@@ -149,3 +161,10 @@ def init(cookie_manager):
                     st.session_state.conversations_total_count = 0
                     st.session_state.total_prices = []
                     st.session_state.filter_errors = query["errors"]
+
+            if page_cookie and not st.session_state.page_loaded:
+                if not payload["is_admin"] and page_cookie == "admin":
+                    page_cookie == "chat"
+
+                st.session_state.page = page_cookie  # Store the JWT in session state
+                st.session_state.page_loaded = True
