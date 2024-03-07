@@ -211,11 +211,6 @@ def filter_by_feedback_expander(filters):
             filters["price_ratings"] = price_match_rating
             filters["phraise_ratings"] = chat_phrasing_rating
             filters["free_text_inside_the_user_actions"] = review_search_text
-            print(filters)
-            print()
-            print(st.session_state.filters)
-            print()
-            print()
             if st.button(
                 "Submit",
                 key="submit_feedback_filters_btn",
