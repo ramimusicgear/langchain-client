@@ -13,7 +13,31 @@ def get_all_filtered(
     selected_db_collection=MONGODB_COLLECTION,
     jwt=None,
 ):
+    """
+    Retrieves filtered chats from a selected MongoDB collection based on various filters provided.
+
+    This function supports filtering by backend versions, categories, subcategories, free text inside messages,
+    date range, feedback, reviewer names, and ratings on price, product, demands, and phraise. It also supports
+    pagination and JWT-based admin access verification.
+
+    Parameters:
+    - filter (dict): A dictionary containing all the filters to apply.
+    - test (bool): A flag to indicate if the function is being called in a test environment. Default is False.
+    - page_number (int): The page number for pagination. Default is 1.
+    - page_size (int): The number of items per page for pagination. Default is 50.
+    - selected_db_collection (str): The MongoDB collection from which to retrieve the data. Default is MONGODB_COLLECTION.
+    - jwt (str, optional): A JWT token for admin access verification.
+
+    Returns:
+    - (list, dict, dict, int): A tuple containing the list of conversations, total prices by date,
+                                any query errors, and the total count of conversations matching the filters.
+
+    Raises:
+    - ValueError: If there's a value error during processing.
+    - Exception: For any other exceptions that occur during processing.
+    """
     if not test and jwt:
+        # Verifies the JWT token and checks if the user is an admin.
         payload = verify_jwt_token(jwt)
         if not payload or not payload["is_admin"]:
             return [], {}, {"errors": ["not admin"]}, 0
@@ -205,22 +229,22 @@ def get_all_filtered(
                 query["user_actions.feedback"] = {"$regex": regex}
 
             if price_ratings is not None:
-                query["user_actions.price.rating"] = price_ratings
+                query["user_actions.price.rating"] = {"$in": price_ratings}
 
             if product_ratings is not None:
-                query["user_actions.product.rating"] = product_ratings
+                query["user_actions.product.rating"] = {"$in": product_ratings}
 
             if demands_ratings is not None:
-                query["user_actions.demands.rating"] = demands_ratings
+                query["user_actions.demands.rating"] = {"$in": demands_ratings}
 
             if phraise_ratings is not None:
-                query["user_actions.phraise.rating"] = phraise_ratings
+                query["user_actions.phraise.rating"] = {"$in": phraise_ratings}
 
         # Pagination logic
         skip_count = (page_number - 1) * page_size
         limit_count = page_size
         query_db = {key: value for key, value in query.items() if key != "errors"}
-        
+
         pipeline = [
             {
                 "$match": query_db  # Ensure this matches the filter criteria you want to apply before aggregation
